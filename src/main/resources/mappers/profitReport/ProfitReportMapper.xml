@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.whomade.planfAi.profitReport.mapper.ProfitReportMapper">
+
+    <insert id="insertReport" parameterType="ProfitVo" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO profit_reports (user_no, report_data, created_at)
+        VALUES (#{userNo}, #{reportData}, NOW())
+    </insert>
+
+    <select id="selectReportsByUserNo" parameterType="long" resultType="ProfitVo">
+        SELECT id, user_no, report_data, created_at
+        FROM profit_reports
+        WHERE user_no = #{userNo}
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="selectUserNoByEmail" parameterType="string" resultType="long">
+        SELECT user_no FROM tb_user WHERE email = #{email}
+    </select>
+
+    <insert id="insertUser">
+        INSERT INTO tb_user (email, password, user_name, created_at)
+        VALUES (#{email}, #{password}, #{userName}, NOW())
+    </insert>
+
+</mapper>
