@@ -2,9 +2,9 @@ spring:
   application:
     name: planfAi
   datasource:
-    url: jdbc:mysql://localhost:3306/planfai?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-    username: root
-    password:
+    url: jdbc:mysql://52.231.229.156:3306/planfai
+    username: planfai
+    password: Cms@1q2w3e
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 mybatis:
