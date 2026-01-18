@@ -35,4 +35,7 @@ target/
 
 ### Mac OS ###
 .DS_Store
+
+### yml ###
+src/main/resources/application-dev.yml
 src/main/resources/application-*.yml
