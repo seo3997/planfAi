@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PlanfAi - Revenue Analysis</title>
+    <title>PlanfAi - 소상공인 수익 분석</title>
     
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -17,206 +17,481 @@
     <!-- CDN Dependencies -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/common/common.js"></script>
 </head>
 <body>
 
 <div id="app" class="container">
     <div class="glass-container">
+        <!-- Header -->
         <header class="d-flex justify-content-between align-items-center mb-5">
             <div>
                 <h1 class="display-5 mb-0" style="background: linear-gradient(to right, #6366f1, #ec4899); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">PlanfAi</h1>
-                <p class="text-muted lead">Smart Revenue Analysis for Small Business</p>
+                <p class="text-muted lead">소상공인 스마트 수익 분석 시스템</p>
             </div>
-            <div class="text-end">
-                <span class="badge bg-light text-dark shadow-sm p-2 rounded-pill">
-                    <i class="me-1">📅</i> {{ currentDate }}
-                </span>
+            <div class="d-flex gap-2">
+                 <div class="input-group">
+                    <span class="input-group-text bg-white">ID</span>
+                    <input type="text" class="form-control" v-model="userEmail" placeholder="이메일 입력">
+                 </div>
+                 <button class="btn btn-outline-primary" @click="loadReports">불러오기</button>
             </div>
         </header>
 
-        <ul class="nav nav-pills mb-4" id="pills-tab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active rounded-pill px-4 me-2" :class="{ 'bg-primary text-white': currentTab === 'analysis' }" @click="currentTab = 'analysis'">
-                    Analysis
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link rounded-pill px-4" :class="{ 'bg-primary text-white': currentTab === 'reports' }" @click="loadReports(); currentTab = 'reports'">
-                    Saved Reports
-                </button>
-            </li>
-        </ul>
-
-        <div v-if="currentTab === 'analysis'" class="fade-in">
-
-            <div class="text-center">
-                <div class="mode-switch">
-                    <button :class="{ active: analysisMode === 'simple' }" @click="analysisMode = 'simple'">Simple Mode</button>
-                    <button :class="{ active: analysisMode === 'expert' }" @click="analysisMode = 'expert'">Expert Mode</button>
-                </div>
-            </div>
-
-            <div class="row g-4">
-                <!-- Data Input Section -->
-                <div class="col-lg-4">
-                    <div class="card border-0 shadow-sm h-100" style="border-radius: 16px;">
-                        <div class="card-body p-4">
-                            <h4 class="card-title mb-4 text-primary">Input Data</h4>
-                            
-                            <div class="mb-3">
-                                <label class="form-label text-muted small fw-bold">User Email (ID)</label>
-                                <input type="text" class="form-control" v-model="form.userId" placeholder="Enter your Email">
-                            </div>
-
-                            <hr class="my-4" style="opacity: 0.1">
-
-                            <div class="mb-3">
-                                <label class="form-label text-muted small fw-bold">Total Revenue</label>
-                                <div class="input-group">
-                                    <span class="input-group-text border-0 bg-light">₩</span>
-                                    <input type="number" class="form-control" v-model.number="form.revenue" placeholder="0">
-                                </div>
-                            </div>
-
-                            <!-- Inputs common for both, but maybe highlighted differently in expert -->
-                            <div class="mb-3">
-                                <label class="form-label text-muted small fw-bold">Fixed Costs</label>
-                                <div class="input-group">
-                                    <span class="input-group-text border-0 bg-light">₩</span>
-                                    <input type="number" class="form-control" v-model.number="form.fixedCost" placeholder="0">
-                                </div>
-                                <div class="form-text">Rent, Salaries, etc.</div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label text-muted small fw-bold">Variable Costs</label>
-                                <div class="input-group">
-                                    <span class="input-group-text border-0 bg-light">₩</span>
-                                    <input type="number" class="form-control" v-model.number="form.variableCost" placeholder="0">
-                                </div>
-                                <div class="form-text">Materials, etc.</div>
-                            </div>
-
-                             <button class="btn btn-premium w-100 mt-4" @click="saveReport" :disabled="!isFormValid || isSaving">
-                                <span v-if="isSaving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                {{ isSaving ? 'Saving...' : 'Save Report' }}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Live Preview Section -->
-                <div class="col-lg-8">
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-4">
-                            <div class="stat-card text-center">
-                                <h6 class="text-muted text-uppercase small mb-2">Revenue</h6>
-                                <h3 class="text-primary mb-0">{{ formatCurrency(form.revenue) }}</h3>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="stat-card text-center">
-                                <h6 class="text-muted text-uppercase small mb-2">Total Costs</h6>
-                                <h3 class="text-danger mb-0">{{ formatCurrency(totalCosts) }}</h3>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="stat-card text-center" :style="{ background: netProfit >= 0 ? 'linear-gradient(135deg, #d1fae5 0%, #10b981 100%)' : 'linear-gradient(135deg, #fee2e2 0%, #ef4444 100%)', color: netProfit >= 0 ? '#064e3b' : '#7f1d1d' }">
-                                <h6 class="text-uppercase small mb-2" style="opacity: 0.8">Net Profit</h6>
-                                <h3 class="fw-bold mb-0">{{ formatCurrency(netProfit) }}</h3>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Expert Mode BEP Card -->
-                    <div v-if="analysisMode === 'expert'" class="card border-0 shadow-sm mb-4" style="border-radius: 16px; background: linear-gradient(135deg, #fefadd 0%, #fff9c4 100%);">
-                        <div class="card-body p-4 d-flex justify-content-between align-items-center">
-                            <div>
-                                <h5 class="mb-1 text-warning-emphasis fw-bold">Break-Even Point (BEP)</h5>
-                                <p class="mb-0 small text-muted">Revenue needed to cover all costs</p>
-                            </div>
-                            <div class="text-end">
-                                <h3 class="mb-0 text-warning-emphasis">{{ formatCurrency(bep) }}</h3>
-                                <small class="text-muted" v-if="form.revenue > 0">
-                                    Current achievement: <strong>{{ Math.min(100, Math.round(form.revenue / bep * 100)) || 0 }}%</strong>
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card border-0 shadow-sm" style="border-radius: 16px; overflow: hidden;">
-                        <div class="card-header bg-white border-bottom p-4">
-                            <h5 class="mb-0">Profit Breakdown</h5>
-                        </div>
-                        <div class="card-body p-4 text-center" v-if="form.revenue > 0">
-                            <!-- Simple Visual Bar -->
-                            <div class="progress" style="height: 40px; border-radius: 20px;">
-                                <div class="progress-bar bg-danger" role="progressbar" :style="{ width: fixedCostPercentage + '%' }" title="Fixed Cost">
-                                    <span v-if="fixedCostPercentage > 10">{{ fixedCostPercentage }}%</span>
-                                </div>
-                                <div class="progress-bar bg-warning" role="progressbar" :style="{ width: variableCostPercentage + '%' }" title="Variable Cost">
-                                    <span v-if="variableCostPercentage > 10">{{ variableCostPercentage }}%</span>
-                                </div>
-                                <div class="progress-bar bg-success" role="progressbar" :style="{ width: profitPercentage + '%' }" title="Profit">
-                                    <span v-if="profitPercentage > 10">{{ profitPercentage }}%</span>
-                                </div>
-                            </div>
-                            <div class="d-flex justify-content-between mt-2 small text-muted">
-                                <span><span class="badge bg-danger rounded-pill me-1"> </span> Fixed</span>
-                                <span><span class="badge bg-warning rounded-pill me-1"> </span> Variable</span>
-                                <span><span class="badge bg-success rounded-pill me-1"> </span> Profit</span>
-                            </div>
-                        </div>
-                         <div class="card-body p-5 text-center text-muted" v-else>
-                            Enter revenue to see breakdown
-                        </div>
-                    </div>
-                </div>
+        <!-- Mode Switcher -->
+        <div class="mode-switch-container">
+            <div class="mode-switch">
+                <button :class="{ active: mode === 'lite' }" @click="switchMode('lite')">🌱 간편 모드</button>
+                <button :class="{ active: mode === 'expert' }" @click="switchMode('expert')">🚀 전문가 모드</button>
             </div>
         </div>
 
-        <div v-if="currentTab === 'reports'" class="fade-in">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h3 class="mb-0">Saved Reports</h3>
-                 <div class="input-group w-auto">
-                    <input type="text" class="form-control" v-model="searchUserId" placeholder="Search User ID">
-                    <button class="btn btn-outline-primary" @click="loadReports">Refresh</button>
+            <!-- LITE MODE -->
+            <div v-if="mode === 'lite'" key="lite">
+                <div class="row g-4">
+                    <div class="col-lg-5">
+                        <div class="card-expert">
+                            <div class="expert-header">
+                                <h5>📝 기본 정보 입력</h5>
+                            </div>
+                            <div class="expert-body">
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">업종 선택</label>
+                                    <select class="form-select" v-model="liteData.BASIC.industryCd">
+                                        <option value="1">제조업</option>
+                                        <option value="2">소매업</option>
+                                        <option value="3">외식업</option>
+                                        <option value="4">시설서비스업</option>
+                                        <option value="5">용역서비스업</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">월 목표 순이익</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" v-model.number="liteData.BASIC.monTargetPrice">
+                                        <span class="input-group-text">원</span>
+                                    </div>
+                                </div>
+
+                                <hr class="my-4" style="opacity: 0.1">
+
+                                <h6 class="mb-3 text-primary">판매 메뉴 입력</h6>
+                                <div v-for="(menu, idx) in liteData.SALE.menu" :key="idx" class="mb-3 p-3 bg-light rounded-3 text-end position-relative">
+                                    <button class="btn-close position-absolute top-0 end-0 m-2" @click="removeMenu(liteData.SALE.menu, idx)" style="font-size: 0.7rem;"></button>
+                                    <div class="row g-2 mb-2">
+                                        <div class="col-12">
+                                            <input type="text" class="form-control form-control-sm" v-model="menu.MenuTitle" placeholder="메뉴명 (예: 아메리카노)">
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="input-group input-group-sm">
+                                                <input type="number" class="form-control" v-model.number="menu.MenuPrice" placeholder="단가">
+                                                <span class="input-group-text">원</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="input-group input-group-sm">
+                                                <input type="number" class="form-control" v-model.number="menu.MenuQty" placeholder="하루 판매량">
+                                                <span class="input-group-text">개</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-outline-primary w-100 btn-sm mb-4" @click="addMenu(liteData.SALE.menu)">+ 메뉴 추가</button>
+
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">월 대략적 비용 (고정비+변동비)</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" v-model.number="liteData.LITE_COST.totalMonthlyCost" placeholder="총 비용 입력">
+                                        <span class="input-group-text">원</span>
+                                    </div>
+                                    <div class="form-text">재료비, 월세, 인건비 등을 합친 대략적인 금액</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-7">
+                        <div class="card-expert h-100 bg-white">
+                            <div class="expert-header bg-white border-bottom-0">
+                                <h5>📊 분석 결과</h5>
+                            </div>
+                            <div class="expert-body text-center pt-0">
+                                <div class="py-5">
+                                    <h6 class="text-uppercase text-muted small mb-2">현재 예상 순이익</h6>
+                                    <h2 class="display-4 fw-bold mb-3" :class="liteResult.netProfit >= 0 ? 'text-primary' : 'text-danger'">
+                                        {{ formatCurrency(liteResult.netProfit) }}
+                                    </h2>
+                                    
+                                    <div class="alert mt-4" :class="liteResult.gap >= 0 ? 'alert-success' : 'alert-warning'">
+                                        <span v-if="liteResult.gap >= 0">
+                                            🎉 <strong>축하합니다!</strong> 목표 수익보다 {{ formatCurrency(liteResult.gap) }} 초과 달성 중입니다.
+                                        </span>
+                                        <span v-else>
+                                            💪 <strong>조금만 더!</strong> 목표까지 {{ formatCurrency(Math.abs(liteResult.gap)) }} 부족합니다.
+                                        </span>
+                                    </div>
+
+                                    <div class="card bg-light border-0 p-3 mt-4 text-start">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <span class="badge bg-primary me-2">TIP</span>
+                                            <span class="fw-bold">목표 달성을 위한 액션</span>
+                                        </div>
+                                        <p class="mb-0 text-muted small" v-if="liteData.SALE.menu.length > 0 && liteResult.gap < 0">
+                                            "{{ liteData.SALE.menu[0].MenuTitle }}" 메뉴를 하루에 
+                                            <strong class="text-dark">{{ Math.ceil(Math.abs(liteResult.gap) / (liteData.SALE.menu[0].MenuPrice * 25)) }}개</strong> 
+                                            더 판매하면 목표에 도달할 수 있습니다! (25일 영업 기준)
+                                        </p>
+                                        <p class="mb-0 text-muted small" v-else>
+                                            현재 상태가 아주 좋습니다. 더 정교한 분석을 원하시면 전문가 모드를 이용해보세요.
+                                        </p>
+                                    </div>
+                                    
+                                    <div class="mt-4 pt-3 border-top">
+                                        <p class="text-muted small mb-3">내 인건비, 세금, 대출이자까지 정확히 계산하고 싶으신가요?</p>
+                                        <button class="btn btn-premium w-100" @click="switchMode('expert')">🚀 전문가 모드로 전환하여 정밀 분석하기</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 16px;">
-                <div class="table-responsive">
-                    <table class="table-premium mb-0">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Revenue</th>
-                                <th>Net Profit</th>
-                                <th>Mode</th>
-                                <th>Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="report in reports" :key="report.id">
-                                <td class="fw-bold">#{{ report.id }}</td>
-                                <td>{{ formatCurrency(parseJson(report.reportData).revenue) }}</td>
-                                <td :class="parseJson(report.reportData).netProfit >= 0 ? 'text-success fw-bold' : 'text-danger fw-bold'">
-                                    {{ formatCurrency(parseJson(report.reportData).netProfit) }}
-                                </td>
-                                <td>
-                                    <span class="badge" :class="parseJson(report.reportData).mode === 'expert' ? 'bg-warning text-dark' : 'bg-primary'">
-                                        {{ parseJson(report.reportData).mode || 'simple' }}
-                                    </span>
-                                </td>
-                                <td class="text-muted small">{{ formatDate(report.createdAt) }}</td>
-                            </tr>
-                            <tr v-if="reports.length === 0">
-                                <td colspan="5" class="text-center py-5 text-muted">No reports found for this user.</td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <!-- EXPERT MODE -->
+            <div v-else key="expert">
+                <div class="row">
+                    <!-- Left: Input Sections -->
+                    <div class="col-lg-6">
+                        <div class="accordion" id="expertAccordion">
+                            
+                            <!-- 1. Basic Setup -->
+                            <div class="accordion-item border-0 mb-3 shadow-sm rounded-3 overflow-hidden">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBasic">
+                                        <span class="section-badge">1단계</span> 기본 환경 설정
+                                    </button>
+                                </h2>
+                                <div id="collapseBasic" class="accordion-collapse collapse show" data-bs-parent="#expertAccordion">
+                                    <div class="accordion-body bg-light">
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label small">업종</label>
+                                                <select class="form-select form-select-sm" v-model="expertData.BASIC.industryCd">
+                                                    <option value="1">제조업</option>
+                                                    <option value="2">소매업</option>
+                                                    <option value="3">외식업</option>
+                                                    <option value="4">시설서비스업</option>
+                                                    <option value="5">용역서비스업</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label small">판매 기준</label>
+                                                <select class="form-select form-select-sm" v-model="expertData.BASIC.saleMode">
+                                                    <option value="1">일 판매량 기준 (X 영업일)</option>
+                                                    <option value="2">월 판매량 기준</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label small">월 영업일수</label>
+                                                <input type="number" class="form-control form-control-sm" v-model.number="expertData.BASIC.workDay">
+                                            </div>
+                                             <div class="col-md-6">
+                                                <label class="form-label small">목표 순이익</label>
+                                                <input type="number" class="form-control form-control-sm" v-model.number="expertData.BASIC.monTargetPrice">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 2. Sales & Cost Plan -->
+                            <div class="accordion-item border-0 mb-3 shadow-sm rounded-3 overflow-hidden">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSales">
+                                        <span class="section-badge">2단계</span> 매출 및 재료비 계획
+                                    </button>
+                                </h2>
+                                <div id="collapseSales" class="accordion-collapse collapse" data-bs-parent="#expertAccordion">
+                                    <div class="accordion-body bg-light p-2">
+                                        <div v-for="(menu, idx) in expertData.SALE.menu" :key="idx" class="card mb-2 border-0 shadow-sm">
+                                            <div class="card-body p-3 position-relative">
+                                                <button class="btn-close position-absolute top-0 end-0 m-2" @click="removeMenu(expertData.SALE.menu, idx, expertData.COST.cost)"></button>
+                                                
+                                                <div class="mb-2">
+                                                    <input type="text" class="form-control form-control-sm fw-bold border-0 bg-light mb-1" v-model="menu.MenuTitle" placeholder="메뉴명">
+                                                </div>
+                                                <div class="row g-2">
+                                                    <div class="col-4">
+                                                        <label class="small text-muted">판매단가</label>
+                                                        <input type="number" class="form-control form-control-sm" v-model.number="menu.MenuPrice">
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <label class="small text-muted">{{ expertData.BASIC.saleMode == '1' ? '일 판매량' : '월 판매량' }}</label>
+                                                        <input type="number" class="form-control form-control-sm" v-model.number="menu.MenuQty">
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <label class="small text-muted">재료비율(%)</label>
+                                                        <input type="number" class="form-control form-control-sm" v-if="expertData.COST.cost[idx]" v-model.number="expertData.COST.cost[idx].costRate">
+                                                    </div>
+                                                </div>
+                                                <div class="mt-2 text-end small text-muted">
+                                                    예상 월 매출: <strong class="text-primary">{{ formatCurrency(calcMenuMonthlyRevenue(menu)) }}</strong>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button class="btn btn-outline-secondary w-100 btn-sm" @click="addMenuExpert">+ 메뉴 추가</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 3. Labor Plan -->
+                            <div class="accordion-item border-0 mb-3 shadow-sm rounded-3 overflow-hidden">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLabor">
+                                        <span class="section-badge">3단계</span> 인건비 계획
+                                    </button>
+                                </h2>
+                                <div id="collapseLabor" class="accordion-collapse collapse" data-bs-parent="#expertAccordion">
+                                    <div class="accordion-body bg-light">
+                                        
+                                        <!-- Job 02 Sales/Admin -->
+                                        <h6 class="small text-muted fw-bold mb-2">판매/관리직 (판관비)</h6>
+                                        <div v-for="(job, idx) in expertData.JOB.job02" :key="'j2'+idx" class="d-flex gap-2 mb-2 align-items-center">
+                                            <input type="text" class="form-control form-control-sm" v-model="job.JobTitle" placeholder="직책/성명" style="width: 30%">
+                                            <input type="number" class="form-control form-control-sm" v-model.number="job.JobCnt" placeholder="인원" style="width: 20%">
+                                            <input type="number" class="form-control form-control-sm" v-model.number="job.JobQty" placeholder="월 급여" style="width: 40%">
+                                            <button class="btn-close" @click="expertData.JOB.job02.splice(idx, 1)"></button>
+                                        </div>
+                                        <button class="btn btn-sm btn-light w-100 border mb-3" @click="addJob(expertData.JOB.job02)">+ 인원 추가</button>
+
+                                        <!-- Job 01 Mfg -->
+                                        <h6 class="small text-muted fw-bold mb-2">생산/제조직 (제조원가)</h6>
+                                        <div v-for="(job, idx) in expertData.JOB.job01" :key="'j1'+idx" class="d-flex gap-2 mb-2 align-items-center">
+                                            <input type="text" class="form-control form-control-sm" v-model="job.JobTitle" placeholder="직책" style="width: 30%">
+                                            <input type="number" class="form-control form-control-sm" v-model.number="job.JobCnt" placeholder="인원" style="width: 20%">
+                                            <input type="number" class="form-control form-control-sm" v-model.number="job.JobQty" placeholder="월 급여" style="width: 40%">
+                                            <button class="btn-close" @click="expertData.JOB.job01.splice(idx, 1)"></button>
+                                        </div>
+                                        <button class="btn btn-sm btn-light w-100 border" @click="addJob(expertData.JOB.job01)">+ 인원 추가</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 4. Invest & Loan -->
+                             <div class="accordion-item border-0 mb-3 shadow-sm rounded-3 overflow-hidden">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseInvest">
+                                        <span class="section-badge">4단계</span> 투자 및 자금조달
+                                    </button>
+                                </h2>
+                                <div id="collapseInvest" class="accordion-collapse collapse" data-bs-parent="#expertAccordion">
+                                    <div class="accordion-body bg-light">
+                                        <h6 class="small text-muted fw-bold">감가상각 대상 자산 (인테리어 등)</h6>
+                                        <div v-for="(inv, idx) in expertData.INVEST.invest02" :key="'i'+idx" class="row g-1 mb-2">
+                                            <div class="col-4"><input type="text" class="form-control form-control-sm" v-model="inv.investTitle" placeholder="항목"></div>
+                                            <div class="col-3"><input type="number" class="form-control form-control-sm" v-model.number="inv.investPrice" placeholder="금액"></div>
+                                            <div class="col-2"><input type="number" class="form-control form-control-sm" v-model.number="inv.investYear" placeholder="년수"></div>
+                                            <div class="col-2">
+                                                <select class="form-select form-select-sm" v-model="inv.investYn">
+                                                    <option value="Y">상각</option>
+                                                    <option value="N">미상각</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-1"><button class="btn-close" @click="expertData.INVEST.invest02.splice(idx,1)"></button></div>
+                                        </div>
+                                        <button class="btn btn-sm btn-light w-100 border mb-4" @click="addInvest(expertData.INVEST.invest02)">+ 자산 추가</button>
+
+                                        <h6 class="small text-muted fw-bold">대출금 (이자비용)</h6>
+                                         <div v-for="(loan, idx) in expertData.LOAN.loan02" :key="'l'+idx" class="row g-1 mb-2">
+                                            <div class="col-5"><input type="text" class="form-control form-control-sm" v-model="loan.loanTitle" placeholder="대출명"></div>
+                                            <div class="col-4"><input type="number" class="form-control form-control-sm" v-model.number="loan.loanPrice" placeholder="원금"></div>
+                                            <div class="col-2"><input type="number" class="form-control form-control-sm" v-model.number="loan.loanRate" placeholder="이율%"></div>
+                                            <div class="col-1"><button class="btn-close" @click="expertData.LOAN.loan02.splice(idx,1)"></button></div>
+                                        </div>
+                                         <button class="btn btn-sm btn-light w-100 border" @click="addLoan(expertData.LOAN.loan02)">+ 대출 추가</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 5. General Expenses -->
+                            <div class="accordion-item border-0 mb-3 shadow-sm rounded-3 overflow-hidden">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExpense">
+                                        <span class="section-badge">5단계</span> 경비 계획 (판관비/제조경비)
+                                    </button>
+                                </h2>
+                                <div id="collapseExpense" class="accordion-collapse collapse" data-bs-parent="#expertAccordion">
+                                    <div class="accordion-body bg-light">
+                                        <h6 class="small text-muted fw-bold mb-2">판매관리비 설정</h6>
+                                        <div v-for="(sc, idx) in expertData.SCOST.SCost" :key="'sc'+idx" class="card mb-2 border-0 bg-white p-2">
+                                            <div class="d-flex justify-content-between mb-1">
+                                                 <input type="text" class="form-control form-control-sm border-0 fw-bold p-0" v-model="sc.SCostTitle" style="width: 50%">
+                                                 <button class="btn-close small" @click="expertData.SCOST.SCost.splice(idx,1)"></button>
+                                            </div>
+                                            <div class="row g-2 align-items-center">
+                                                <div class="col-5">
+                                                    <select class="form-select form-select-sm" v-model="sc.SCostCd">
+                                                        <option value="월정액">월정액(원)</option>
+                                                        <option value="매출액">매출대비(%)</option>
+                                                        <option value="인건비">인건비대비(%)</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-7">
+                                                    <input type="number" class="form-control form-control-sm" v-model.number="sc.SCostTVa" placeholder="값 입력">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button class="btn btn-sm btn-light w-100 border" @click="addExpense(expertData.SCOST.SCost)">+ 경비 항목 추가</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> <!-- End Accordion -->
+                    </div>
+
+                    <!-- Right: Dashboard -->
+                    <div class="col-lg-6">
+                        <div class="sticky-top" style="top: 20px; z-index: 900;">
+                             <div class="card-expert bg-white shadow-lg border-0" style="border: 2px solid var(--primary-color);">
+                                <div class="expert-header bg-white">
+                                    <h5 class="text-primary fw-bold">📈 수익성 분석 리포트</h5>
+                                    <button class="btn btn-premium btn-sm py-1 px-3" @click="saveExpertReport" :disabled="isSaving">
+                                        {{ isSaving ? '저장 중...' : '리포트 저장' }}
+                                    </button>
+                                </div>
+                                <div class="expert-body">
+                                    <!-- Key Metrics -->
+                                    <div class="row text-center mb-4">
+                                        <div class="col-6 mb-3">
+                                            <small class="text-muted d-block text-uppercase" style="font-size: 0.7rem;">월 예상 매출</small>
+                                            <span class="fs-4 fw-bold text-dark">{{ formatCurrency(expertResult.totalRevenue) }}</span>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <small class="text-muted d-block text-uppercase" style="font-size: 0.7rem;">영업이익</small>
+                                            <span class="fs-4 fw-bold" :class="expertResult.opIncome >= 0 ? 'text-primary' : 'text-danger'">{{ formatCurrency(expertResult.opIncome) }}</span>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="text-muted d-block text-uppercase" style="font-size: 0.7rem;">영업 이익률</small>
+                                            <span class="fs-5 fw-bold text-dark">{{ expertResult.opMargin }}%</span>
+                                        </div>
+                                        <div class="col-6">
+                                             <small class="text-muted d-block text-uppercase" style="font-size: 0.7rem;">목표 달성</small>
+                                              <span class="badge rounded-pill" :class="expertResult.targetGap >= 0 ? 'bg-success' : 'bg-warning text-dark'">
+                                                {{ expertResult.targetGap >= 0 ? '달성' : '미달' }}
+                                              </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <hr class="my-4" style="opacity: 0.1">
+
+                                    <!-- Cost Breakdown Table -->
+                                    <table class="table table-sm table-borderless small mb-4">
+                                        <tbody>
+                                            <tr>
+                                                <td class="text-muted">(-) 재료비 (COGS)</td>
+                                                <td class="text-end fw-bold">{{ formatCurrency(expertResult.totalMaterialCost) }}</td>
+                                                <td class="text-end text-muted" style="width: 40px">{{ expertResult.materialRatio }}%</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-muted">(-) 인건비</td>
+                                                <td class="text-end fw-bold">{{ formatCurrency(expertResult.totalLaborCost) }}</td>
+                                                <td class="text-end text-muted">{{ expertResult.laborRatio }}%</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-muted">(-) 판관비/경비</td>
+                                                <td class="text-end fw-bold">{{ formatCurrency(expertResult.totalExpense) }}</td>
+                                                <td class="text-end text-muted">{{ expertResult.expenseRatio }}%</td>
+                                            </tr>
+                                             <tr>
+                                                <td class="text-muted ps-3 fst-italic">ㄴ 이자/감가상각 포함</td>
+                                                <td></td>
+                                                <td></td>
+                                            </tr>
+                                        </tbody>
+                                        <tfoot class="border-top">
+                                            <tr>
+                                                <td class="pt-2 fw-bold">(=) 영업이익</td>
+                                                <td class="pt-2 text-end fw-bold fs-6" :class="expertResult.opIncome >= 0 ? 'text-primary' : 'text-danger'">
+                                                    {{ formatCurrency(expertResult.opIncome) }}
+                                                </td>
+                                                <td></td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+
+                                    <!-- BEP Analysis -->
+                                    <div class="card bg-warning-subtle border-0 p-3 mb-3">
+                                        <h6 class="fw-bold mb-2 text-warning-emphasis">⚖️ 손익분기점 (BEP) 분석</h6>
+                                        <div class="d-flex justify-content-between mb-1 small">
+                                            <span>BEP 매출액</span>
+                                            <span class="fw-bold">{{ formatCurrency(expertResult.bepRevenue) }}</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between small">
+                                            <span>고정비 합계</span>
+                                            <span>{{ formatCurrency(expertResult.totalFixedCost) }}</span>
+                                        </div>
+                                        <div class="progress mt-2" style="height: 6px;">
+                                            <div class="progress-bar bg-warning" role="progressbar" :style="{ width: Math.min(100, (expertResult.totalRevenue / expertResult.bepRevenue) * 100) + '%' }"></div>
+                                        </div>
+                                        <div class="text-center mt-1" style="font-size: 0.7rem;">
+                                            현재 BEP의 <strong>{{ Math.round((expertResult.totalRevenue / expertResult.bepRevenue) * 100) || 0 }}%</strong> 달성
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Action Guide -->
+                                    <div class="alert alert-light border small text-muted mb-0">
+                                        <strong class="d-block mb-1 text-dark">💡 AI 분석 코멘트</strong>
+                                        <span v-if="expertResult.targetGap < 0">
+                                            목표 이익까지 <strong>{{ formatCurrency(Math.abs(expertResult.targetGap)) }}</strong> 남았습니다. 
+                                            고정비 비중이 {{ ((expertResult.totalFixedCost / expertResult.totalRevenue)*100).toFixed(1) }}%로 
+                                            {{ (expertResult.totalFixedCost / expertResult.totalRevenue) > 0.4 ? '높은 편입니다. 임차료나 인건비 절감이 필요합니다.' : '적정 수준입니다. 매출 증대에 집중하세요.' }}
+                                        </span>
+                                        <span v-else>
+                                            목표를 달성했습니다! 현재 이익률 {{ expertResult.opMargin }}%는 매우 양호한 수준입니다.
+                                        </span>
+                                    </div>
+
+                                </div>
+                             </div>
+                        </div>
+                    </div>
                 </div>
+            </div> <!-- End Expert -->
+
+        <!-- Reports List (Common) -->
+        <hr class="my-5" style="opacity: 0.1">
+        <div class="card-expert">
+            <div class="expert-header">
+                <h5>🗂️ 저장된 리포트 이력</h5>
+            </div>
+            <div class="card-body p-0 table-responsive">
+                <table class="table table-hover table-premium mb-0">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">No.</th>
+                            <th>구분</th>
+                            <th>매출액</th>
+                            <th>영업이익</th>
+                            <th>BEP</th>
+                            <th>작성일시</th>
+                            <th>액션</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="rpt in reports" :key="rpt.id">
+                            <td class="ps-4 text-muted small">#{{ rpt.id }}</td>
+                            <td><span class="badge" :class="parseReport(rpt).mode === 'expert' ? 'bg-secondary' : 'bg-success'">{{ parseReport(rpt).mode === 'expert' ? '전문가' : '간편' }}</span></td>
+                            <td>{{ formatCurrency(parseReport(rpt).revenue) }}</td>
+                            <td :class="parseReport(rpt).netProfit >= 0 ? 'text-primary fw-bold' : 'text-danger fw-bold'">{{ formatCurrency(parseReport(rpt).netProfit) }}</td>
+                            <td class="text-muted small">{{ parseReport(rpt).bep ? formatCurrency(parseReport(rpt).bep) : '-' }}</td>
+                            <td class="text-muted small">{{ formatDate(rpt.createdAt) }}</td>
+                            <td><button class="btn btn-sm btn-outline-secondary" @click="loadReportToCanvas(rpt)">불러오기</button></td>
+                        </tr>
+                        <tr v-if="reports.length === 0">
+                            <td colspan="7" class="text-center py-5 text-muted">저장된 데이터가 없습니다.</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
@@ -224,139 +499,295 @@
 </div>
 
 <script>
-    const { createApp, ref, computed } = Vue;
+    const { createApp, ref, reactive, computed, watch, onMounted } = Vue;
 
     createApp({
         setup() {
-            const currentTab = ref('analysis');
-            const analysisMode = ref('simple'); // 'simple' or 'expert'
-            const searchUserId = ref('user1@example.com');
-            
-            const form = ref({
-                userId: 'user1@example.com',
-                revenue: 0,
-                fixedCost: 0,
-                variableCost: 0
-            });
-
+            const mode = ref('lite'); // 'lite' or 'expert'
+            const userEmail = ref('test@example.com');
             const isSaving = ref(false);
             const reports = ref([]);
 
-            // Computed Properties
-            const totalCosts = computed(() => (form.value.fixedCost || 0) + (form.value.variableCost || 0));
-            const netProfit = computed(() => (form.value.revenue || 0) - totalCosts.value);
+            // ================= LITE MODE STATE =================
+            const liteData = reactive({
+                BASIC: { industryCd: '3', monTargetPrice: 3000000 },
+                SALE: {
+                    menu: [
+                        { MenuTitle: '기본 메뉴', MenuPrice: 10000, MenuQty: 30 }
+                    ]
+                },
+                LITE_COST: { totalMonthlyCost: 1500000 }
+            });
+
+            // ================= EXPERT MODE STATE =================
+            const expertData = reactive({
+                BASIC: { industryCd: '3', saleMode: '1', workDay: 25, monTargetPrice: 5000000 },
+                SALE: { menu: [] },
+                COST: { cost: [] }, // matched index with SALE.menu
+                JOB: { job01: [], job02: [] }, // Mfg, Sales
+                INVEST: { invest02: [], invest06: [] },
+                LOAN: { loan01: [], loan02: [] },
+                SCOST: { SCost: [
+                    { SCostTitle: '임차료', SCostCd: '월정액', SCostTVa: 1000000 },
+                    { SCostTitle: '공과금', SCostCd: '월정액', SCostTVa: 300000 },
+                    { SCostTitle: '카드수수료', SCostCd: '매출액', SCostTVa: 1.5 }
+                ] }, 
+                MCOST: { MCost: [] }
+            });
+
+            // ================= HELPERS =================
+            const formatCurrency = (val) => {
+                if(isNaN(val)) return '0원';
+                return new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(val);
+            };
+            const formatDate = (d) => d ? new Date(d).toLocaleString() : '';
+            const parseReport = (rpt) => {
+                try { return JSON.parse(rpt.reportData); } catch(e) { return {}; }
+            };
+
+            // ================= LITE LOGIC =================
+            const liteResult = computed(() => {
+                // Revenue = sum(Price * Qty * 25days) assuming saleMode 1 default for Lite
+                // Lite assumes Daily Qty input usually. Let's fix 25 days for Lite ease.
+                const WORK_DAYS = 25;
+                let revenue = 0;
+                liteData.SALE.menu.forEach(m => {
+                    revenue += (m.MenuPrice || 0) * (m.MenuQty || 0) * WORK_DAYS;
+                });
+                
+                const cost = liteData.LITE_COST.totalMonthlyCost || 0;
+                const netProfit = revenue - cost;
+                const gap = netProfit - liteData.BASIC.monTargetPrice;
+                
+                return { revenue, netProfit, gap };
+            });
+
+            // ================= EXPERT LOGIC (CORE) =================
             
-            const currentDate = computed(() => new Date().toLocaleDateString());
-            const isFormValid = computed(() => form.value.userId && form.value.revenue >= 0);
-
-            // BEP Calculation for Expert Mode
-            // BEP = Fixed Cost / (1 - (Variable Cost / Revenue))
-            const bep = computed(() => {
-                const r = form.value.revenue;
-                const f = form.value.fixedCost;
-                const v = form.value.variableCost;
-
-                if (r === 0) return 0;
-                if (v >= r) return 0; // Infinity or bad biz
-
-                const contributionMarginRatio = 1 - (v / r);
-                if (contributionMarginRatio <= 0) return 0;
-
-                return Math.round(f / contributionMarginRatio);
-            });
-
-            // Percentages for Progress Bar
-            const fixedCostPercentage = computed(() => {
-                if (!form.value.revenue) return 0;
-                return Math.min(100, Math.round((form.value.fixedCost / form.value.revenue) * 100));
-            });
-            const variableCostPercentage = computed(() => {
-                if (!form.value.revenue) return 0;
-                let remaining = 100 - fixedCostPercentage.value;
-                let calculated = Math.round((form.value.variableCost / form.value.revenue) * 100);
-                return Math.min(remaining, calculated);
-            });
-            const profitPercentage = computed(() => {
-                 if (!form.value.revenue) return 0;
-                 return Math.max(0, 100 - fixedCostPercentage.value - variableCostPercentage.value);
-            });
-
-
-            // Methods
-            const formatCurrency = (val) => window.CommonUtils.formatCurrency(val);
-            
-            const parseJson = (jsonStr) => {
-                try {
-                    return JSON.parse(jsonStr);
-                } catch (e) {
-                    return {};
+            // 1. Calculate Revenue per Menu
+            const calcMenuMonthlyRevenue = (menu) => {
+                const price = menu.MenuPrice || 0;
+                const qty = menu.MenuQty || 0;
+                if(expertData.BASIC.saleMode == '1') {
+                    // Daily
+                    return price * qty * (expertData.BASIC.workDay || 0);
+                } else {
+                    // Monthly
+                    return price * qty;
                 }
             };
 
-            const formatDate = (dateStr) => {
-                if (!dateStr) return '';
-                return new Date(dateStr).toLocaleString();
+            const expertResult = computed(() => {
+                // A. Total Revenue
+                let totalRevenue = 0;
+                expertData.SALE.menu.forEach(m => totalRevenue += calcMenuMonthlyRevenue(m));
+
+                // B. Material Cost (Variable)
+                let totalMaterialCost = 0;
+                expertData.SALE.menu.forEach((m, idx) => {
+                    const rev = calcMenuMonthlyRevenue(m);
+                    const costItem = expertData.COST.cost[idx];
+                    const rate = costItem ? (costItem.costRate || 0) : 0;
+                    totalMaterialCost += rev * (rate / 100);
+                });
+
+                // C. Labor Cost (Fixed usually)
+                let totalLaborCost = 0;
+                // Job01 (Mfg) + Job02 (Sales)
+                [...expertData.JOB.job01, ...expertData.JOB.job02].forEach(j => {
+                    totalLaborCost += (j.JobQty || 0) * (j.JobCnt || 0);
+                });
+
+                // D. Depreciation (Fixed)
+                let totalDepreciation = 0;
+                [...expertData.INVEST.invest02].forEach(inv => {
+                    if(inv.investYn === 'Y' && inv.investYear > 0) {
+                        // Monthly depreciation
+                        totalDepreciation += (inv.investPrice || 0) / (inv.investYear * 12);
+                    }
+                });
+
+                // E. Interest (Fixed)
+                let totalInterest = 0;
+                [...expertData.LOAN.loan02].forEach(l => {
+                    // Monthly interest
+                    totalInterest += (l.loanPrice || 0) * ((l.loanRate || 0)/100) / 12;
+                });
+
+                // F. Other Expenses (Variable vs Fixed Mix)
+                let totalFixedExpense = 0;
+                let totalVariableExpense = 0; // % of Revenue
+
+                // Helper to process SCost/MCost
+                const processExpense = (list) => {
+                    list.forEach(item => {
+                        let val = item.SCostTVa || item.MCostTVa || 0; 
+                        let type = item.SCostCd || item.MCostCd;
+                        
+                        if(type === '월정액') {
+                            totalFixedExpense += val;
+                        } else if(type === '매출액') {
+                            // Variable
+                            totalVariableExpense += totalRevenue * (val / 100);
+                        } else if(type === '인건비') {
+                            // Fixed (linked to fixed labor)
+                            totalFixedExpense += totalLaborCost * (val / 100);
+                        }
+                    });
+                };
+
+                processExpense(expertData.SCOST.SCost);
+                // processExpense(expertData.MCOST.MCost); // Add if needed
+
+                // Aggregates
+                const totalExpense = totalFixedExpense + totalVariableExpense + totalDepreciation + totalInterest;
+                const totalCostAll = totalMaterialCost + totalLaborCost + totalExpense;
+                const opIncome = totalRevenue - totalCostAll;
+                
+                // Ratios
+                const materialRatio = totalRevenue ? ((totalMaterialCost/totalRevenue)*100).toFixed(1) : 0;
+                const laborRatio = totalRevenue ? ((totalLaborCost/totalRevenue)*100).toFixed(1) : 0;
+                const expenseRatio = totalRevenue ? ((totalExpense/totalRevenue)*100).toFixed(1) : 0;
+                const opMargin = totalRevenue ? ((opIncome/totalRevenue)*100).toFixed(1) : 0;
+                const targetGap = opIncome - (expertData.BASIC.monTargetPrice || 0);
+
+                // BEP Calculation
+                // BEP Revenue = Total Fixed Cost / (1 - Variable Ratio)
+                // Fixed Costs = Labor + Depreciation + Interest + Fixed Expenses
+                const totalFixed = totalLaborCost + totalDepreciation + totalInterest + totalFixedExpense;
+                
+                // Variable Costs = Material + Variable Expenses
+                const totalVariable = totalMaterialCost + totalVariableExpense;
+                
+                let bepRevenue = 0;
+                if(totalRevenue > 0) {
+                    const variableRatio = totalVariable / totalRevenue;
+                    if(variableRatio < 1) {
+                         bepRevenue = totalFixed / (1 - variableRatio);
+                    }
+                }
+
+                return {
+                    totalRevenue,
+                    totalMaterialCost,
+                    totalLaborCost,
+                    totalExpense,
+                    opIncome,
+                    opMargin,
+                    materialRatio, laborRatio, expenseRatio,
+                    targetGap,
+                    totalFixedCost: totalFixed,
+                    bepRevenue
+                };
+            });
+
+
+            // ================= ACTIONS =================
+            const switchMode = (m) => {
+                console.log("Switching mode to:", m);
+                try {
+                    // 1. Prepare Data FIRST (before switching view)
+                    if(m === 'expert') {
+                        // A. Migration from Lite if needed
+                        if(expertData.SALE.menu.length === 0 && liteData.SALE.menu.length > 0) {
+                             console.log("Migrating data from Lite...");
+                             expertData.SALE.menu = JSON.parse(JSON.stringify(liteData.SALE.menu));
+                             expertData.COST.cost = []; 
+                             expertData.SALE.menu.forEach(() => {
+                                 expertData.COST.cost.push({ costRate: 35 });
+                             });
+                        }
+
+                        // B. Safety Sync (Ensure Cost array matches Sales array)
+                        const diff = expertData.SALE.menu.length - expertData.COST.cost.length;
+                        if(diff > 0) {
+                             console.log("Syncing cost array...", diff);
+                             for(let i=0; i<diff; i++) expertData.COST.cost.push({ costRate: 35 });
+                        }
+                    }
+                    
+                    // 2. Switch Mode (Trigger Render)
+                    mode.value = m;
+                    
+                } catch(e) {
+                    console.error("Mode switch error:", e);
+                    alert("모드 전환 중 오류가 발생했습니다: " + e.message);
+                }
             };
 
-            const saveReport = async () => {
-                if (!isFormValid.value) return;
+            const addMenu = (list) => list.push({ MenuTitle: '', MenuPrice: 0, MenuQty: 0 });
+            const removeMenu = (list, idx, costList) => {
+                list.splice(idx, 1);
+                if(costList) costList.splice(idx, 1);
+            };
+            
+            const addMenuExpert = () => {
+                expertData.SALE.menu.push({ MenuTitle: '', MenuPrice: 0, MenuQty: 0 });
+                expertData.COST.cost.push({ costRate: 0 });
+            };
+
+            const addJob = (list) => list.push({ JobTitle: '', JobCnt: 1, JobQty: 0 });
+            const addInvest = (list) => list.push({ investTitle: '', investPrice: 0, investYear: 5, investYn: 'Y' });
+            const addLoan = (list) => list.push({ loanTitle: '', loanPrice: 0, loanRate: 5.0 });
+            const addExpense = (list) => list.push({ SCostTitle: '', SCostCd: '월정액', SCostTVa: 0 });
+
+            // SERVER API
+            const loadReports = async () => {
+                try {
+                    const res = await axios.get(`/api/report/${userEmail.value}`);
+                    reports.value = res.data;
+                } catch(e) { console.error(e); }
+            };
+
+            const saveExpertReport = async () => {
                 isSaving.value = true;
+                const result = expertResult.value;
                 
-                const reportContent = {
-                    mode: analysisMode.value,
-                    revenue: form.value.revenue,
-                    fixedCost: form.value.fixedCost,
-                    variableCost: form.value.variableCost,
-                    netProfit: netProfit.value,
-                    bep: bep.value,
-                    timestamp: new Date().toISOString()
+                // Construct payload
+                const payload = {
+                    mode: 'expert',
+                    ...expertData, // Spread full expert data
+                    summary: { ...result } // Snapshot results
                 };
 
                 try {
-                    await axios.post('/api/report', {
-                        userId: form.value.userId,
-                        content: reportContent
-                    });
-                    alert('Report saved successfully!');
-                    loadReports();
-                } catch (error) {
-                    console.error(error);
-                    alert('Failed to save report: ' + error.message);
+                     await axios.post('/api/report', { userId: userEmail.value, content: payload });
+                     alert('저장되었습니다!');
+                     loadReports();
+                } catch(e) {
+                    alert('저장 실패: ' + e.message);
                 } finally {
                     isSaving.value = false;
                 }
             };
 
-            const loadReports = async () => {
-                const targetId = searchUserId.value || form.value.userId;
-                try {
-                    const response = await axios.get(`/api/report/${targetId}`);
-                    reports.value = response.data;
-                } catch (error) {
-                    console.error(error);
+            const loadReportToCanvas = (rpt) => {
+                const data = JSON.parse(rpt.reportData);
+                if(data.mode === 'expert') {
+                    mode.value = 'expert';
+                    Object.assign(expertData, data);
+                    // Ensure arrays exists (backward compatibility)
+                    if(!expertData.BASIC) expertData.BASIC = {};
+                    // ... verify other keys if needed
+                } else {
+                    mode.value = 'lite';
+                   // Object.assign(liteData, data); // Map accordingly
                 }
             };
 
+            onMounted(() => {
+                loadReports();
+            });
+
             return {
-                currentTab,
-                analysisMode,
-                form,
-                totalCosts,
-                netProfit,
-                bep,
-                currentDate,
-                isFormValid,
-                isSaving,
-                saveReport,
-                reports,
-                loadReports,
-                searchUserId,
-                formatCurrency,
-                parseJson,
-                formatDate,
-                fixedCostPercentage,
-                variableCostPercentage,
-                profitPercentage
+                mode, userEmail, isSaving, reports,
+                liteData, expertData,
+                liteResult, expertResult,
+                switchMode,
+                addMenu, removeMenu, addMenuExpert,
+                addJob, addInvest, addLoan, addExpense,
+                calcMenuMonthlyRevenue,
+                formatCurrency, formatDate, parseReport, loadReports, saveExpertReport, loadReportToCanvas
             };
         }
     }).mount('#app');
