@@ -1,0 +1,115 @@
+2026-01-21 20:38:45.960 INFO  [main] c.whomade.planfAi.PlanfAiApplication - Starting PlanfAiApplication using Java 21.0.9 with PID 29919 (/Users/soo/Documents/AiWork/planfAi/target/classes started by soo in /Users/soo/Documents/AiWork/planfAi)
+2026-01-21 20:38:45.960 DEBUG [main] c.whomade.planfAi.PlanfAiApplication - Running with Spring Boot v3.4.1, Spring v6.2.1
+2026-01-21 20:38:45.960 INFO  [main] c.whomade.planfAi.PlanfAiApplication - The following 1 profile is active: "dev"
+2026-01-21 20:38:46.274 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-01-21 20:38:46.278 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-01-21 20:38:46.279 INFO  [main] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-01-21 20:38:46.279 INFO  [main] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.34]
+2026-01-21 20:38:46.295 INFO  [main] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-01-21 20:38:46.295 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 321 ms
+2026-01-21 20:38:46.330 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-01-21 20:38:46.587 INFO  [main] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@2aa5bd48
+2026-01-21 20:38:46.588 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-21 20:38:46.690 INFO  [main] o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2026-01-21 20:38:46.771 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-01-21 20:38:46.776 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-01-21 20:38:46.779 INFO  [main] c.whomade.planfAi.PlanfAiApplication - Started PlanfAiApplication in 1.005 seconds (process running for 7.053)
+2026-01-21 20:38:57.974 INFO  [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-01-21 20:38:57.976 INFO  [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-01-21 20:38:57.979 INFO  [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet - Completed initialization in 3 ms
+2026-01-21 20:38:58.032 DEBUG [http-nio-8080-exec-1] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-21 20:38:58.044 DEBUG [http-nio-8080-exec-1] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-21 20:38:58.065 TRACE [http-nio-8080-exec-1] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-21 20:38:58.065 TRACE [http-nio-8080-exec-1] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-21 20:38:58.066 DEBUG [http-nio-8080-exec-1] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-21 20:38:58.092 DEBUG [http-nio-8080-exec-1] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-21 20:38:58.092 DEBUG [http-nio-8080-exec-1] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-21 20:38:58.106 TRACE [http-nio-8080-exec-1] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-21 20:38:58.106 TRACE [http-nio-8080-exec-1] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 2, 1, <<BLOB>>, 2026-01-21 11:29:03
+2026-01-21 20:38:58.107 TRACE [http-nio-8080-exec-1] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 1, 1, <<BLOB>>, 2026-01-21 11:25:43
+2026-01-21 20:38:58.107 DEBUG [http-nio-8080-exec-1] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 2
+2026-01-21 20:41:43.731 DEBUG [http-nio-8080-exec-3] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-21 20:41:43.734 DEBUG [http-nio-8080-exec-3] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-21 20:41:43.749 TRACE [http-nio-8080-exec-3] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-21 20:41:43.750 TRACE [http-nio-8080-exec-3] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-21 20:41:43.750 DEBUG [http-nio-8080-exec-3] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-21 20:41:43.776 DEBUG [http-nio-8080-exec-3] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-21 20:41:43.777 DEBUG [http-nio-8080-exec-3] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-21 20:41:43.790 TRACE [http-nio-8080-exec-3] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-21 20:41:43.792 TRACE [http-nio-8080-exec-3] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 2, 1, <<BLOB>>, 2026-01-21 11:29:03
+2026-01-21 20:41:43.793 TRACE [http-nio-8080-exec-3] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 1, 1, <<BLOB>>, 2026-01-21 11:25:43
+2026-01-21 20:41:43.793 DEBUG [http-nio-8080-exec-3] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 2
+2026-01-21 20:41:44.079 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-21 20:41:44.080 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-21 20:41:44.093 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-21 20:41:44.093 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-21 20:41:44.093 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-21 20:41:44.118 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-21 20:41:44.119 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-21 20:41:44.132 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-21 20:41:44.133 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 2, 1, <<BLOB>>, 2026-01-21 11:29:03
+2026-01-21 20:41:44.134 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 1, 1, <<BLOB>>, 2026-01-21 11:25:43
+2026-01-21 20:41:44.135 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 2
+2026-01-21 20:41:44.304 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-21 20:41:44.305 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-21 20:41:44.318 TRACE [http-nio-8080-exec-5] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-21 20:41:44.318 TRACE [http-nio-8080-exec-5] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-21 20:41:44.318 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-21 20:41:44.342 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-21 20:41:44.342 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-21 20:41:44.353 TRACE [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-21 20:41:44.354 TRACE [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 2, 1, <<BLOB>>, 2026-01-21 11:29:03
+2026-01-21 20:41:44.354 TRACE [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 1, 1, <<BLOB>>, 2026-01-21 11:25:43
+2026-01-21 20:41:44.354 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 2
+2026-01-21 20:41:59.181 DEBUG [http-nio-8080-exec-7] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-21 20:41:59.181 DEBUG [http-nio-8080-exec-7] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-21 20:41:59.195 TRACE [http-nio-8080-exec-7] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-21 20:41:59.195 TRACE [http-nio-8080-exec-7] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-21 20:41:59.195 DEBUG [http-nio-8080-exec-7] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-21 20:41:59.218 DEBUG [http-nio-8080-exec-7] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-21 20:41:59.218 DEBUG [http-nio-8080-exec-7] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-21 20:41:59.230 TRACE [http-nio-8080-exec-7] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-21 20:41:59.231 TRACE [http-nio-8080-exec-7] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 2, 1, <<BLOB>>, 2026-01-21 11:29:03
+2026-01-21 20:41:59.231 TRACE [http-nio-8080-exec-7] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 1, 1, <<BLOB>>, 2026-01-21 11:25:43
+2026-01-21 20:41:59.231 DEBUG [http-nio-8080-exec-7] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 2
+2026-01-21 20:42:09.447 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-21 20:42:09.448 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-21 20:42:09.459 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-21 20:42:09.459 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-21 20:42:09.460 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-21 20:42:09.484 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-21 20:42:09.484 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-21 20:42:09.497 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-21 20:42:09.497 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 2, 1, <<BLOB>>, 2026-01-21 11:29:03
+2026-01-21 20:42:09.497 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 1, 1, <<BLOB>>, 2026-01-21 11:25:43
+2026-01-21 20:42:09.498 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 2
+2026-01-21 20:42:12.817 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-21 20:42:12.818 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-21 20:42:12.831 TRACE [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-21 20:42:12.831 TRACE [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-21 20:42:12.831 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-21 20:42:12.856 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-21 20:42:12.857 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-21 20:42:12.871 TRACE [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-21 20:42:12.872 TRACE [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 2, 1, <<BLOB>>, 2026-01-21 11:29:03
+2026-01-21 20:42:12.874 TRACE [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 1, 1, <<BLOB>>, 2026-01-21 11:25:43
+2026-01-21 20:42:12.875 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 2
+2026-01-21 20:42:25.936 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-21 20:42:25.937 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-21 20:42:25.950 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-21 20:42:25.950 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-21 20:42:25.950 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-21 20:42:25.974 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-21 20:42:25.975 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-21 20:42:25.989 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-21 20:42:25.990 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 2, 1, <<BLOB>>, 2026-01-21 11:29:03
+2026-01-21 20:42:25.991 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 1, 1, <<BLOB>>, 2026-01-21 11:25:43
+2026-01-21 20:42:25.992 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 2
+2026-01-21 20:42:35.558 DEBUG [http-nio-8080-exec-3] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-21 20:42:35.559 DEBUG [http-nio-8080-exec-3] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test1@example.com(String)
+2026-01-21 20:42:35.571 TRACE [http-nio-8080-exec-3] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-21 20:42:35.572 TRACE [http-nio-8080-exec-3] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 2
+2026-01-21 20:42:35.572 DEBUG [http-nio-8080-exec-3] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-21 20:42:35.597 DEBUG [http-nio-8080-exec-3] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-21 20:42:35.598 DEBUG [http-nio-8080-exec-3] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 2(Long)
+2026-01-21 20:42:35.613 DEBUG [http-nio-8080-exec-3] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 0
