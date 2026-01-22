@@ -32,14 +32,25 @@ public class ProfitReportService {
     }
 
     @Transactional
-    public void saveReport(Long userNo, String reportDataJson) {
+    public void saveReport(Long userNo, String reportDataJson, Long reportId) {
         ProfitVo vo = new ProfitVo();
         vo.setUserNo(userNo);
         vo.setReportData(reportDataJson);
-        profitReportMapper.insertReport(vo);
+
+        if (reportId != null && reportId > 0) {
+            vo.setId(reportId);
+            profitReportMapper.updateReport(vo);
+        } else {
+            profitReportMapper.insertReport(vo);
+        }
     }
 
     public List<ProfitVo> getReports(Long userNo) {
         return profitReportMapper.selectReportsByUserNo(userNo);
+    }
+
+    @Transactional
+    public void deleteReport(Long reportId) {
+        profitReportMapper.deleteReport(reportId);
     }
 }

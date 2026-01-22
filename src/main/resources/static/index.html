@@ -33,7 +33,7 @@
             <div class="d-flex gap-2">
                  <div class="input-group">
                     <span class="input-group-text bg-white">ID</span>
-                    <input type="text" class="form-control" v-model="userEmail" placeholder="이메일 입력">
+                     <input type="text" class="form-control" v-model="userEmail" placeholder="이메일 입력">
                  </div>
                  <button class="btn btn-outline-primary" @click="loadReports">불러오기</button>
             </div>
@@ -480,12 +480,15 @@
                     <tbody>
                         <tr v-for="rpt in reports" :key="rpt.id">
                             <td class="ps-4 text-muted small">#{{ rpt.id }}</td>
-                            <td><span class="badge" :class="parseReport(rpt).mode === 'expert' ? 'bg-secondary' : 'bg-success'">{{ parseReport(rpt).mode === 'expert' ? '전문가' : '간편' }}</span></td>
-                            <td>{{ formatCurrency(parseReport(rpt).revenue) }}</td>
-                            <td :class="parseReport(rpt).netProfit >= 0 ? 'text-primary fw-bold' : 'text-danger fw-bold'">{{ formatCurrency(parseReport(rpt).netProfit) }}</td>
-                            <td class="text-muted small">{{ parseReport(rpt).bep ? formatCurrency(parseReport(rpt).bep) : '-' }}</td>
+                            <td><span class="badge" :class="getReportValues(rpt).mode === 'expert' ? 'bg-secondary' : 'bg-success'">{{ getReportValues(rpt).mode === 'expert' ? '전문가' : '간편' }}</span></td>
+                            <td>{{ formatCurrency(getReportValues(rpt).revenue) }}</td>
+                            <td :class="getReportValues(rpt).netProfit >= 0 ? 'text-primary fw-bold' : 'text-danger fw-bold'">{{ formatCurrency(getReportValues(rpt).netProfit) }}</td>
+                            <td class="text-muted small">{{ getReportValues(rpt).bep ? formatCurrency(getReportValues(rpt).bep) : '-' }}</td>
                             <td class="text-muted small">{{ formatDate(rpt.createdAt) }}</td>
-                            <td><button class="btn btn-sm btn-outline-secondary" @click="loadReportToCanvas(rpt)">불러오기</button></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-secondary me-1" @click="loadReportToCanvas(rpt)">불러오기</button>
+                                <button class="btn btn-sm btn-outline-danger" @click="deleteReport(rpt.id)">삭제</button>
+                            </td>
                         </tr>
                         <tr v-if="reports.length === 0">
                             <td colspan="7" class="text-center py-5 text-muted">저장된 데이터가 없습니다.</td>
@@ -499,6 +502,7 @@
 </div>
 
 <script>
+  
     const { createApp, ref, reactive, computed, watch, onMounted } = Vue;
 
     createApp({
@@ -507,6 +511,7 @@
             const userEmail = ref('test@example.com');
             const isSaving = ref(false);
             const reports = ref([]);
+            const currentReportId = ref(null);
 
             // ================= LITE MODE STATE =================
             const liteData = reactive({
@@ -543,6 +548,25 @@
             const formatDate = (d) => d ? new Date(d).toLocaleString() : '';
             const parseReport = (rpt) => {
                 try { return JSON.parse(rpt.reportData); } catch(e) { return {}; }
+            };
+
+            const getReportValues = (rpt) => {
+                const data = parseReport(rpt);
+                if (data.mode === 'expert' && data.summary) {
+                    return {
+                        mode: 'expert',
+                        revenue: data.summary.totalRevenue,
+                        netProfit: data.summary.opIncome,
+                        bep: data.summary.bepRevenue
+                    };
+                }
+                // Fallback / Lite
+                return {
+                    mode: data.mode || 'lite',
+                    revenue: data.revenue || (data.liteResult ? data.liteResult.revenue : 0),
+                    netProfit: data.netProfit || (data.liteResult ? data.liteResult.netProfit : 0),
+                    bep: data.bep || 0
+                };
             };
 
             // ================= LITE LOGIC =================
@@ -688,22 +712,80 @@
                 try {
                     // 1. Prepare Data FIRST (before switching view)
                     if(m === 'expert') {
-                        // A. Migration from Lite if needed
-                        if(expertData.SALE.menu.length === 0 && liteData.SALE.menu.length > 0) {
-                             console.log("Migrating data from Lite...");
-                             expertData.SALE.menu = JSON.parse(JSON.stringify(liteData.SALE.menu));
-                             expertData.COST.cost = []; 
-                             expertData.SALE.menu.forEach(() => {
-                                 expertData.COST.cost.push({ costRate: 35 });
-                             });
+                        // ALWAYS Sync Basic Info from Lite -> Expert
+                        if(liteData.BASIC) {
+                            expertData.BASIC.industryCd = liteData.BASIC.industryCd;
+                            expertData.BASIC.monTargetPrice = liteData.BASIC.monTargetPrice;
                         }
 
-                        // B. Safety Sync (Ensure Cost array matches Sales array)
-                        const diff = expertData.SALE.menu.length - expertData.COST.cost.length;
-                        if(diff > 0) {
-                             console.log("Syncing cost array...", diff);
-                             for(let i=0; i<diff; i++) expertData.COST.cost.push({ costRate: 35 });
+                        // ALWAYS Sync/Merge Menus from Lite -> Expert
+                        // We treat Lite as source of truth for the MAIN list structure when switching 
+                        // but try to preserve Expert-only fields (like Cost Rate) if they exist.
+                        
+                        const liteMenus = liteData.SALE.menu || [];
+                        const expertMenus = expertData.SALE.menu;
+                        const expertCosts = expertData.COST.cost;
+
+                        // 1. Update/Add items
+                        liteMenus.forEach((lMenu, i) => {
+                            if(expertMenus[i]) {
+                                // Update existing
+                                expertMenus[i].MenuTitle = lMenu.MenuTitle;
+                                expertMenus[i].MenuPrice = lMenu.MenuPrice;
+                                expertMenus[i].MenuQty = lMenu.MenuQty;
+                                // costRate is preserved in expertCosts[i]
+                            } else {
+                                // Add new
+                                expertMenus.push({ 
+                                    MenuTitle: lMenu.MenuTitle, 
+                                    MenuPrice: lMenu.MenuPrice, 
+                                    MenuQty: lMenu.MenuQty 
+                                });
+                                expertCosts.push({ costRate: 35 }); // Default cost rate
+                            }
+                        });
+
+                        // 2. Remove extra items if Lite list is shorter
+                        if(expertMenus.length > liteMenus.length) {
+                             expertMenus.splice(liteMenus.length);
+                             expertCosts.splice(liteMenus.length);
                         }
+
+                    } else if (m === 'lite') {
+                         // ALWAYS Sync Basic Info from Expert -> Lite
+                         if(expertData.BASIC) {
+                            liteData.BASIC.industryCd = expertData.BASIC.industryCd;
+                            liteData.BASIC.monTargetPrice = expertData.BASIC.monTargetPrice;
+                         }
+                         
+                         // ALWAYS Sync Menus from Expert -> Lite
+                         const expertMenus = expertData.SALE.menu || [];
+                         const liteMenus = liteData.SALE.menu;
+                         
+                         expertMenus.forEach((eMenu, i) => {
+                             if(liteMenus[i]) {
+                                 liteMenus[i].MenuTitle = eMenu.MenuTitle;
+                                 liteMenus[i].MenuPrice = eMenu.MenuPrice;
+                                 liteMenus[i].MenuQty = eMenu.MenuQty;
+                             } else {
+                                  liteMenus.push({
+                                    MenuTitle: eMenu.MenuTitle, 
+                                    MenuPrice: eMenu.MenuPrice, 
+                                    MenuQty: eMenu.MenuQty 
+                                  });
+                             }
+                         });
+                         
+                         // Remove extra
+                         if(liteMenus.length > expertMenus.length) {
+                             liteMenus.splice(expertMenus.length);
+                         }
+
+                         // Sync Total Cost (Material + Labor + Expense)
+                         const res = expertResult.value;
+                         const totalCost = (res.totalMaterialCost || 0) + (res.totalLaborCost || 0) + (res.totalExpense || 0);
+                         if(!liteData.LITE_COST) liteData.LITE_COST = {};
+                         liteData.LITE_COST.totalMonthlyCost = Math.round(totalCost);
                     }
                     
                     // 2. Switch Mode (Trigger Render)
@@ -734,7 +816,9 @@
             // SERVER API
             const loadReports = async () => {
                 try {
-                    const res = await axios.get(`/api/report/${userEmail.value}`);
+                    // var email = document.getElementById("userEmail1").value;
+                    const res = await axios.get(`/api/report/`+userEmail.value);
+                    //const res = await axios.get(`/api/report/${userEmail.value}`);
                     reports.value = res.data;
                 } catch(e) { console.error(e); }
             };
@@ -746,12 +830,13 @@
                 // Construct payload
                 const payload = {
                     mode: 'expert',
+                    id: currentReportId.value, // Send ID for Update
                     ...expertData, // Spread full expert data
                     summary: { ...result } // Snapshot results
                 };
 
                 try {
-                     await axios.post('/api/report', { userId: userEmail.value, content: payload });
+                     await axios.post('/api/report', { userId: userEmail.value, content: payload, id: currentReportId.value });
                      alert('저장되었습니다!');
                      loadReports();
                 } catch(e) {
@@ -762,6 +847,7 @@
             };
 
             const loadReportToCanvas = (rpt) => {
+                currentReportId.value = rpt.id; // Set ID
                 const data = JSON.parse(rpt.reportData);
                 if(data.mode === 'expert') {
                     mode.value = 'expert';
@@ -772,6 +858,18 @@
                 } else {
                     mode.value = 'lite';
                    // Object.assign(liteData, data); // Map accordingly
+                }
+            };
+
+            const deleteReport = async (id) => {
+                if(!confirm('정말 삭제하시겠습니까?')) return;
+                try {
+                    await axios.delete(`/api/report/${id}`);
+                    alert('삭제되었습니다.');
+                    loadReports();
+                    if(currentReportId.value === id) currentReportId.value = null;
+                } catch(e) {
+                    alert('삭제 실패: ' + e.message);
                 }
             };
 
@@ -787,7 +885,7 @@
                 addMenu, removeMenu, addMenuExpert,
                 addJob, addInvest, addLoan, addExpense,
                 calcMenuMonthlyRevenue,
-                formatCurrency, formatDate, parseReport, loadReports, saveExpertReport, loadReportToCanvas
+                formatCurrency, formatDate, parseReport, getReportValues, loadReports, saveExpertReport, loadReportToCanvas, deleteReport
             };
         }
     }).mount('#app');

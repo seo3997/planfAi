@@ -34,9 +34,16 @@ public class ProfitReportController {
 
             // Delegate business logic to Service
             Long userNo = profitReportService.findOrCreateUser(userId);
+
+            // Extract Report ID if exists (for Update)
+            Long reportId = null;
+            if (payload.get("id") != null) {
+                reportId = ((Number) payload.get("id")).longValue();
+            }
+
             String reportDataJson = objectMapper.writeValueAsString(content);
 
-            profitReportService.saveReport(userNo, reportDataJson);
+            profitReportService.saveReport(userNo, reportDataJson, reportId);
 
             return ResponseEntity.ok("Report saved successfully");
         } catch (JsonProcessingException e) {
@@ -49,5 +56,11 @@ public class ProfitReportController {
         Long userNo = profitReportService.findOrCreateUser(userId);
         List<ProfitVo> reports = profitReportService.getReports(userNo);
         return ResponseEntity.ok(reports);
+    }
+
+    @DeleteMapping("/{reportId}")
+    public ResponseEntity<String> deleteReport(@PathVariable Long reportId) {
+        profitReportService.deleteReport(reportId);
+        return ResponseEntity.ok("Report deleted successfully");
     }
 }

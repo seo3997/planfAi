@@ -1,115 +1,902 @@
-2026-01-21 20:38:45.960 INFO  [main] c.whomade.planfAi.PlanfAiApplication - Starting PlanfAiApplication using Java 21.0.9 with PID 29919 (/Users/soo/Documents/AiWork/planfAi/target/classes started by soo in /Users/soo/Documents/AiWork/planfAi)
-2026-01-21 20:38:45.960 DEBUG [main] c.whomade.planfAi.PlanfAiApplication - Running with Spring Boot v3.4.1, Spring v6.2.1
-2026-01-21 20:38:45.960 INFO  [main] c.whomade.planfAi.PlanfAiApplication - The following 1 profile is active: "dev"
-2026-01-21 20:38:46.274 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
-2026-01-21 20:38:46.278 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
-2026-01-21 20:38:46.279 INFO  [main] o.a.catalina.core.StandardService - Starting service [Tomcat]
-2026-01-21 20:38:46.279 INFO  [main] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.34]
-2026-01-21 20:38:46.295 INFO  [main] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
-2026-01-21 20:38:46.295 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 321 ms
-2026-01-21 20:38:46.330 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
-2026-01-21 20:38:46.587 INFO  [main] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@2aa5bd48
-2026-01-21 20:38:46.588 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
-2026-01-21 20:38:46.690 INFO  [main] o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
-2026-01-21 20:38:46.771 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
-2026-01-21 20:38:46.776 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
-2026-01-21 20:38:46.779 INFO  [main] c.whomade.planfAi.PlanfAiApplication - Started PlanfAiApplication in 1.005 seconds (process running for 7.053)
-2026-01-21 20:38:57.974 INFO  [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
-2026-01-21 20:38:57.976 INFO  [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
-2026-01-21 20:38:57.979 INFO  [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet - Completed initialization in 3 ms
-2026-01-21 20:38:58.032 DEBUG [http-nio-8080-exec-1] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
-2026-01-21 20:38:58.044 DEBUG [http-nio-8080-exec-1] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
-2026-01-21 20:38:58.065 TRACE [http-nio-8080-exec-1] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
-2026-01-21 20:38:58.065 TRACE [http-nio-8080-exec-1] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
-2026-01-21 20:38:58.066 DEBUG [http-nio-8080-exec-1] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
-2026-01-21 20:38:58.092 DEBUG [http-nio-8080-exec-1] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
-2026-01-21 20:38:58.092 DEBUG [http-nio-8080-exec-1] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
-2026-01-21 20:38:58.106 TRACE [http-nio-8080-exec-1] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
-2026-01-21 20:38:58.106 TRACE [http-nio-8080-exec-1] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 2, 1, <<BLOB>>, 2026-01-21 11:29:03
-2026-01-21 20:38:58.107 TRACE [http-nio-8080-exec-1] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 1, 1, <<BLOB>>, 2026-01-21 11:25:43
-2026-01-21 20:38:58.107 DEBUG [http-nio-8080-exec-1] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 2
-2026-01-21 20:41:43.731 DEBUG [http-nio-8080-exec-3] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
-2026-01-21 20:41:43.734 DEBUG [http-nio-8080-exec-3] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
-2026-01-21 20:41:43.749 TRACE [http-nio-8080-exec-3] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
-2026-01-21 20:41:43.750 TRACE [http-nio-8080-exec-3] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
-2026-01-21 20:41:43.750 DEBUG [http-nio-8080-exec-3] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
-2026-01-21 20:41:43.776 DEBUG [http-nio-8080-exec-3] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
-2026-01-21 20:41:43.777 DEBUG [http-nio-8080-exec-3] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
-2026-01-21 20:41:43.790 TRACE [http-nio-8080-exec-3] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
-2026-01-21 20:41:43.792 TRACE [http-nio-8080-exec-3] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 2, 1, <<BLOB>>, 2026-01-21 11:29:03
-2026-01-21 20:41:43.793 TRACE [http-nio-8080-exec-3] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 1, 1, <<BLOB>>, 2026-01-21 11:25:43
-2026-01-21 20:41:43.793 DEBUG [http-nio-8080-exec-3] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 2
-2026-01-21 20:41:44.079 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
-2026-01-21 20:41:44.080 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
-2026-01-21 20:41:44.093 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
-2026-01-21 20:41:44.093 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
-2026-01-21 20:41:44.093 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
-2026-01-21 20:41:44.118 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
-2026-01-21 20:41:44.119 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
-2026-01-21 20:41:44.132 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
-2026-01-21 20:41:44.133 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 2, 1, <<BLOB>>, 2026-01-21 11:29:03
-2026-01-21 20:41:44.134 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 1, 1, <<BLOB>>, 2026-01-21 11:25:43
-2026-01-21 20:41:44.135 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 2
-2026-01-21 20:41:44.304 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
-2026-01-21 20:41:44.305 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
-2026-01-21 20:41:44.318 TRACE [http-nio-8080-exec-5] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
-2026-01-21 20:41:44.318 TRACE [http-nio-8080-exec-5] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
-2026-01-21 20:41:44.318 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
-2026-01-21 20:41:44.342 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
-2026-01-21 20:41:44.342 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
-2026-01-21 20:41:44.353 TRACE [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
-2026-01-21 20:41:44.354 TRACE [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 2, 1, <<BLOB>>, 2026-01-21 11:29:03
-2026-01-21 20:41:44.354 TRACE [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 1, 1, <<BLOB>>, 2026-01-21 11:25:43
-2026-01-21 20:41:44.354 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 2
-2026-01-21 20:41:59.181 DEBUG [http-nio-8080-exec-7] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
-2026-01-21 20:41:59.181 DEBUG [http-nio-8080-exec-7] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
-2026-01-21 20:41:59.195 TRACE [http-nio-8080-exec-7] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
-2026-01-21 20:41:59.195 TRACE [http-nio-8080-exec-7] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
-2026-01-21 20:41:59.195 DEBUG [http-nio-8080-exec-7] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
-2026-01-21 20:41:59.218 DEBUG [http-nio-8080-exec-7] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
-2026-01-21 20:41:59.218 DEBUG [http-nio-8080-exec-7] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
-2026-01-21 20:41:59.230 TRACE [http-nio-8080-exec-7] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
-2026-01-21 20:41:59.231 TRACE [http-nio-8080-exec-7] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 2, 1, <<BLOB>>, 2026-01-21 11:29:03
-2026-01-21 20:41:59.231 TRACE [http-nio-8080-exec-7] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 1, 1, <<BLOB>>, 2026-01-21 11:25:43
-2026-01-21 20:41:59.231 DEBUG [http-nio-8080-exec-7] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 2
-2026-01-21 20:42:09.447 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
-2026-01-21 20:42:09.448 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
-2026-01-21 20:42:09.459 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
-2026-01-21 20:42:09.459 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
-2026-01-21 20:42:09.460 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
-2026-01-21 20:42:09.484 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
-2026-01-21 20:42:09.484 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
-2026-01-21 20:42:09.497 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
-2026-01-21 20:42:09.497 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 2, 1, <<BLOB>>, 2026-01-21 11:29:03
-2026-01-21 20:42:09.497 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 1, 1, <<BLOB>>, 2026-01-21 11:25:43
-2026-01-21 20:42:09.498 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 2
-2026-01-21 20:42:12.817 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
-2026-01-21 20:42:12.818 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
-2026-01-21 20:42:12.831 TRACE [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
-2026-01-21 20:42:12.831 TRACE [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
-2026-01-21 20:42:12.831 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
-2026-01-21 20:42:12.856 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
-2026-01-21 20:42:12.857 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
-2026-01-21 20:42:12.871 TRACE [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
-2026-01-21 20:42:12.872 TRACE [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 2, 1, <<BLOB>>, 2026-01-21 11:29:03
-2026-01-21 20:42:12.874 TRACE [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 1, 1, <<BLOB>>, 2026-01-21 11:25:43
-2026-01-21 20:42:12.875 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 2
-2026-01-21 20:42:25.936 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
-2026-01-21 20:42:25.937 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
-2026-01-21 20:42:25.950 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
-2026-01-21 20:42:25.950 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
-2026-01-21 20:42:25.950 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
-2026-01-21 20:42:25.974 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
-2026-01-21 20:42:25.975 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
-2026-01-21 20:42:25.989 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
-2026-01-21 20:42:25.990 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 2, 1, <<BLOB>>, 2026-01-21 11:29:03
-2026-01-21 20:42:25.991 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 1, 1, <<BLOB>>, 2026-01-21 11:25:43
-2026-01-21 20:42:25.992 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 2
-2026-01-21 20:42:35.558 DEBUG [http-nio-8080-exec-3] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
-2026-01-21 20:42:35.559 DEBUG [http-nio-8080-exec-3] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test1@example.com(String)
-2026-01-21 20:42:35.571 TRACE [http-nio-8080-exec-3] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
-2026-01-21 20:42:35.572 TRACE [http-nio-8080-exec-3] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 2
-2026-01-21 20:42:35.572 DEBUG [http-nio-8080-exec-3] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
-2026-01-21 20:42:35.597 DEBUG [http-nio-8080-exec-3] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
-2026-01-21 20:42:35.598 DEBUG [http-nio-8080-exec-3] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 2(Long)
-2026-01-21 20:42:35.613 DEBUG [http-nio-8080-exec-3] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 0
+2026-01-22 00:03:59.808 WARN  [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=6m26s57ms).
+2026-01-22 01:23:17.579 WARN  [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=17m17s9ms).
+2026-01-22 01:39:26.569 WARN  [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=16m8s991ms).
+2026-01-22 01:53:56.895 WARN  [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=13m30s312ms).
+2026-01-22 02:10:16.924 WARN  [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=16m20s32ms).
+2026-01-22 03:10:17.203 WARN  [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=16m29s648ms).
+2026-01-22 03:27:41.229 WARN  [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=17m24s27ms).
+2026-01-22 03:44:07.267 WARN  [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m56s43ms).
+2026-01-22 03:54:57.093 WARN  [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=10m19s817ms).
+2026-01-22 05:12:20.332 WARN  [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=16m52s455ms).
+2026-01-22 05:29:51.339 WARN  [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m30s924ms).
+2026-01-22 05:47:00.018 WARN  [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=16m8s670ms).
+2026-01-22 05:55:52.044 WARN  [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=8m52s27ms).
+2026-01-22 07:16:09.666 WARN  [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m46s779ms).
+2026-01-22 08:16:41.454 WARN  [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m1s71ms).
+2026-01-22 08:34:02.751 WARN  [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=16m51s284ms).
+2026-01-22 08:51:56.911 WARN  [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=17m24s152ms).
+2026-01-22 10:14:12.100 WARN  [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=49m41s267ms).
+2026-01-22 10:33:52.574 WARN  [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=19m40s539ms).
+2026-01-22 11:02:29.697 WARN  [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=28m37s117ms).
+2026-01-22 11:13:29.338 WARN  [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m29s580ms).
+2026-01-22 11:18:56.981 WARN  [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m27s643ms).
+2026-01-22 11:46:15.474 WARN  [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=26m48s488ms).
+2026-01-22 11:57:17.956 WARN  [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=11m2s483ms).
+2026-01-22 12:22:46.100 WARN  [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Retrograde clock change detected (housekeeper delta=27s973ms), soft-evicting connections from pool.
+2026-01-22 14:46:51.632 WARN  [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=2m32s263ms).
+2026-01-22 14:51:37.688 WARN  [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=4m1s341ms).
+2026-01-22 15:23:41.067 WARN  [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=32m3s376ms).
+2026-01-22 15:40:34.868 WARN  [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=16m53s804ms).
+2026-01-22 16:29:46.467 WARN  [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=49m11s598ms).
+2026-01-22 17:12:24.286 WARN  [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=42m37s820ms).
+2026-01-22 18:45:59.254 WARN  [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m2s185ms).
+2026-01-22 18:58:41.359 WARN  [http-nio-8080-exec-7] com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@13452854 (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
+2026-01-22 18:58:51.366 WARN  [http-nio-8080-exec-7] com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@b667b85 (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
+2026-01-22 18:59:01.372 WARN  [http-nio-8080-exec-7] com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@6a51a174 (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
+2026-01-22 18:59:01.382 ERROR [http-nio-8080-exec-7] o.a.c.c.C.[.[.[.[dispatcherServlet] - Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed: org.springframework.transaction.CannotCreateTransactionException: Could not open JDBC Connection for transaction] with root cause
+com.mysql.cj.exceptions.ConnectionIsClosedException: No operations allowed after connection closed.
+	at java.base/jdk.internal.reflect.DirectConstructorHandleAccessor.newInstance(DirectConstructorHandleAccessor.java:62)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:502)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:486)
+	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:52)
+	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:95)
+	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:140)
+	at com.mysql.cj.NativeSession.checkClosed(NativeSession.java:929)
+	at com.mysql.cj.jdbc.ConnectionImpl.checkClosed(ConnectionImpl.java:565)
+	at com.mysql.cj.jdbc.ConnectionImpl.setNetworkTimeout(ConnectionImpl.java:2773)
+	at com.zaxxer.hikari.pool.PoolBase.setNetworkTimeout(PoolBase.java:562)
+	at com.zaxxer.hikari.pool.PoolBase.isConnectionDead(PoolBase.java:169)
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:168)
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:144)
+	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:127)
+	at org.springframework.jdbc.datasource.DataSourceTransactionManager.doBegin(DataSourceTransactionManager.java:269)
+	at org.springframework.transaction.support.AbstractPlatformTransactionManager.startTransaction(AbstractPlatformTransactionManager.java:532)
+	at org.springframework.transaction.support.AbstractPlatformTransactionManager.getTransaction(AbstractPlatformTransactionManager.java:405)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.createTransactionIfNecessary(TransactionAspectSupport.java:639)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:374)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:727)
+	at com.whomade.planfAi.profitReport.service.ProfitReportService$$SpringCGLIB$$0.findOrCreateUser(<generated>)
+	at com.whomade.planfAi.profitReport.controller.ProfitReportController.getReports(ProfitReportController.java:49)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:257)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:190)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:986)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:891)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1088)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:978)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
+	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:903)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:564)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:483)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:905)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1741)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1190)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-01-22 19:15:23.387 INFO  [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-01-22 19:15:23.394 INFO  [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-01-22 19:15:23.402 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-01-22 19:15:33.409 WARN  [SpringApplicationShutdownHook] com.zaxxer.hikari.pool.HikariPool - Timed-out waiting for close connection executor to shutdown
+2026-01-22 19:15:33.410 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-01-22 19:15:53.610 INFO  [main] c.whomade.planfAi.PlanfAiApplication - Starting PlanfAiApplication using Java 21.0.9 with PID 80859 (/Users/soo/Documents/AiWork/planfAi/target/classes started by soo in /Users/soo/Documents/AiWork/planfAi)
+2026-01-22 19:15:53.611 DEBUG [main] c.whomade.planfAi.PlanfAiApplication - Running with Spring Boot v3.4.1, Spring v6.2.1
+2026-01-22 19:15:53.611 INFO  [main] c.whomade.planfAi.PlanfAiApplication - The following 1 profile is active: "dev"
+2026-01-22 19:15:53.921 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-01-22 19:15:53.925 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-01-22 19:15:53.926 INFO  [main] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-01-22 19:15:53.926 INFO  [main] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.34]
+2026-01-22 19:15:53.941 INFO  [main] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-01-22 19:15:53.941 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 317 ms
+2026-01-22 19:15:53.973 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-01-22 19:15:54.235 INFO  [main] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@1ec88aa1
+2026-01-22 19:15:54.236 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-22 19:15:54.341 INFO  [main] o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2026-01-22 19:15:54.418 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-01-22 19:15:54.423 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-01-22 19:15:54.426 INFO  [main] c.whomade.planfAi.PlanfAiApplication - Started PlanfAiApplication in 0.998 seconds (process running for 7.541)
+2026-01-22 19:16:10.813 INFO  [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-01-22 19:16:10.813 INFO  [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-01-22 19:16:10.814 INFO  [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2026-01-22 19:16:11.000 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 19:16:11.028 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 19:16:11.061 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 19:16:11.062 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 19:16:11.063 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 19:16:11.092 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 19:16:11.096 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 19:16:11.111 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 19:16:11.112 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 2, 1, <<BLOB>>, 2026-01-21 11:29:03
+2026-01-22 19:16:11.116 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 1, 1, <<BLOB>>, 2026-01-21 11:25:43
+2026-01-22 19:16:11.117 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 2
+2026-01-22 19:26:10.857 WARN  [http-nio-8080-exec-5] com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@1ec88aa1 (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
+2026-01-22 19:26:20.871 WARN  [http-nio-8080-exec-5] com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@3ae75c7d (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
+2026-01-22 19:26:29.508 INFO  [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-01-22 19:26:30.880 WARN  [http-nio-8080-exec-5] com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@2ebb016f (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
+2026-01-22 19:26:33.053 WARN  [http-nio-8080-exec-6] com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@6f277253 (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
+2026-01-22 19:26:51.294 INFO  [main] c.whomade.planfAi.PlanfAiApplication - Starting PlanfAiApplication using Java 21.0.9 with PID 81820 (/Users/soo/Documents/AiWork/planfAi/target/classes started by soo in /Users/soo/Documents/AiWork/planfAi)
+2026-01-22 19:26:51.295 DEBUG [main] c.whomade.planfAi.PlanfAiApplication - Running with Spring Boot v3.4.1, Spring v6.2.1
+2026-01-22 19:26:51.295 INFO  [main] c.whomade.planfAi.PlanfAiApplication - The following 1 profile is active: "dev"
+2026-01-22 19:26:51.602 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-01-22 19:26:51.607 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-01-22 19:26:51.608 INFO  [main] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-01-22 19:26:51.608 INFO  [main] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.34]
+2026-01-22 19:26:51.623 INFO  [main] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-01-22 19:26:51.623 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 315 ms
+2026-01-22 19:26:51.655 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-01-22 19:26:51.904 INFO  [main] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@19002b34
+2026-01-22 19:26:51.905 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-22 19:26:52.004 INFO  [main] o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2026-01-22 19:26:52.084 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-01-22 19:26:52.089 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-01-22 19:26:52.092 INFO  [main] c.whomade.planfAi.PlanfAiApplication - Started PlanfAiApplication in 0.984 seconds (process running for 7.057)
+2026-01-22 19:27:00.062 INFO  [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-01-22 19:27:00.062 INFO  [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-01-22 19:27:00.064 INFO  [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2026-01-22 19:27:00.370 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 19:27:00.382 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 19:27:00.408 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 19:27:00.408 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 19:27:00.409 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 19:27:00.435 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 19:27:00.436 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 19:27:00.448 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 19:27:00.449 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 2, 1, <<BLOB>>, 2026-01-21 11:29:03
+2026-01-22 19:27:00.450 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 1, 1, <<BLOB>>, 2026-01-21 11:25:43
+2026-01-22 19:27:00.450 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 2
+2026-01-22 19:27:04.232 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 19:27:04.234 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 19:27:04.248 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 19:27:04.248 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 19:27:04.249 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 19:27:04.286 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 19:27:04.287 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 19:27:04.308 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 19:27:04.309 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 2, 1, <<BLOB>>, 2026-01-21 11:29:03
+2026-01-22 19:27:04.310 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 1, 1, <<BLOB>>, 2026-01-21 11:25:43
+2026-01-22 19:27:04.311 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 2
+2026-01-22 19:28:49.640 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 19:28:49.642 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 19:28:49.656 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 19:28:49.656 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 19:28:49.657 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 19:28:49.683 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 19:28:49.684 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 19:28:49.699 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 19:28:49.700 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 2, 1, <<BLOB>>, 2026-01-21 11:29:03
+2026-01-22 19:28:49.702 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 1, 1, <<BLOB>>, 2026-01-21 11:25:43
+2026-01-22 19:28:49.702 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 2
+2026-01-22 19:28:51.268 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 19:28:51.269 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 19:28:51.281 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 19:28:51.281 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 19:28:51.281 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 19:28:51.306 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 19:28:51.307 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 19:28:51.318 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 19:28:51.318 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 2, 1, <<BLOB>>, 2026-01-21 11:29:03
+2026-01-22 19:28:51.318 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 1, 1, <<BLOB>>, 2026-01-21 11:25:43
+2026-01-22 19:28:51.319 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 2
+2026-01-22 19:29:21.746 DEBUG [http-nio-8080-exec-7] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 19:29:21.747 DEBUG [http-nio-8080-exec-7] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 19:29:21.758 TRACE [http-nio-8080-exec-7] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 19:29:21.759 TRACE [http-nio-8080-exec-7] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 19:29:21.759 DEBUG [http-nio-8080-exec-7] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 19:29:21.805 DEBUG [http-nio-8080-exec-7] c.w.p.p.m.P.insertReport - ==>  Preparing: INSERT INTO profit_reports (user_no, report_data, created_at) VALUES (?, ?, NOW())
+2026-01-22 19:29:21.806 DEBUG [http-nio-8080-exec-7] c.w.p.p.m.P.insertReport - ==> Parameters: 1(Long), {"mode":"expert","BASIC":{"workDay":25,"saleMode":"1","industryCd":"3","monTargetPrice":5000000},"SALE":{"menu":[{"MenuQty":30,"MenuPrice":10000,"MenuTitle":"기본 메뉴"}]},"COST":{"cost":[{"costRate":35}]},"JOB":{"job01":[],"job02":[]},"INVEST":{"invest02":[],"invest06":[]},"LOAN":{"loan01":[],"loan02":[]},"SCOST":{"SCost":[{"SCostCd":"월정액","SCostTVa":1000000,"SCostTitle":"임차료"},{"SCostCd":"월정액","SCostTVa":300000,"SCostTitle":"공과금"},{"SCostCd":"매출액","SCostTVa":1.5,"SCostTitle":"카드수수료"}]},"MCOST":{"MCost":[]},"summary":{"totalRevenue":7500000,"totalMaterialCost":2625000,"totalLaborCost":0,"totalExpense":1412500,"opIncome":3462500,"opMargin":"46.2","materialRatio":"35.0","laborRatio":"0.0","expenseRatio":"18.8","targetGap":-1537500,"totalFixedCost":1300000,"bepRevenue":2047244.0944881889}}(String)
+2026-01-22 19:29:21.835 DEBUG [http-nio-8080-exec-7] c.w.p.p.m.P.insertReport - <==    Updates: 1
+2026-01-22 19:29:23.278 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 19:29:23.279 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 19:29:23.293 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 19:29:23.294 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 19:29:23.294 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 19:29:23.319 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 19:29:23.320 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 19:29:23.336 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 19:29:23.337 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 4, 1, <<BLOB>>, 2026-01-22 10:29:21
+2026-01-22 19:29:23.338 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 2, 1, <<BLOB>>, 2026-01-21 11:29:03
+2026-01-22 19:29:23.338 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 1, 1, <<BLOB>>, 2026-01-21 11:25:43
+2026-01-22 19:29:23.339 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 3
+2026-01-22 19:31:38.066 INFO  [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-01-22 19:31:38.070 INFO  [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-01-22 19:31:38.072 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-01-22 19:33:50.031 INFO  [main] c.whomade.planfAi.PlanfAiApplication - Starting PlanfAiApplication using Java 21.0.9 with PID 82377 (/Users/soo/Documents/AiWork/planfAi/target/classes started by soo in /Users/soo/Documents/AiWork/planfAi)
+2026-01-22 19:33:50.032 DEBUG [main] c.whomade.planfAi.PlanfAiApplication - Running with Spring Boot v3.4.1, Spring v6.2.1
+2026-01-22 19:33:50.032 INFO  [main] c.whomade.planfAi.PlanfAiApplication - The following 1 profile is active: "dev"
+2026-01-22 19:33:50.399 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-01-22 19:33:50.405 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-01-22 19:33:50.405 INFO  [main] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-01-22 19:33:50.405 INFO  [main] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.34]
+2026-01-22 19:33:50.421 INFO  [main] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-01-22 19:33:50.421 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 375 ms
+2026-01-22 19:33:50.457 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-01-22 19:33:51.204 INFO  [main] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@2ec85a25
+2026-01-22 19:33:51.205 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-22 19:33:51.305 INFO  [main] o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2026-01-22 19:33:51.386 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-01-22 19:33:51.391 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-01-22 19:33:51.394 INFO  [main] c.whomade.planfAi.PlanfAiApplication - Started PlanfAiApplication in 1.543 seconds (process running for 6.954)
+2026-01-22 19:34:04.279 INFO  [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-01-22 19:34:04.279 INFO  [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-01-22 19:34:04.281 INFO  [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2026-01-22 19:34:04.476 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 19:34:04.491 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 19:34:04.521 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 19:34:04.521 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 19:34:04.524 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 19:34:04.550 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 19:34:04.551 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 19:34:04.566 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 19:34:04.567 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 4, 1, <<BLOB>>, 2026-01-22 10:29:21
+2026-01-22 19:34:04.568 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 2, 1, <<BLOB>>, 2026-01-21 11:29:03
+2026-01-22 19:34:04.568 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 1, 1, <<BLOB>>, 2026-01-21 11:25:43
+2026-01-22 19:34:04.569 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 3
+2026-01-22 19:34:08.941 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 19:34:08.942 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 19:34:08.955 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 19:34:08.956 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 19:34:08.956 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 19:34:08.984 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 19:34:08.984 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 19:34:08.997 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 19:34:08.997 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 4, 1, <<BLOB>>, 2026-01-22 10:29:21
+2026-01-22 19:34:08.998 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 2, 1, <<BLOB>>, 2026-01-21 11:29:03
+2026-01-22 19:34:08.998 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 1, 1, <<BLOB>>, 2026-01-21 11:25:43
+2026-01-22 19:34:08.999 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 3
+2026-01-22 19:34:13.413 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 19:34:13.414 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 19:34:13.428 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 19:34:13.429 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 19:34:13.429 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 19:34:13.458 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 19:34:13.458 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 19:34:13.470 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 19:34:13.471 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 4, 1, <<BLOB>>, 2026-01-22 10:29:21
+2026-01-22 19:34:13.471 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 2, 1, <<BLOB>>, 2026-01-21 11:29:03
+2026-01-22 19:34:13.471 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 1, 1, <<BLOB>>, 2026-01-21 11:25:43
+2026-01-22 19:34:13.472 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 3
+2026-01-22 19:34:37.888 DEBUG [http-nio-8080-exec-3] c.w.p.p.m.P.deleteReport - ==>  Preparing: DELETE FROM profit_reports WHERE id = ?
+2026-01-22 19:34:37.890 DEBUG [http-nio-8080-exec-3] c.w.p.p.m.P.deleteReport - ==> Parameters: 1(Long)
+2026-01-22 19:34:37.914 DEBUG [http-nio-8080-exec-3] c.w.p.p.m.P.deleteReport - <==    Updates: 1
+2026-01-22 19:34:39.142 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 19:34:39.143 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 19:34:39.159 TRACE [http-nio-8080-exec-5] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 19:34:39.159 TRACE [http-nio-8080-exec-5] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 19:34:39.160 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 19:34:39.186 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 19:34:39.187 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 19:34:39.201 TRACE [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 19:34:39.201 TRACE [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 4, 1, <<BLOB>>, 2026-01-22 10:29:21
+2026-01-22 19:34:39.202 TRACE [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 2, 1, <<BLOB>>, 2026-01-21 11:29:03
+2026-01-22 19:34:39.203 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 2
+2026-01-22 19:34:42.457 DEBUG [http-nio-8080-exec-7] c.w.p.p.m.P.deleteReport - ==>  Preparing: DELETE FROM profit_reports WHERE id = ?
+2026-01-22 19:34:42.458 DEBUG [http-nio-8080-exec-7] c.w.p.p.m.P.deleteReport - ==> Parameters: 2(Long)
+2026-01-22 19:34:42.483 DEBUG [http-nio-8080-exec-7] c.w.p.p.m.P.deleteReport - <==    Updates: 1
+2026-01-22 19:34:43.389 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 19:34:43.390 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 19:34:43.403 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 19:34:43.404 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 19:34:43.404 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 19:34:43.430 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 19:34:43.431 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 19:34:43.444 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 19:34:43.445 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 4, 1, <<BLOB>>, 2026-01-22 10:29:21
+2026-01-22 19:34:43.446 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 1
+2026-01-22 19:37:49.718 INFO  [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-01-22 19:37:49.721 INFO  [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-01-22 19:37:49.723 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-01-22 19:37:49.865 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-01-22 19:38:24.176 INFO  [main] c.whomade.planfAi.PlanfAiApplication - Starting PlanfAiApplication using Java 21.0.9 with PID 82731 (/Users/soo/Documents/AiWork/planfAi/target/classes started by soo in /Users/soo/Documents/AiWork/planfAi)
+2026-01-22 19:38:24.176 DEBUG [main] c.whomade.planfAi.PlanfAiApplication - Running with Spring Boot v3.4.1, Spring v6.2.1
+2026-01-22 19:38:24.177 INFO  [main] c.whomade.planfAi.PlanfAiApplication - The following 1 profile is active: "dev"
+2026-01-22 19:38:24.488 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-01-22 19:38:24.492 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-01-22 19:38:24.493 INFO  [main] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-01-22 19:38:24.493 INFO  [main] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.34]
+2026-01-22 19:38:24.508 INFO  [main] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-01-22 19:38:24.509 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 319 ms
+2026-01-22 19:38:24.541 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-01-22 19:38:24.777 INFO  [main] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@68aec50
+2026-01-22 19:38:24.778 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-22 19:38:24.874 INFO  [main] o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2026-01-22 19:38:24.954 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-01-22 19:38:24.959 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-01-22 19:38:24.962 INFO  [main] c.whomade.planfAi.PlanfAiApplication - Started PlanfAiApplication in 0.959 seconds (process running for 6.393)
+2026-01-22 19:38:38.214 INFO  [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-01-22 19:38:38.215 INFO  [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-01-22 19:38:38.216 INFO  [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2026-01-22 19:38:38.391 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 19:38:38.404 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 19:38:38.430 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 19:38:38.430 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 19:38:38.431 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 19:38:38.459 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 19:38:38.460 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 19:38:38.473 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 19:38:38.474 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 4, 1, <<BLOB>>, 2026-01-22 10:29:21
+2026-01-22 19:38:38.475 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 1
+2026-01-22 19:38:40.961 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 19:38:40.962 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 19:38:40.974 TRACE [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 19:38:40.974 TRACE [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 19:38:40.974 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 19:38:40.999 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 19:38:41.000 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 19:38:41.013 TRACE [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 19:38:41.014 TRACE [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 4, 1, <<BLOB>>, 2026-01-22 10:29:21
+2026-01-22 19:38:41.014 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 1
+2026-01-22 19:38:48.915 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 19:38:48.915 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 19:38:48.929 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 19:38:48.930 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 19:38:48.930 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 19:38:48.953 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 19:38:48.954 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 19:38:48.967 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 19:38:48.968 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 4, 1, <<BLOB>>, 2026-01-22 10:29:21
+2026-01-22 19:38:48.968 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 1
+2026-01-22 19:42:21.425 INFO  [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-01-22 19:42:21.429 INFO  [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-01-22 19:42:21.432 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-01-22 19:42:21.560 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-01-22 19:42:39.119 INFO  [main] c.whomade.planfAi.PlanfAiApplication - Starting PlanfAiApplication using Java 21.0.9 with PID 83035 (/Users/soo/Documents/AiWork/planfAi/target/classes started by soo in /Users/soo/Documents/AiWork/planfAi)
+2026-01-22 19:42:39.120 DEBUG [main] c.whomade.planfAi.PlanfAiApplication - Running with Spring Boot v3.4.1, Spring v6.2.1
+2026-01-22 19:42:39.120 INFO  [main] c.whomade.planfAi.PlanfAiApplication - The following 1 profile is active: "dev"
+2026-01-22 19:42:39.429 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-01-22 19:42:39.434 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-01-22 19:42:39.434 INFO  [main] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-01-22 19:42:39.434 INFO  [main] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.34]
+2026-01-22 19:42:39.452 INFO  [main] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-01-22 19:42:39.453 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 319 ms
+2026-01-22 19:42:39.485 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-01-22 19:42:39.726 INFO  [main] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@3030836d
+2026-01-22 19:42:39.727 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-22 19:42:39.840 INFO  [main] o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2026-01-22 19:42:39.918 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-01-22 19:42:39.923 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-01-22 19:42:39.926 INFO  [main] c.whomade.planfAi.PlanfAiApplication - Started PlanfAiApplication in 0.978 seconds (process running for 6.419)
+2026-01-22 19:42:52.696 INFO  [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-01-22 19:42:52.696 INFO  [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-01-22 19:42:52.697 INFO  [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2026-01-22 19:42:53.014 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 19:42:53.024 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 19:42:53.046 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 19:42:53.046 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 19:42:53.047 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 19:42:53.073 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 19:42:53.074 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 19:42:53.089 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 19:42:53.090 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 4, 1, <<BLOB>>, 2026-01-22 10:29:21
+2026-01-22 19:42:53.091 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 1
+2026-01-22 19:42:57.128 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 19:42:57.130 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 19:42:57.145 TRACE [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 19:42:57.145 TRACE [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 19:42:57.146 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 19:42:57.172 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 19:42:57.173 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 19:42:57.186 TRACE [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 19:42:57.186 TRACE [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 4, 1, <<BLOB>>, 2026-01-22 10:29:21
+2026-01-22 19:42:57.187 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 1
+2026-01-22 19:44:27.793 DEBUG [http-nio-8080-exec-9] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 19:44:27.794 DEBUG [http-nio-8080-exec-9] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 19:44:27.807 TRACE [http-nio-8080-exec-9] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 19:44:27.807 TRACE [http-nio-8080-exec-9] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 19:44:27.807 DEBUG [http-nio-8080-exec-9] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 19:44:27.854 DEBUG [http-nio-8080-exec-9] c.w.p.p.m.P.insertReport - ==>  Preparing: INSERT INTO profit_reports (user_no, report_data, created_at) VALUES (?, ?, NOW())
+2026-01-22 19:44:27.856 DEBUG [http-nio-8080-exec-9] c.w.p.p.m.P.insertReport - ==> Parameters: 1(Long), {"mode":"expert","id":null,"BASIC":{"industryCd":"3","saleMode":"1","workDay":25,"monTargetPrice":2000000},"SALE":{"menu":[{"MenuTitle":"아메리카도","MenuPrice":3000,"MenuQty":20},{"MenuTitle":"카페라테","MenuPrice":2000,"MenuQty":20}]},"COST":{"cost":[{"costRate":35},{"costRate":35}]},"JOB":{"job01":[],"job02":[]},"INVEST":{"invest02":[],"invest06":[]},"LOAN":{"loan01":[],"loan02":[]},"SCOST":{"SCost":[{"SCostTitle":"임차료","SCostCd":"월정액","SCostTVa":1000000},{"SCostTitle":"공과금","SCostCd":"월정액","SCostTVa":300000},{"SCostTitle":"카드수수료","SCostCd":"매출액","SCostTVa":1.5}]},"MCOST":{"MCost":[]},"summary":{"totalRevenue":2500000,"totalMaterialCost":875000,"totalLaborCost":0,"totalExpense":1337500,"opIncome":287500,"opMargin":"11.5","materialRatio":"35.0","laborRatio":"0.0","expenseRatio":"53.5","targetGap":-1712500,"totalFixedCost":1300000,"bepRevenue":2047244.0944881889}}(String)
+2026-01-22 19:44:27.882 DEBUG [http-nio-8080-exec-9] c.w.p.p.m.P.insertReport - <==    Updates: 1
+2026-01-22 19:44:29.501 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 19:44:29.502 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 19:44:29.514 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 19:44:29.515 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 19:44:29.515 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 19:44:29.540 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 19:44:29.541 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 19:44:29.555 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 19:44:29.556 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 5, 1, <<BLOB>>, 2026-01-22 10:44:27
+2026-01-22 19:44:29.557 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 4, 1, <<BLOB>>, 2026-01-22 10:29:21
+2026-01-22 19:44:29.557 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 2
+2026-01-22 19:44:33.761 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 19:44:33.762 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 19:44:33.780 TRACE [http-nio-8080-exec-5] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 19:44:33.781 TRACE [http-nio-8080-exec-5] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 19:44:33.781 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 19:44:33.806 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 19:44:33.807 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 19:44:33.821 TRACE [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 19:44:33.821 TRACE [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 5, 1, <<BLOB>>, 2026-01-22 10:44:27
+2026-01-22 19:44:33.821 TRACE [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 4, 1, <<BLOB>>, 2026-01-22 10:29:21
+2026-01-22 19:44:33.822 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 2
+2026-01-22 19:45:46.924 DEBUG [http-nio-8080-exec-9] c.w.p.p.m.P.deleteReport - ==>  Preparing: DELETE FROM profit_reports WHERE id = ?
+2026-01-22 19:45:46.926 DEBUG [http-nio-8080-exec-9] c.w.p.p.m.P.deleteReport - ==> Parameters: 4(Long)
+2026-01-22 19:45:46.950 DEBUG [http-nio-8080-exec-9] c.w.p.p.m.P.deleteReport - <==    Updates: 1
+2026-01-22 19:45:48.195 DEBUG [http-nio-8080-exec-1] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 19:45:48.196 DEBUG [http-nio-8080-exec-1] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 19:45:48.208 TRACE [http-nio-8080-exec-1] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 19:45:48.208 TRACE [http-nio-8080-exec-1] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 19:45:48.209 DEBUG [http-nio-8080-exec-1] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 19:45:48.233 DEBUG [http-nio-8080-exec-1] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 19:45:48.233 DEBUG [http-nio-8080-exec-1] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 19:45:48.246 TRACE [http-nio-8080-exec-1] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 19:45:48.247 TRACE [http-nio-8080-exec-1] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 5, 1, <<BLOB>>, 2026-01-22 10:44:27
+2026-01-22 19:45:48.247 DEBUG [http-nio-8080-exec-1] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 1
+2026-01-22 19:46:41.025 INFO  [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-01-22 19:46:41.028 INFO  [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-01-22 19:46:41.030 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-01-22 19:46:41.162 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-01-22 19:48:10.479 INFO  [main] c.whomade.planfAi.PlanfAiApplication - Starting PlanfAiApplication using Java 21.0.9 with PID 83441 (/Users/soo/Documents/AiWork/planfAi/target/classes started by soo in /Users/soo/Documents/AiWork/planfAi)
+2026-01-22 19:48:10.480 DEBUG [main] c.whomade.planfAi.PlanfAiApplication - Running with Spring Boot v3.4.1, Spring v6.2.1
+2026-01-22 19:48:10.480 INFO  [main] c.whomade.planfAi.PlanfAiApplication - The following 1 profile is active: "dev"
+2026-01-22 19:48:10.786 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-01-22 19:48:10.791 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-01-22 19:48:10.792 INFO  [main] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-01-22 19:48:10.792 INFO  [main] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.34]
+2026-01-22 19:48:10.808 INFO  [main] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-01-22 19:48:10.809 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 315 ms
+2026-01-22 19:48:10.840 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-01-22 19:48:11.075 INFO  [main] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@783b3aa0
+2026-01-22 19:48:11.076 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-22 19:48:11.170 INFO  [main] o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2026-01-22 19:48:11.252 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-01-22 19:48:11.256 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-01-22 19:48:11.259 INFO  [main] c.whomade.planfAi.PlanfAiApplication - Started PlanfAiApplication in 0.95 seconds (process running for 6.378)
+2026-01-22 19:48:19.933 INFO  [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-01-22 19:48:19.933 INFO  [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-01-22 19:48:19.934 INFO  [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2026-01-22 19:48:20.162 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 19:48:20.237 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 19:48:20.267 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 19:48:20.268 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 19:48:20.269 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 19:48:20.296 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 19:48:20.297 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 19:48:20.309 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 19:48:20.310 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 5, 1, <<BLOB>>, 2026-01-22 10:44:27
+2026-01-22 19:48:20.311 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 1
+2026-01-22 19:48:26.237 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 19:48:26.238 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 19:48:26.250 TRACE [http-nio-8080-exec-5] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 19:48:26.251 TRACE [http-nio-8080-exec-5] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 19:48:26.251 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 19:48:26.276 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 19:48:26.278 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 19:48:26.290 TRACE [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 19:48:26.290 TRACE [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 5, 1, <<BLOB>>, 2026-01-22 10:44:27
+2026-01-22 19:48:26.291 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 1
+2026-01-22 19:48:27.440 DEBUG [http-nio-8080-exec-7] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 19:48:27.441 DEBUG [http-nio-8080-exec-7] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 19:48:27.454 TRACE [http-nio-8080-exec-7] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 19:48:27.454 TRACE [http-nio-8080-exec-7] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 19:48:27.455 DEBUG [http-nio-8080-exec-7] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 19:48:27.480 DEBUG [http-nio-8080-exec-7] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 19:48:27.481 DEBUG [http-nio-8080-exec-7] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 19:48:27.493 TRACE [http-nio-8080-exec-7] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 19:48:27.494 TRACE [http-nio-8080-exec-7] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 5, 1, <<BLOB>>, 2026-01-22 10:44:27
+2026-01-22 19:48:27.495 DEBUG [http-nio-8080-exec-7] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 1
+2026-01-22 19:50:50.096 DEBUG [http-nio-8080-exec-9] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 19:50:50.097 DEBUG [http-nio-8080-exec-9] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 19:50:50.109 TRACE [http-nio-8080-exec-9] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 19:50:50.109 TRACE [http-nio-8080-exec-9] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 19:50:50.109 DEBUG [http-nio-8080-exec-9] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 19:50:50.160 DEBUG [http-nio-8080-exec-9] c.w.p.p.m.P.updateReport - ==>  Preparing: UPDATE profit_reports SET report_data = ?, created_at = NOW() WHERE id = ? AND user_no = ?
+2026-01-22 19:50:50.161 DEBUG [http-nio-8080-exec-9] c.w.p.p.m.P.updateReport - ==> Parameters: {"mode":"expert","id":null,"BASIC":{"workDay":25,"saleMode":"1","industryCd":"3","monTargetPrice":2000000},"SALE":{"menu":[{"MenuQty":20,"MenuPrice":3000,"MenuTitle":"아메리카도"},{"MenuQty":20,"MenuPrice":4000,"MenuTitle":"카페라테"}]},"COST":{"cost":[{"costRate":35},{"costRate":35}]},"JOB":{"job01":[],"job02":[]},"INVEST":{"invest02":[],"invest06":[]},"LOAN":{"loan01":[],"loan02":[]},"SCOST":{"SCost":[{"SCostCd":"월정액","SCostTVa":1000000,"SCostTitle":"임차료"},{"SCostCd":"월정액","SCostTVa":300000,"SCostTitle":"공과금"},{"SCostCd":"매출액","SCostTVa":1.5,"SCostTitle":"카드수수료"}]},"MCOST":{"MCost":[]},"summary":{"totalRevenue":3500000,"totalMaterialCost":1225000,"totalLaborCost":0,"totalExpense":1352500,"opIncome":922500,"opMargin":"26.4","materialRatio":"35.0","laborRatio":"0.0","expenseRatio":"38.6","targetGap":-1077500,"totalFixedCost":1300000,"bepRevenue":2047244.0944881889}}(String), 5(Long), 1(Long)
+2026-01-22 19:50:50.186 DEBUG [http-nio-8080-exec-9] c.w.p.p.m.P.updateReport - <==    Updates: 1
+2026-01-22 19:50:51.542 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 19:50:51.543 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 19:50:51.556 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 19:50:51.557 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 19:50:51.557 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 19:50:51.584 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 19:50:51.585 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 19:50:51.600 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 19:50:51.601 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 5, 1, <<BLOB>>, 2026-01-22 10:50:50
+2026-01-22 19:50:51.602 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 1
+2026-01-22 19:50:54.481 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 19:50:54.481 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 19:50:54.494 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 19:50:54.494 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 19:50:54.495 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 19:50:54.521 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 19:50:54.521 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 19:50:54.534 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 19:50:54.535 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 5, 1, <<BLOB>>, 2026-01-22 10:50:50
+2026-01-22 19:50:54.535 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 1
+2026-01-22 19:51:01.935 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 19:51:01.936 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test1@example.com(String)
+2026-01-22 19:51:01.949 TRACE [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 19:51:01.950 TRACE [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 2
+2026-01-22 19:51:01.950 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 19:51:01.976 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 19:51:01.976 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 2(Long)
+2026-01-22 19:51:01.989 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 0
+2026-01-22 19:51:12.747 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 19:51:12.748 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 19:51:12.761 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 19:51:12.762 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 19:51:12.762 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 19:51:12.788 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 19:51:12.789 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 19:51:12.802 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 19:51:12.803 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 5, 1, <<BLOB>>, 2026-01-22 10:50:50
+2026-01-22 19:51:12.804 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 1
+2026-01-22 19:56:27.397 INFO  [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-01-22 19:56:27.401 INFO  [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-01-22 19:56:27.403 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-01-22 19:56:37.409 WARN  [SpringApplicationShutdownHook] com.zaxxer.hikari.pool.HikariPool - Timed-out waiting for close connection executor to shutdown
+2026-01-22 19:56:37.411 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-01-22 19:57:28.292 INFO  [main] c.whomade.planfAi.PlanfAiApplication - Starting PlanfAiApplication using Java 21.0.9 with PID 84094 (/Users/soo/Documents/AiWork/planfAi/target/classes started by soo in /Users/soo/Documents/AiWork/planfAi)
+2026-01-22 19:57:28.293 DEBUG [main] c.whomade.planfAi.PlanfAiApplication - Running with Spring Boot v3.4.1, Spring v6.2.1
+2026-01-22 19:57:28.293 INFO  [main] c.whomade.planfAi.PlanfAiApplication - The following 1 profile is active: "dev"
+2026-01-22 19:57:28.608 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-01-22 19:57:28.612 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-01-22 19:57:28.613 INFO  [main] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-01-22 19:57:28.613 INFO  [main] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.34]
+2026-01-22 19:57:28.628 INFO  [main] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-01-22 19:57:28.628 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 323 ms
+2026-01-22 19:57:28.660 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-01-22 19:57:29.203 INFO  [main] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@68aec50
+2026-01-22 19:57:29.204 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-22 19:57:29.305 INFO  [main] o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2026-01-22 19:57:29.385 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-01-22 19:57:29.389 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-01-22 19:57:29.392 INFO  [main] c.whomade.planfAi.PlanfAiApplication - Started PlanfAiApplication in 1.271 seconds (process running for 6.783)
+2026-01-22 19:57:44.096 INFO  [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-01-22 19:57:44.097 INFO  [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-01-22 19:57:44.098 INFO  [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2026-01-22 19:57:44.351 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 19:57:44.381 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 19:57:44.419 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 19:57:44.419 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 19:57:44.423 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 19:57:44.458 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 19:57:44.460 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 19:57:44.478 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 19:57:44.478 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 5, 1, <<BLOB>>, 2026-01-22 10:50:50
+2026-01-22 19:57:44.480 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 1
+2026-01-22 19:57:46.845 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 19:57:46.846 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 19:57:46.860 TRACE [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 19:57:46.860 TRACE [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 19:57:46.860 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 19:57:46.884 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 19:57:46.885 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 19:57:46.898 TRACE [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 19:57:46.899 TRACE [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 5, 1, <<BLOB>>, 2026-01-22 10:50:50
+2026-01-22 19:57:46.899 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 1
+2026-01-22 19:57:48.679 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 19:57:48.680 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 19:57:48.694 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 19:57:48.695 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 19:57:48.695 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 19:57:48.721 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 19:57:48.722 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 19:57:48.735 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 19:57:48.736 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 5, 1, <<BLOB>>, 2026-01-22 10:50:50
+2026-01-22 19:57:48.737 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 1
+2026-01-22 20:04:17.474 INFO  [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-01-22 20:04:17.480 INFO  [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-01-22 20:04:17.483 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-01-22 20:04:27.492 WARN  [SpringApplicationShutdownHook] com.zaxxer.hikari.pool.HikariPool - Timed-out waiting for close connection executor to shutdown
+2026-01-22 20:04:27.494 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-01-22 20:05:26.580 INFO  [main] c.whomade.planfAi.PlanfAiApplication - Starting PlanfAiApplication using Java 21.0.9 with PID 84627 (/Users/soo/Documents/AiWork/planfAi/target/classes started by soo in /Users/soo/Documents/AiWork/planfAi)
+2026-01-22 20:05:26.581 DEBUG [main] c.whomade.planfAi.PlanfAiApplication - Running with Spring Boot v3.4.1, Spring v6.2.1
+2026-01-22 20:05:26.581 INFO  [main] c.whomade.planfAi.PlanfAiApplication - The following 1 profile is active: "dev"
+2026-01-22 20:05:26.892 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-01-22 20:05:26.896 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-01-22 20:05:26.897 INFO  [main] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-01-22 20:05:26.897 INFO  [main] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.34]
+2026-01-22 20:05:26.912 INFO  [main] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-01-22 20:05:26.912 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 318 ms
+2026-01-22 20:05:26.944 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-01-22 20:05:27.231 INFO  [main] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@783b3aa0
+2026-01-22 20:05:27.232 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-22 20:05:27.328 INFO  [main] o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2026-01-22 20:05:27.409 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-01-22 20:05:27.417 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-01-22 20:05:27.420 INFO  [main] c.whomade.planfAi.PlanfAiApplication - Started PlanfAiApplication in 1.012 seconds (process running for 6.444)
+2026-01-22 20:05:47.031 INFO  [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-01-22 20:05:47.031 INFO  [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-01-22 20:05:47.033 INFO  [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2026-01-22 20:05:47.353 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 20:05:47.371 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 20:05:47.429 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 20:05:47.429 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 20:05:47.431 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 20:05:47.457 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 20:05:47.458 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 20:05:47.471 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 20:05:47.471 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 5, 1, <<BLOB>>, 2026-01-22 10:50:50
+2026-01-22 20:05:47.472 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 1
+2026-01-22 20:07:35.332 DEBUG [http-nio-8080-exec-1] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 20:07:35.336 DEBUG [http-nio-8080-exec-1] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 20:07:35.350 TRACE [http-nio-8080-exec-1] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 20:07:35.350 TRACE [http-nio-8080-exec-1] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 20:07:35.350 DEBUG [http-nio-8080-exec-1] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 20:07:35.375 DEBUG [http-nio-8080-exec-1] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 20:07:35.376 DEBUG [http-nio-8080-exec-1] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 20:07:35.389 TRACE [http-nio-8080-exec-1] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 20:07:35.390 TRACE [http-nio-8080-exec-1] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 5, 1, <<BLOB>>, 2026-01-22 10:50:50
+2026-01-22 20:07:35.391 DEBUG [http-nio-8080-exec-1] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 1
+2026-01-22 20:07:48.746 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 20:07:48.748 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 20:07:48.760 TRACE [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 20:07:48.761 TRACE [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 20:07:48.761 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 20:07:48.787 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 20:07:48.788 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 20:07:48.804 TRACE [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 20:07:48.804 TRACE [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 5, 1, <<BLOB>>, 2026-01-22 10:50:50
+2026-01-22 20:07:48.805 DEBUG [http-nio-8080-exec-6] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 1
+2026-01-22 20:07:54.787 DEBUG [http-nio-8080-exec-7] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 20:07:54.788 DEBUG [http-nio-8080-exec-7] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test1@example.com(String)
+2026-01-22 20:07:54.801 TRACE [http-nio-8080-exec-7] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 20:07:54.802 TRACE [http-nio-8080-exec-7] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 2
+2026-01-22 20:07:54.802 DEBUG [http-nio-8080-exec-7] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 20:07:54.828 DEBUG [http-nio-8080-exec-7] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 20:07:54.828 DEBUG [http-nio-8080-exec-7] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 2(Long)
+2026-01-22 20:07:54.841 DEBUG [http-nio-8080-exec-7] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 0
+2026-01-22 20:07:56.076 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 20:07:56.077 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test1@example.com(String)
+2026-01-22 20:07:56.091 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 20:07:56.092 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 2
+2026-01-22 20:07:56.092 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 20:07:56.117 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 20:07:56.118 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 2(Long)
+2026-01-22 20:07:56.131 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 0
+2026-01-22 20:07:56.718 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 20:07:56.719 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test1@example.com(String)
+2026-01-22 20:07:56.733 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 20:07:56.733 TRACE [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 2
+2026-01-22 20:07:56.734 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 20:07:56.759 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 20:07:56.760 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 2(Long)
+2026-01-22 20:07:56.774 DEBUG [http-nio-8080-exec-10] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 0
+2026-01-22 20:10:03.544 INFO  [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-01-22 20:10:03.548 INFO  [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-01-22 20:10:03.550 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-01-22 20:10:13.555 WARN  [SpringApplicationShutdownHook] com.zaxxer.hikari.pool.HikariPool - Timed-out waiting for close connection executor to shutdown
+2026-01-22 20:10:13.557 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-01-22 20:10:56.359 INFO  [main] c.whomade.planfAi.PlanfAiApplication - Starting PlanfAiApplication using Java 21.0.9 with PID 85032 (/Users/soo/Documents/AiWork/planfAi/target/classes started by soo in /Users/soo/Documents/AiWork/planfAi)
+2026-01-22 20:10:56.360 DEBUG [main] c.whomade.planfAi.PlanfAiApplication - Running with Spring Boot v3.4.1, Spring v6.2.1
+2026-01-22 20:10:56.360 INFO  [main] c.whomade.planfAi.PlanfAiApplication - The following 1 profile is active: "dev"
+2026-01-22 20:10:56.668 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-01-22 20:10:56.674 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-01-22 20:10:56.675 INFO  [main] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-01-22 20:10:56.675 INFO  [main] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.34]
+2026-01-22 20:10:56.695 INFO  [main] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-01-22 20:10:56.695 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 322 ms
+2026-01-22 20:10:56.751 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-01-22 20:10:57.003 INFO  [main] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@68aec50
+2026-01-22 20:10:57.004 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-22 20:10:57.098 INFO  [main] o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2026-01-22 20:10:57.177 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-01-22 20:10:57.182 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-01-22 20:10:57.185 INFO  [main] c.whomade.planfAi.PlanfAiApplication - Started PlanfAiApplication in 0.995 seconds (process running for 6.406)
+2026-01-22 20:11:07.811 INFO  [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-01-22 20:11:07.812 INFO  [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-01-22 20:11:07.814 INFO  [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2026-01-22 20:11:08.015 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 20:11:08.040 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 20:11:08.064 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 20:11:08.065 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 20:11:08.066 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 20:11:08.091 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 20:11:08.091 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 20:11:08.105 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 20:11:08.105 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 5, 1, <<BLOB>>, 2026-01-22 10:50:50
+2026-01-22 20:11:08.107 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 1
+2026-01-22 20:12:08.222 INFO  [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-01-22 20:12:08.226 INFO  [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-01-22 20:12:08.228 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-01-22 20:12:08.354 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-01-22 20:12:15.976 INFO  [main] c.whomade.planfAi.PlanfAiApplication - Starting PlanfAiApplication using Java 21.0.9 with PID 85187 (/Users/soo/Documents/AiWork/planfAi/target/classes started by soo in /Users/soo/Documents/AiWork/planfAi)
+2026-01-22 20:12:15.976 DEBUG [main] c.whomade.planfAi.PlanfAiApplication - Running with Spring Boot v3.4.1, Spring v6.2.1
+2026-01-22 20:12:15.977 INFO  [main] c.whomade.planfAi.PlanfAiApplication - The following 1 profile is active: "dev"
+2026-01-22 20:12:16.273 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-01-22 20:12:16.277 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-01-22 20:12:16.278 INFO  [main] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-01-22 20:12:16.278 INFO  [main] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.34]
+2026-01-22 20:12:16.293 INFO  [main] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-01-22 20:12:16.293 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 304 ms
+2026-01-22 20:12:16.322 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-01-22 20:12:16.577 INFO  [main] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@6ed18d80
+2026-01-22 20:12:16.578 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-22 20:12:16.673 INFO  [main] o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2026-01-22 20:12:16.754 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-01-22 20:12:16.759 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-01-22 20:12:16.762 INFO  [main] c.whomade.planfAi.PlanfAiApplication - Started PlanfAiApplication in 0.949 seconds (process running for 6.366)
+2026-01-22 20:12:23.809 INFO  [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-01-22 20:12:23.809 INFO  [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-01-22 20:12:23.813 INFO  [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet - Completed initialization in 4 ms
+2026-01-22 20:12:23.975 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 20:12:23.987 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 20:12:24.018 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 20:12:24.019 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 20:12:24.021 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 20:12:24.047 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 20:12:24.048 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 20:12:24.061 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 20:12:24.062 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 5, 1, <<BLOB>>, 2026-01-22 10:50:50
+2026-01-22 20:12:24.063 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 1
+2026-01-22 20:12:27.491 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 20:12:27.492 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 20:12:27.505 TRACE [http-nio-8080-exec-5] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 20:12:27.505 TRACE [http-nio-8080-exec-5] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 20:12:27.505 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 20:12:27.530 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 20:12:27.531 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 20:12:27.543 TRACE [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 20:12:27.544 TRACE [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 5, 1, <<BLOB>>, 2026-01-22 10:50:50
+2026-01-22 20:12:27.545 DEBUG [http-nio-8080-exec-5] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 1
+2026-01-22 20:19:33.032 INFO  [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-01-22 20:19:33.036 INFO  [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-01-22 20:19:33.038 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-01-22 20:19:54.426 INFO  [main] c.whomade.planfAi.PlanfAiApplication - Starting PlanfAiApplication using Java 21.0.9 with PID 85700 (/Users/soo/Documents/AiWork/planfAi/target/classes started by soo in /Users/soo/Documents/AiWork/planfAi)
+2026-01-22 20:19:54.426 DEBUG [main] c.whomade.planfAi.PlanfAiApplication - Running with Spring Boot v3.4.1, Spring v6.2.1
+2026-01-22 20:19:54.426 INFO  [main] c.whomade.planfAi.PlanfAiApplication - The following 1 profile is active: "dev"
+2026-01-22 20:19:54.733 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-01-22 20:19:54.737 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-01-22 20:19:54.738 INFO  [main] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-01-22 20:19:54.738 INFO  [main] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.34]
+2026-01-22 20:19:54.754 INFO  [main] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-01-22 20:19:54.754 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 315 ms
+2026-01-22 20:19:54.786 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-01-22 20:19:55.017 INFO  [main] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@2ec85a25
+2026-01-22 20:19:55.018 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-22 20:19:55.134 INFO  [main] o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2026-01-22 20:19:55.234 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-01-22 20:19:55.241 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-01-22 20:19:55.245 INFO  [main] c.whomade.planfAi.PlanfAiApplication - Started PlanfAiApplication in 0.989 seconds (process running for 6.398)
+2026-01-22 20:20:02.703 INFO  [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-01-22 20:20:02.703 INFO  [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-01-22 20:20:02.704 INFO  [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2026-01-22 20:20:03.012 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 20:20:03.038 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 20:20:03.066 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 20:20:03.066 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 20:20:03.069 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 20:20:03.094 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 20:20:03.095 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 20:20:03.108 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 20:20:03.109 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 5, 1, <<BLOB>>, 2026-01-22 10:50:50
+2026-01-22 20:20:03.111 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 1
+2026-01-22 20:20:53.034 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 20:20:53.037 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 20:20:53.051 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 20:20:53.051 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 20:20:53.052 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 20:20:53.076 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 20:20:53.077 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 20:20:53.094 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 20:20:53.095 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 5, 1, <<BLOB>>, 2026-01-22 10:50:50
+2026-01-22 20:20:53.096 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 1
+2026-01-22 20:23:58.987 INFO  [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-01-22 20:23:58.995 INFO  [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-01-22 20:23:58.997 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-01-22 20:23:59.129 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-01-22 20:24:28.873 INFO  [main] c.whomade.planfAi.PlanfAiApplication - Starting PlanfAiApplication using Java 21.0.9 with PID 86010 (/Users/soo/Documents/AiWork/planfAi/target/classes started by soo in /Users/soo/Documents/AiWork/planfAi)
+2026-01-22 20:24:28.874 DEBUG [main] c.whomade.planfAi.PlanfAiApplication - Running with Spring Boot v3.4.1, Spring v6.2.1
+2026-01-22 20:24:28.874 INFO  [main] c.whomade.planfAi.PlanfAiApplication - The following 1 profile is active: "dev"
+2026-01-22 20:24:29.177 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-01-22 20:24:29.181 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-01-22 20:24:29.182 INFO  [main] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-01-22 20:24:29.182 INFO  [main] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.34]
+2026-01-22 20:24:29.197 INFO  [main] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-01-22 20:24:29.197 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 310 ms
+2026-01-22 20:24:29.229 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-01-22 20:24:29.466 INFO  [main] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@6ed18d80
+2026-01-22 20:24:29.467 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-22 20:24:29.561 INFO  [main] o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2026-01-22 20:24:29.640 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-01-22 20:24:29.645 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-01-22 20:24:29.648 INFO  [main] c.whomade.planfAi.PlanfAiApplication - Started PlanfAiApplication in 0.944 seconds (process running for 6.346)
+2026-01-22 20:24:35.285 INFO  [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-01-22 20:24:35.286 INFO  [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-01-22 20:24:35.287 INFO  [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2026-01-22 20:24:35.442 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 20:24:35.455 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 20:24:35.479 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 20:24:35.479 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 20:24:35.481 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 20:24:35.506 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 20:24:35.507 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 20:24:35.521 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 20:24:35.522 TRACE [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 5, 1, <<BLOB>>, 2026-01-22 10:50:50
+2026-01-22 20:24:35.524 DEBUG [http-nio-8080-exec-2] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 1
+2026-01-22 20:24:52.956 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 20:24:52.957 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 20:24:52.970 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 20:24:52.970 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 20:24:52.970 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 20:24:52.995 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 20:24:52.995 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 20:24:53.008 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 20:24:53.008 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 5, 1, <<BLOB>>, 2026-01-22 10:50:50
+2026-01-22 20:24:53.008 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 1
+2026-01-22 20:26:04.574 INFO  [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-01-22 20:26:04.578 INFO  [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-01-22 20:26:04.581 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-01-22 20:26:04.707 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-01-22 20:27:05.160 INFO  [main] c.whomade.planfAi.PlanfAiApplication - Starting PlanfAiApplication using Java 21.0.9 with PID 86568 (/Users/soo/Documents/AiWork/planfAi/target/classes started by soo in /Users/soo/Documents/AiWork/planfAi)
+2026-01-22 20:27:05.161 DEBUG [main] c.whomade.planfAi.PlanfAiApplication - Running with Spring Boot v3.4.1, Spring v6.2.1
+2026-01-22 20:27:05.161 INFO  [main] c.whomade.planfAi.PlanfAiApplication - The following 1 profile is active: "dev"
+2026-01-22 20:27:05.481 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-01-22 20:27:05.486 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-01-22 20:27:05.486 INFO  [main] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-01-22 20:27:05.486 INFO  [main] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.34]
+2026-01-22 20:27:05.507 INFO  [main] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-01-22 20:27:05.507 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 333 ms
+2026-01-22 20:27:05.541 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-01-22 20:27:05.809 INFO  [main] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@783b3aa0
+2026-01-22 20:27:05.811 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-22 20:27:05.926 INFO  [main] o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2026-01-22 20:27:06.009 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-01-22 20:27:06.014 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-01-22 20:27:06.018 INFO  [main] c.whomade.planfAi.PlanfAiApplication - Started PlanfAiApplication in 1.027 seconds (process running for 6.458)
+2026-01-22 20:27:15.573 INFO  [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-01-22 20:27:15.574 INFO  [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-01-22 20:27:15.575 INFO  [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2026-01-22 20:27:15.901 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 20:27:15.918 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 20:27:15.948 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 20:27:15.948 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 20:27:15.954 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 20:27:15.982 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 20:27:15.984 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 20:27:15.998 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 20:27:15.999 TRACE [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 5, 1, <<BLOB>>, 2026-01-22 10:50:50
+2026-01-22 20:27:16.002 DEBUG [http-nio-8080-exec-4] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 1
+2026-01-22 20:27:18.420 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 20:27:18.421 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 20:27:18.434 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 20:27:18.434 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 20:27:18.435 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 20:27:18.459 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 20:27:18.460 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 20:27:18.473 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 20:27:18.474 TRACE [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 5, 1, <<BLOB>>, 2026-01-22 10:50:50
+2026-01-22 20:27:18.474 DEBUG [http-nio-8080-exec-8] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 1
+2026-01-22 20:27:19.694 DEBUG [http-nio-8080-exec-9] c.w.p.p.m.P.selectUserNoByEmail - ==>  Preparing: SELECT user_no FROM tb_user WHERE email = ?
+2026-01-22 20:27:19.695 DEBUG [http-nio-8080-exec-9] c.w.p.p.m.P.selectUserNoByEmail - ==> Parameters: test@example.com(String)
+2026-01-22 20:27:19.708 TRACE [http-nio-8080-exec-9] c.w.p.p.m.P.selectUserNoByEmail - <==    Columns: user_no
+2026-01-22 20:27:19.708 TRACE [http-nio-8080-exec-9] c.w.p.p.m.P.selectUserNoByEmail - <==        Row: 1
+2026-01-22 20:27:19.708 DEBUG [http-nio-8080-exec-9] c.w.p.p.m.P.selectUserNoByEmail - <==      Total: 1
+2026-01-22 20:27:19.732 DEBUG [http-nio-8080-exec-9] c.w.p.p.m.P.selectReportsByUserNo - ==>  Preparing: SELECT id, user_no, report_data, created_at FROM profit_reports WHERE user_no = ? ORDER BY created_at DESC
+2026-01-22 20:27:19.733 DEBUG [http-nio-8080-exec-9] c.w.p.p.m.P.selectReportsByUserNo - ==> Parameters: 1(Long)
+2026-01-22 20:27:19.748 TRACE [http-nio-8080-exec-9] c.w.p.p.m.P.selectReportsByUserNo - <==    Columns: id, user_no, report_data, created_at
+2026-01-22 20:27:19.749 TRACE [http-nio-8080-exec-9] c.w.p.p.m.P.selectReportsByUserNo - <==        Row: 5, 1, <<BLOB>>, 2026-01-22 10:50:50
+2026-01-22 20:27:19.750 DEBUG [http-nio-8080-exec-9] c.w.p.p.m.P.selectReportsByUserNo - <==      Total: 1

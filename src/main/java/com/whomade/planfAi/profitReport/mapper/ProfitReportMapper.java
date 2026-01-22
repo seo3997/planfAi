@@ -8,7 +8,11 @@ import java.util.List;
 public interface ProfitReportMapper {
     void insertReport(ProfitVo profitVo);
 
+    void updateReport(ProfitVo profitVo);
+
     List<ProfitVo> selectReportsByUserNo(Long userNo);
+
+    void deleteReport(Long reportId);
 
     // Simple user check for demo purposes (usually UserMapper lies separately)
     Long selectUserNoByEmail(String email);

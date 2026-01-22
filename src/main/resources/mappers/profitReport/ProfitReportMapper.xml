@@ -9,12 +9,23 @@
         VALUES (#{userNo}, #{reportData}, NOW())
     </insert>
 
+    <update id="updateReport" parameterType="ProfitVo">
+        UPDATE profit_reports
+        SET report_data = #{reportData},
+            created_at = NOW()
+        WHERE id = #{id} AND user_no = #{userNo}
+    </update>
+
     <select id="selectReportsByUserNo" parameterType="long" resultType="ProfitVo">
         SELECT id, user_no, report_data, created_at
         FROM profit_reports
         WHERE user_no = #{userNo}
         ORDER BY created_at DESC
     </select>
+
+    <delete id="deleteReport" parameterType="long">
+        DELETE FROM profit_reports WHERE id = #{reportId}
+    </delete>
 
     <select id="selectUserNoByEmail" parameterType="string" resultType="long">
         SELECT user_no FROM tb_user WHERE email = #{email}
