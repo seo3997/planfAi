@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study 1: JS Framework Comparison</title>
+    <!-- Bootstrap for styling -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- jQuery CDN -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <!-- Vue 3 CDN -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        .section-box { border: 1px solid #ddd; padding: 20px; margin-bottom: 20px; border-radius: 8px; }
+    </style>
+</head>
+<body class="p-4">
+    <div class="container">
+        <h1 class="mb-4">JS Framework Comparison: Price Calculation</h1>
+        <p class="text-muted mb-5">입력값: 상품가격, 수량 -> 버튼 클릭 -> 계산 결과 출력</p>
+
+        <!-- 1. Vanilla JS Implementation -->
+        <div class="section-box">
+            <h2>1. Vanilla JS</h2>
+            <div class="row g-3 align-items-center">
+                <div class="col-auto">
+                    <input type="number" id="v-price" class="form-control" placeholder="상품가격" onchange="calcVanilla()">
+                </div>
+                <div class="col-auto">x</div>
+                <div class="col-auto">
+                    <input type="number" id="v-qty" class="form-control" placeholder="수량" onchange="calcVanilla()">
+                </div>
+                <div class="col-auto">
+                    <button id="v-btn" class="btn btn-primary" onclick="calcVanilla()">계산</button>
+                </div>
+                <div class="col-auto">
+                    = <input type="text" id="v-result" class="form-control d-inline-block w-auto fw-bold text-primary" readonly value="0"> 원
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. jQuery Implementation -->
+        <div class="section-box">
+            <h2>2. jQuery</h2>
+            <div class="row g-3 align-items-center">
+                <div class="col-auto">
+                    <input type="number" id="j-price" class="form-control" placeholder="상품가격">
+                </div>
+                <div class="col-auto">x</div>
+                <div class="col-auto">
+                    <input type="number" id="j-qty" class="form-control" placeholder="수량">
+                </div>
+                <div class="col-auto">
+                    <button id="j-btn" class="btn btn-success">계산</button>
+                </div>
+                <div class="col-auto">
+                    = <input type="text" id="j-result" class="form-control d-inline-block w-auto fw-bold text-success" readonly value="0"> 원
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Vue.js Implementation -->
+        <div id="app" class="section-box">
+            <h2>3. Vue.js</h2>
+            <div class="row g-3 align-items-center">
+                <div class="col-auto">
+                    <!-- Vue v-model for two-way binding -->
+                    <input type="number" v-model="price" class="form-control" placeholder="상품가격">
+                </div>
+                <div class="col-auto">x</div>
+                <div class="col-auto">
+                    <input type="number" v-model="qty" class="form-control" placeholder="수량">
+                </div>
+                <div class="col-auto">
+                    <!-- Vue event handling -->
+                    <button @click="calcVue" class="btn btn-warning text-white">계산</button>
+                </div>
+                <div class="col-auto">
+                    = <input type="text" v-model="result" class="form-control d-inline-block w-auto fw-bold text-warning" readonly> 원
+                </div>
+            </div>
+        </div>
+        <!-- Explanation Section -->
+        <div class="mt-5 p-4 bg-light rounded">
+            <h3 class="mb-4">🔍 기술 설명 및 비교</h3>
+            
+            <div class="mb-4">
+                <h4 class="text-primary">1. Vanilla JS (순수 자바스크립트)</h4>
+                <p>
+                    특별한 라이브러리나 프레임워크 없이 브라우저 내장 API만으로 구현하는 방식입니다.<br>
+                    <strong>특징:</strong> 가장 빠르고 가볍지만, 코드량이 많아질 수 있고 DOM(화면 요소)을 직접 하나하나 조작해야 해서 복잡한 대규모 앱에는 불편할 수 있습니다.<br>
+                    <strong>핵심 코드:</strong> <code>document.getElementById('id').value</code>로 값을 가져오고, <code>innerText</code>로 화면을 갱신합니다.
+                </p>
+            </div>
+
+            <div class="mb-4">
+                <h4 class="text-success">2. jQuery (제이쿼리)</h4>
+                <p>
+                    복잡한 자바스크립트 코드를 짧고 쉽게 쓸 수 있게 해주는 라이브러리입니다. (과거 표준처럼 많이 쓰임)<br>
+                    <strong>특징:</strong> <code>$</code> 기호 하나로 요소를 쉽게 찾고 이벤트를 연결할 수 있습니다. 하지만 요즘은 브라우저 표준 기능이 좋아져서 사용이 줄어드는 추세입니다.<br>
+                    <strong>핵심 코드:</strong> <code>$('#id').val()</code>로 값을 쉽게 가져오고, <code>.text()</code>로 화면을 수정합니다.
+                </p>
+            </div>
+
+            <div class="mb-4">
+                <h4 class="text-warning text-dark-emphasis">3. Vue.js (뷰) & React (리액트) 개념 비교</h4>
+                <p>
+                    Vue와 React는 현대적인 <strong>SPA(Single Page Application)</strong> 프레임워크입니다. 
+                    화면의 데이터가 바뀌면 알아서 화면을 고쳐주는 <strong>'반응형(Reactivity)'</strong> 시스템이 핵심입니다.
+                </p>
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <strong>Vue.js의 특징:</strong> <br>
+                        HTML(Template), JS(Logic), CSS(Style)가 한 파일(.vue)이나 명확히 분리된 구조로 되어 있어 <strong>배우기 쉽고 직관적</strong>입니다.<br>
+                        위 예제처럼 <code>v-model</code>을 쓰면 변수와 입력창이 자동으로 <span class="badge bg-secondary">양방향 연결</span>되어, 값이 바뀌면 즉시 화면도 바뀝니다.
+                    </li>
+                    <li class="list-group-item">
+                        <strong>React(리액트)의 개념 (MVVM 관점):</strong> <br>
+                        React도 Vue와 마찬가지로 <strong>MVVM(Model-View-ViewModel) 패턴</strong>의 철학을 공유합니다.<br>
+                        <strong>1. 데이터 바인딩:</strong> 화면에 보여질 데이터는 'State(상태)'라는 곳에 저장됩니다.<br>
+                        <strong>2. 자동 화면 갱신:</strong> 이 State 값이 바뀌면, 리액트 엔진이 이를 감지하고 변경된 부분만 자동으로 화면(View)에 반영해줍니다.<br>
+                        즉, 개발자가 직접 <code>document.getElementById</code>로 값을 넣을 필요 없이, <strong>"데이터만 바꾸면 화면은 알아서 바뀐다"</strong>는 것이 핵심입니다.
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. Vanilla JS Logic
+        function calcVanilla() {
+            // Get elements by ID
+            const price = document.getElementById('v-price').value;
+            const qty = document.getElementById('v-qty').value;
+            // Calculate
+            const total = Number(price) * Number(qty);
+            // Update DOM (Input value)
+            document.getElementById('v-result').value = total.toLocaleString();
+        }
+
+        // 2. jQuery Logic
+        $(document).ready(function() {
+            $('#j-btn').click(function() {
+                // Get values
+                const price = $('#j-price').val();
+                const qty = $('#j-qty').val();
+                // Calculate
+                const total = Number(price) * Number(qty);
+                // Update DOM (Input value)
+                $('#j-result').val(total.toLocaleString());
+            });
+        });
+
+        // 3. Vue.js Logic
+        const { createApp, ref, computed } = Vue;
+
+        createApp({
+            setup() {
+                // Reactive state
+                const price = ref('');
+                const qty = ref('');
+
+                const result = computed(() => {
+                    const total = Number(price.value) * Number(qty.value);
+                    return total.toLocaleString();
+                });
+                // Method
+                const calcVue = () => {
+                    const total = Number(price.value) * Number(qty.value);
+                    result.value = total.toLocaleString();
+                };
+
+                return {
+                    price, qty, result, calcVue
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

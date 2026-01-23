@@ -818,7 +818,13 @@
                 try {
                     // var email = document.getElementById("userEmail1").value;
                     const res = await axios.get(`/api/report/`+userEmail.value);
+                    console.log("*****************");
+                    console.log(res)
+                    console.log("*****************");
                     //const res = await axios.get(`/api/report/${userEmail.value}`);
+                    console.log("*****************");
+                    console.log(res.data)
+                    console.log("*****************");
                     reports.value = res.data;
                 } catch(e) { console.error(e); }
             };
