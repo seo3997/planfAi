@@ -405,62 +405,119 @@
                                 </div>
                             </div>
 
-                            <!-- 4. Invest & Loan -->
+                            <!-- 4. Investment Plan -->
+                             <div class="accordion-item border-0 mb-3 shadow-sm rounded-3 overflow-hidden">
+                                 <h2 class="accordion-header">
+                                     <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseInvest">
+                                         <span class="section-badge">4단계</span> 투자 계획 (Investment Plan)
+                                     </button>
+                                 </h2>
+                                 <div id="collapseInvest" class="accordion-collapse collapse" data-bs-parent="#expertAccordion">
+                                     <div class="accordion-body bg-light">
+                                         <div class="table-responsive">
+                                             <table class="table table-sm small align-middle bg-white rounded shadow-sm">
+                                                 <thead class="bg-light">
+                                                     <tr class="text-center">
+                                                         <th width="15%">투자구분</th>
+                                                         <th width="10%">부문</th>
+                                                         <th width="20%">항목명</th>
+                                                         <th width="20%">금액</th>
+                                                         <th width="10%">년수</th>
+                                                         <th width="10%">상각</th>
+                                                         <th width="5%"></th>
+                                                     </tr>
+                                                 </thead>
+                                                 <tbody>
+                                                     <tr v-for="(inv, idx) in expertData.INVEST.plan" :key="'inv'+idx">
+                                                         <td>
+                                                             <select class="form-select form-select-sm" v-model="inv.investType">
+                                                                 <option v-for="(list, cat) in investCategories" :key="cat" :value="cat">{{ cat }}</option>
+                                                             </select>
+                                                         </td>
+                                                         <td>
+                                                             <select class="form-select form-select-sm" v-model="inv.section">
+                                                                 <option value="제조">제조</option>
+                                                                 <option value="판매">판매</option>
+                                                             </select>
+                                                         </td>
+                                                         <td>
+                                                             <select class="form-select form-select-sm" v-model="inv.investTitle">
+                                                                 <option v-for="title in investCategories[inv.investType]" :key="title" :value="title">{{ title }}</option>
+                                                             </select>
+                                                         </td>
+                                                         <td><input type="number" class="form-control form-control-sm text-end" v-model.number="inv.investPrice"></td>
+                                                         <td><input type="number" class="form-control form-control-sm text-center" v-model.number="inv.investYear"></td>
+                                                         <td>
+                                                             <select class="form-select form-select-sm" v-model="inv.investYn">
+                                                                 <option value="Y">Y</option>
+                                                                 <option value="N">N</option>
+                                                             </select>
+                                                         </td>
+                                                         <td class="text-center"><button class="btn-close small" @click="expertData.INVEST.plan.splice(idx,1)"></button></td>
+                                                     </tr>
+                                                 </tbody>
+                                             </table>
+                                         </div>
+                                         <button class="btn btn-sm btn-light w-100 border mt-2" @click="addInvestExpert">+ 투자 항목 추가</button>
+                                         <div class="mt-3 text-end small text-muted">
+                                             월 감가상각비 합계: <strong class="text-primary">{{ formatCurrency(expertResult.totalDepreciation) }}</strong>
+                                         </div>
+                                     </div>
+                                 </div>
+                             </div>
+
+                             <!-- 5. Financing Plan -->
                              <div class="accordion-item border-0 mb-3 shadow-sm rounded-3 overflow-hidden">
                                 <h2 class="accordion-header">
-                                    <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseInvest">
-                                        <span class="section-badge">4단계</span> 투자 및 자금조달
+                                    <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLoan">
+                                        <span class="section-badge">5단계</span> 자금조달 계획 (Financing Plan)
                                     </button>
                                 </h2>
-                                <div id="collapseInvest" class="accordion-collapse collapse" data-bs-parent="#expertAccordion">
+                                <div id="collapseLoan" class="accordion-collapse collapse" data-bs-parent="#expertAccordion">
                                     <div class="accordion-body bg-light">
-                                        <h6 class="small text-muted fw-bold">감가상각 대상 자산 (인테리어 등)</h6>
-                                        <div v-for="(inv, idx) in expertData.INVEST.invest02" :key="'i'+idx" class="row g-1 mb-2">
-                                            <div class="col-4"><input type="text" class="form-control form-control-sm" v-model="inv.investTitle" placeholder="항목"></div>
-                                            <div class="col-3"><input type="number" class="form-control form-control-sm" v-model.number="inv.investPrice" placeholder="금액"></div>
-                                            <div class="col-2"><input type="number" class="form-control form-control-sm" v-model.number="inv.investYear" placeholder="년수"></div>
-                                            <div class="col-2">
-                                                <select class="form-select form-select-sm" v-model="inv.investYn">
-                                                    <option value="Y">상각</option>
-                                                    <option value="N">미상각</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-1"><button class="btn-close" @click="expertData.INVEST.invest02.splice(idx,1)"></button></div>
-                                        </div>
-                                        <button class="btn btn-sm btn-light w-100 border mb-4" @click="addInvest(expertData.INVEST.invest02)">+ 시설/비품 추가</button>
-
-                                        <h6 class="small text-muted fw-bold">기타 투자 (권리금/보증금 등)</h6>
-                                        <div v-for="(inv, idx) in expertData.INVEST.invest04" :key="'i4'+idx" class="row g-1 mb-2">
-                                            <div class="col-6"><input type="text" class="form-control form-control-sm" v-model="inv.investTitle" placeholder="권리금/기타(상각)"></div>
-                                            <div class="col-4"><input type="number" class="form-control form-control-sm" v-model.number="inv.investPrice" placeholder="금액"></div>
-                                            <div class="col-2"><button class="btn-close" @click="expertData.INVEST.invest04.splice(idx,1)"></button></div>
-                                        </div>
-                                        <button class="btn btn-sm btn-light w-100 border mb-2" @click="addInvest(expertData.INVEST.invest04, 'N')">+ 권리금/기타 추가</button>
-
-                                        <div v-for="(inv, idx) in expertData.INVEST.invest06" :key="'i6'+idx" class="row g-1 mb-2">
-                                            <div class="col-6"><input type="text" class="form-control form-control-sm" v-model="inv.investTitle" placeholder="보증금(비상각)"></div>
-                                            <div class="col-4"><input type="number" class="form-control form-control-sm" v-model.number="inv.investPrice" placeholder="금액"></div>
-                                            <div class="col-2"><button class="btn-close" @click="expertData.INVEST.invest06.splice(idx,1)"></button></div>
-                                        </div>
-                                        <button class="btn btn-sm btn-light w-100 border mb-4" @click="addInvest(expertData.INVEST.invest06, 'N')">+ 보증금 추가</button>
-
-                                        <h6 class="small text-muted fw-bold">대출금 (이자비용)</h6>
-                                         <div v-for="(loan, idx) in expertData.LOAN.loan02" :key="'l'+idx" class="row g-1 mb-2">
-                                            <div class="col-5"><input type="text" class="form-control form-control-sm" v-model="loan.loanTitle" placeholder="대출명"></div>
-                                            <div class="col-4"><input type="number" class="form-control form-control-sm" v-if="loan.loanYear" v-model.number="loan.loanYear[0]" placeholder="원금"></div>
-                                            <div class="col-2"><input type="number" class="form-control form-control-sm" v-if="loan.loanRate" v-model.number="loan.loanRate[0]" placeholder="이율%"></div>
-                                            <div class="col-1"><button class="btn-close" @click="expertData.LOAN.loan02.splice(idx,1)"></button></div>
-                                        </div>
-                                         <button class="btn btn-sm btn-light w-100 border" @click="addLoan(expertData.LOAN.loan02)">+ 대출 추가</button>
+                                         <div class="table-responsive">
+                                             <table class="table table-sm small align-middle bg-white rounded shadow-sm">
+                                                 <thead class="bg-light">
+                                                     <tr class="text-center">
+                                                         <th width="20%">자금구분</th>
+                                                         <th width="30%">항목명</th>
+                                                         <th width="25%">금액</th>
+                                                         <th width="15%">이자율(%)</th>
+                                                         <th width="10%"></th>
+                                                     </tr>
+                                                 </thead>
+                                                 <tbody>
+                                                     <tr v-for="(ln, idx) in expertData.LOAN.plan" :key="'ln'+idx">
+                                                         <td>
+                                                             <select class="form-select form-select-sm" v-model="ln.loanType">
+                                                                 <option v-for="(list, cat) in loanCategories" :key="cat" :value="cat">{{ cat }}</option>
+                                                             </select>
+                                                         </td>
+                                                         <td>
+                                                             <select class="form-select form-select-sm" v-model="ln.loanTitle">
+                                                                 <option v-for="title in loanCategories[ln.loanType]" :key="title" :value="title">{{ title }}</option>
+                                                             </select>
+                                                         </td>
+                                                         <td><input type="number" class="form-control form-control-sm text-end" v-model.number="ln.loanPrice"></td>
+                                                         <td class="text-center"><input type="number" step="0.1" class="form-control form-control-sm text-end" v-model.number="ln.loanRate"></td>
+                                                         <td class="text-center"><button class="btn-close small" @click="expertData.LOAN.plan.splice(idx,1)"></button></td>
+                                                     </tr>
+                                                 </tbody>
+                                             </table>
+                                         </div>
+                                         <button class="btn btn-sm btn-light w-100 border mt-2" @click="addLoanExpert">+ 자금조달 항목 추가</button>
+                                         <div class="mt-3 text-end small text-muted">
+                                             월 이자비용 합계: <strong class="text-primary">{{ formatCurrency(expertResult.totalInterest) }}</strong>
+                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                             </div>
                             
                             <!-- 5. General Expenses -->
                             <div class="accordion-item border-0 mb-3 shadow-sm rounded-3 overflow-hidden">
                                 <h2 class="accordion-header">
                                     <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExpense">
-                                        <span class="section-badge">5단계</span> 경비 계획 (판관비/제조경비)
+                                        <span class="section-badge">6단계</span> 경비 계획 (판관비/제조경비)
                                     </button>
                                 </h2>
                                 <div id="collapseExpense" class="accordion-collapse collapse" data-bs-parent="#expertAccordion">
@@ -1704,15 +1761,10 @@
                     benefitRate: 0
                 },
                 INVEST: {
-                    invest01: [],
-                    invest02: [],
-                    invest04: [],
-                    invest06: [],
-                    invest08: []
+                    plan: [] 
                 },
                 LOAN: {
-                    loan01: [], // Capital
-                    loan02: []  // Loans
+                    plan: [] 
                 },
                 MCOST: {
                     MCost: [],
@@ -1913,35 +1965,17 @@
                 // PRD says loop invest02 and check bizCd. Since UI doesn't have bizCd per item yet, assume all are General(2) for simplicity or split logic if needed.
                 // Let's assume all are General Depreciation for now to fit KPI logic.
                 // 2.3 Depreciation
-                // Sum all relevant assets (invest01..08) IF investYn == 'Y'
                 let Dep_total = 0;
                 let TotalInvest = 0;
                 
-                const calcDep = (list) => {
-                    if(!list) return;
-                    list.forEach(inv => {
-                        // In JSON, investPrice is raw int (e.g. 40000). 
-                        // If it's 40,000 KRW, it's correct. 
-                        // If it means 40,000 'Cheon-won' (40M), we should check.
-                        // User prompt example: MenuPrice 20000 (20k), Invest 40000 (40k?). 
-                        // Likely Invest is in 'Cheon-won' (Thousands) unit in typical KR apps, 
-                        // BUT user sample menu is 20,000. Let's assume RAW UNIT for now as per valid JSON.
-                        // Or if Invest is 40000 and Year is 5, YearAmt is 667 (~40000/60). 
-                        // So 40000 is the full amount. 
-                        
+                if (data.INVEST.plan) {
+                    data.INVEST.plan.forEach(inv => {
                         TotalInvest += (inv.investPrice || 0);
                         if(inv.investYn === 'Y' && (inv.investYear || 0) > 0) {
                             Dep_total += (inv.investPrice || 0) / (inv.investYear * 12);
                         }
                     });
-                };
-                
-                calcDep(data.INVEST.invest01);
-                calcDep(data.INVEST.invest02);
-                calcDep(data.INVEST.invest04);
-                // Deposit (invest06) usually not depreciated, but verify Yn
-                calcDep(data.INVEST.invest06);
-                calcDep(data.INVEST.invest08);
+                }
 
                 // 2.4 Labor Cost
                 let Labor_mfg = 0;
@@ -1999,15 +2033,13 @@
                     });
                 }
 
-                // 2.5 Interest
-                // Loan uses array [Principal, ..] and [Rate, ..]
+                // 2.6 Interest
                 let Interest_total = 0;
-                if(data.LOAN.loan02) {
-                    data.LOAN.loan02.forEach(l => {
-                        // Access first element [0]
-                        const principal = (l.loanYear && l.loanYear.length > 0) ? l.loanYear[0] : 0;
-                        const rate = (l.loanRate && l.loanRate.length > 0) ? l.loanRate[0] : 0;
-                        Interest_total += principal * (rate/100) / 12;
+                if(data.LOAN.plan) {
+                    data.LOAN.plan.forEach(l => {
+                        if(l.loanType === '타인자금') {
+                            Interest_total += (l.loanPrice || 0) * ((l.loanRate || 0)/100) / 12;
+                        }
                     });
                 }
 
@@ -2312,6 +2344,25 @@
                 }
             };
 
+            const investCategories = {
+                '유형자산': ['토지', '건물', '시설공사비', '기계장치', '차량운반구', '비품구입비', '기타 유형자산'],
+                '무형자산': ['영업권(권리금)', '산업재산권', '개발비', '가맹비(소멸성)', '기타 무형자산'],
+                '기타비유동자산': ['임차보증금', '가맹보증금'],
+                '기타투자비용': ['초동상품(재료)비', '개업전 급료', '개업전 지급임차료', '개업전 홍보비용', '개업전 지급수수료', '기타 투자비용']
+            };
+            const loanCategories = {
+                '자기자금': ['자본금', '출자금', '투자자금', '기타자금'],
+                '타인자금': ['소상공인융자', '은행융자', '기타차입금']
+            };
+
+            const addInvestExpert = () => expertData.INVEST.plan.push({ 
+                investType: '유형자산', section: '제조', investTitle: '시설공사비', investPrice: 0, investYear: 5, investYn: 'Y' 
+            });
+            const addLoanExpert = () => expertData.LOAN.plan.push({ 
+                loanType: '자기자금', loanTitle: '자본금', loanPrice: 0, loanRate: 0 
+            });
+
+
             const addMenu = (list) => list.push({ MenuTitle: '', MenuPrice: 0, MenuQty: 0 });
 
             // ================= CHARTS =================
@@ -2428,7 +2479,8 @@
                 openYearlyModal, closeYearlyModal, saveYearlyModal, calcYearly, calcYearlyDirect, onYMenuCdChange,
                 showMaterialYearlyModal, currentMaterialYearly, openMaterialYearlyModal, closeMaterialYearlyModal, saveMaterialYearly, calcMaterialYearly,
                 showLaborModal, expertData,
-                showLaborYearlyModal, currentLaborYearly, openLaborYearlyModal, closeLaborYearlyModal, saveLaborYearly, calcLaborYearly
+                showLaborYearlyModal, currentLaborYearly, openLaborYearlyModal, closeLaborYearlyModal, saveLaborYearly, calcLaborYearly,
+                investCategories, loanCategories, addInvestExpert, addLoanExpert
 
 
             };
