@@ -533,7 +533,9 @@
                                     <table class="table table-sm table-borderless small mb-4">
                                         <tbody>
                                             <tr>
-                                                <td class="text-muted">(-) 재료비 (COGS)</td>
+                                                <td class="text-muted" @click="showMaterialModal = true" style="cursor: pointer;">
+                                                    (-) 재료비 (COGS) <span class="small text-primary" style="text-decoration: underline;">(상세)</span>
+                                                </td>
                                                 <td class="text-end fw-bold">{{ formatCurrency(expertResult.totalMaterialCost) }}</td>
                                                 <td class="text-end text-muted" style="width: 40px">{{ expertResult.materialRatio }}%</td>
                                             </tr>
@@ -835,6 +837,142 @@
         </div>
     </div>
 
+    <!-- Material Cost Detail Modal -->
+    <div v-if="showMaterialModal" class="modal-backdrop fade show"></div>
+    <div v-if="showMaterialModal" class="modal fade show d-block" tabindex="-1" style="z-index: 1055;">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">📉 재료비 상세 (Material Cost Projection)</h5>
+                    <button type="button" class="btn-close" @click="showMaterialModal = false"></button>
+                </div>
+                <div class="modal-body bg-light">
+                    
+                    <!-- Top Summary Card -->
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body bg-white py-3">
+                            <h5 class="fw-bold mb-3 border-bottom pb-2">재료비 요약</h5>
+                            <div class="row text-center">
+                                <div class="col-4 border-end">
+                                    <small class="text-muted d-block">월 예상 재료비</small>
+                                    <strong class="fs-5">{{ formatCurrency(expertResult.totalMaterialCost) }}</strong>
+                                </div>
+                                <div class="col-4 border-end">
+                                    <small class="text-muted d-block">재료비율</small>
+                                    <strong class="fs-5">{{ expertResult.materialRatio }}%</strong>
+                                </div>
+                                <div class="col-4">
+                                    <small class="text-muted d-block">1차년도 연 예상 재료비</small>
+                                    <strong class="fs-5 text-danger">{{ formatCurrency(expertResult.totalMaterialCost * 12) }}</strong> 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabs -->
+                    <ul class="nav nav-tabs mb-3" id="matTabs">
+                        <li class="nav-item">
+                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabMatYearly" type="button">3개년 예상 재료비 (Yearly)</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabMatMonthly" type="button">1차년도 월별 상세 (Monthly)</button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="matTabContent">
+                        
+                        <!-- TAB 1: Yearly -->
+                        <div class="tab-pane fade show active" id="tabMatYearly">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body p-0 table-responsive">
+                                    <table class="table table-bordered mb-0 text-center align-middle small table-hover">
+                                        <thead class="bg-light">
+                                            <tr>
+                                                <th width="5%">No</th>
+                                                <th width="20%">메뉴명</th>
+                                                <th width="10%">내용</th>
+                                                <th>1차년도</th>
+                                                <th>2차년도</th>
+                                                <th>3차년도</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <template v-for="(m, idx) in expertData.SALE.menuY" :key="'my'+idx">
+                                                <tr>
+                                                    <td rowspan="2" class="bg-white">{{ idx + 1 }}</td>
+                                                    <td rowspan="2" class="text-start fw-bold bg-white">
+                                                        {{ expertData.SALE.menu[idx]?.MenuTitle }}
+                                                    </td>
+                                                    <td class="bg-light">재료비율</td>
+                                                    <td colspan="3" class="text-center text-muted">
+                                                        {{ expertData.COST.cost[idx]?.costRate || 0 }}%
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="bg-light">재료비</td>
+                                                    <td class="fw-bold text-end pe-2">{{ formatNumber((expertData.COST.costY[idx]?.YMenuCost[0]||0)/1000) }}</td>
+                                                    <td class="fw-bold text-end pe-2">{{ formatNumber((expertData.COST.costY[idx]?.YMenuCost[1]||0)/1000) }}</td>
+                                                    <td class="fw-bold text-end pe-2">{{ formatNumber((expertData.COST.costY[idx]?.YMenuCost[2]||0)/1000) }}</td>
+                                                </tr>
+                                            </template>
+                                            
+                                            <!-- Total Footer -->
+                                            <tr class="table-secondary fw-bold">
+                                                <td colspan="3">합계 (재료비)</td>
+                                                <td class="text-end pe-2">{{ formatNumber(sumArrayIdx(expertData.COST.costY, 'YMenuCost', 0)/1000) }}</td>
+                                                <td class="text-end pe-2">{{ formatNumber(sumArrayIdx(expertData.COST.costY, 'YMenuCost', 1)/1000) }}</td>
+                                                <td class="text-end pe-2">{{ formatNumber(sumArrayIdx(expertData.COST.costY, 'YMenuCost', 2)/1000) }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB 2: Monthly -->
+                        <div class="tab-pane fade" id="tabMatMonthly">
+                             <div class="card border-0 shadow-sm">
+                                <div class="card-body p-0 table-responsive">
+                                    <table class="table table-bordered mb-0 text-center align-middle small table-striped">
+                                        <thead class="bg-light sticky-top">
+                                            <tr>
+                                                <th rowspan="1" style="min-width: 40px;">No</th>
+                                                <th rowspan="1" style="min-width: 120px;">메뉴명</th>
+                                                <th rowspan="1" style="min-width: 60px;">비율</th>
+                                                <th v-for="n in 12" :key="n" style="min-width: 70px;">{{n}}월</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <template v-for="(m, idx) in expertData.COST.costM" :key="'cm'+idx">
+                                                <tr>
+                                                    <td class="bg-white">{{ idx + 1 }}</td>
+                                                    <td class="text-start bg-white fw-bold">
+                                                        {{ expertData.SALE.menu[idx]?.MenuTitle }}
+                                                    </td>
+                                                    <td class="text-muted small">{{ expertData.COST.cost[idx]?.costRate }}%</td>
+                                                    <td v-for="c in m.MMenuCost" class="text-end pe-2">{{ formatNumber(c/1000) }}</td>
+                                                </tr>
+                                            </template>
+                                             <!-- Footer -->
+                                            <tr class="table-secondary fw-bold border-top-2">
+                                                <td colspan="3">합계</td>
+                                                <td v-for="n in 12" class="text-end pe-2">{{ formatNumber(sumArrayIdx(expertData.COST.costM, 'MMenuCost', n-1)/1000) }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div> <!-- End Tab Content -->
+                </div>
+                <div class="modal-footer bg-light">
+                    <div class="small text-muted me-auto">* 단위(천원) 표기 참고</div>
+                    <button type="button" class="btn btn-secondary" @click="showMaterialModal = false">닫기</button>
+                </div>
+            </div>
+        </div>
+
     <!-- Yearly Sales Modal (Per Menu) -->
     <div v-if="showYearlyModal" class="modal-backdrop fade show" style="z-index: 1055;"></div>
     <div v-if="showYearlyModal" class="modal fade show d-block" tabindex="-1" style="z-index: 1060;">
@@ -954,6 +1092,7 @@
             const reports = ref([]);
             const currentReportId = ref(null);
             const showProjectionModal = ref(false);
+            const showMaterialModal = ref(false);
 
             // Yearly Sales Logic
             const showYearlyModal = ref(false);
@@ -1097,6 +1236,7 @@
                 // 1. Menu Projections
                 // Reset menuM (always recalc)
                 expertData.SALE.menuM = [];
+                expertData.COST.costM = [];
                 
                 expertData.SALE.menu.forEach((m, idx) => {
                     // Calc Monthly Qty/Amt per item
@@ -1146,11 +1286,31 @@
                          yItem.YMenuAmt[1] = (yItem.YMenuQty[1]||0) * (yItem.YMenuPrice[1]||0);
                          yItem.YMenuAmt[2] = (yItem.YMenuQty[2]||0) * (yItem.YMenuPrice[2]||0);
                     }
+
+                    // C. costM & costY (Material Cost Projections)
+                    const costItem = expertData.COST.cost[idx];
+                    const costRate = costItem ? (costItem.costRate || 0) : 0;
+
+                    // Monthly Cost
+                    const mCostArr = mAmtArr.map(amt => Math.round(amt * (costRate/100)));
+                    expertData.COST.costM.push({ MMenuCost: mCostArr });
+
+                    // Yearly Cost
+                    if (!expertData.COST.costY[idx]) {
+                        expertData.COST.costY[idx] = { YMenuCost: [0,0,0] };
+                    }
+                    const yCostArr = yItem.YMenuAmt.map(amt => Math.round(amt * (costRate/100)));
+                    expertData.COST.costY[idx].YMenuCost = yCostArr;
                 });
                 
                 // Trim menuY
                 if (expertData.SALE.menuY.length > expertData.SALE.menu.length) {
                     expertData.SALE.menuY.splice(expertData.SALE.menu.length);
+                }
+
+                 // Trim costY
+                 if (expertData.COST.costY.length > expertData.SALE.menu.length) {
+                    expertData.COST.costY.splice(expertData.SALE.menu.length);
                 }
             };
 
@@ -1692,7 +1852,7 @@
             });
 
             return {
-                mode, userEmail, isSaving, reports, showProjectionModal,
+                mode, userEmail, isSaving, reports, showProjectionModal, showMaterialModal,
                 liteData, expertData,
                 liteResult, expertResult,
                 switchMode,
