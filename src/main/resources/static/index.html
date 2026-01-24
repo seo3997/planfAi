@@ -381,15 +381,7 @@
                                         </div>
                                         <button class="btn btn-sm btn-light w-100 border mb-3" @click="addJob(expertData.JOB.job02)">+ 인원 추가</button>
 
-                                        <div class="card bg-light border-0 mb-3">
-                                            <div class="card-body p-2">
-                                                 <label class="small text-muted fw-bold">4대보험 및 복리후생비율 (%)</label>
-                                                 <div class="d-flex align-items-center gap-2">
-                                                     <input type="number" class="form-control form-control-sm" v-model.number="expertData.JOB.benefitRate" style="width: 80px">
-                                                     <span class="small text-muted">기본 15% 권장</span>
-                                                 </div>
-                                            </div>
-                                        </div>
+
 
                                         <!-- Job 01 Mfg -->
                                         <h6 class="small text-muted fw-bold mb-2">생산/제조직 (제조원가)</h6>
@@ -1395,7 +1387,7 @@
                     job02: [], 
                     job01M: [], job02M: [],
                     job01Y: [], job02Y: [],
-                    benefitRate: 15
+                    benefitRate: 0
                 },
                 INVEST: {
                     invest01: [],
@@ -1626,8 +1618,8 @@
                    Headcount += (j.JobCnt || 0);
                 });
                 
-                const benefitRate = (data.JOB.benefitRate || 0) / 100;
-                const Labor_total = (Labor_mfg + Labor_sales) * (1 + benefitRate);
+                const benefitRate = 0; // Removed as per user request
+                const Labor_total = (Labor_mfg + Labor_sales);
 
                 // 2.5 Expenses (Mfg vs Sales)
                 let Exp_mfg = 0; 
