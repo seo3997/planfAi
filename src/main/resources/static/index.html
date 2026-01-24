@@ -23,7 +23,7 @@
 </head>
 <body>
 
-<div id="app" class="container">
+<div id="app" class="container-fluid px-4">
     <div class="glass-container">
         <!-- Header -->
         <header class="d-flex justify-content-between align-items-center mb-5">
@@ -274,9 +274,9 @@
 
             <!-- EXPERT MODE -->
             <div v-else key="expert">
-                <div class="row">
+                <div class="row g-4">
                     <!-- Left: Input Sections -->
-                    <div class="col-lg-6">
+                    <div class="col-lg-7">
                         <div class="accordion" id="expertAccordion">
                             
                             <!-- 1. Basic Info -->
@@ -420,49 +420,144 @@
                                  </h2>
                                  <div id="collapseInvest" class="accordion-collapse collapse" data-bs-parent="#expertAccordion">
                                      <div class="accordion-body bg-light">
-                                         <!-- Simple list for Investment now using nested categories properly would be complex in HTML without more helpers. 
-                                              Let's keep the user's flat plan approach but sync with nested data if needed. 
-                                              Wait, the user wants it to match their JSON: invest.production.{production01..04} etc. 
-                                              I should probably flatten it for UI editing or provide specific sections.
-                                              Let's flatten it for the UI but map to correct JSON paths.
-                                         -->
-                                         <div class="table-responsive">
-                                             <table class="table table-sm small align-middle bg-white rounded shadow-sm">
-                                                 <thead class="bg-light">
-                                                     <tr class="text-center">
-                                                         <th width="15%">부문</th>
-                                                         <th width="20%">항목명</th>
-                                                         <th width="20%">금액</th>
-                                                         <th width="10%">년수</th>
-                                                         <th width="10%">상각</th>
-                                                         <th width="5%"></th>
-                                                     </tr>
-                                                 </thead>
-                                                 <tbody>
-                                                     <template v-for="(section, sName) in expertData.invest" :key="sName">
-                                                         <template v-for="(list, listName) in section" :key="listName">
-                                                             <tr v-for="(inv, idx) in list" :key="idx">
-                                                                 <td class="text-center fw-bold">{{ sName == 'production' ? '제조' : '판매' }}</td>
-                                                                 <td><input type="text" class="form-control form-control-sm" v-model="inv.investTitle"></td>
-                                                                 <td><input type="number" class="form-control form-control-sm text-end" v-model.number="inv.investPrice"></td>
-                                                                 <td><input type="number" class="form-control form-control-sm text-center" v-model.number="inv.investYear"></td>
-                                                                 <td>
-                                                                     <select class="form-select form-select-sm" v-model="inv.investYn">
-                                                                         <option value="Y">Y</option>
-                                                                         <option value="N">N</option>
-                                                                     </select>
-                                                                 </td>
-                                                                 <td class="text-center"><button class="btn-close small" @click="list.splice(idx,1)"></button></td>
-                                                             </tr>
-                                                         </template>
-                                                     </template>
-                                                 </tbody>
-                                             </table>
-                                         </div>
-                                         <div class="d-flex gap-2">
-                                            <button class="btn btn-sm btn-light border flex-grow-1" @click="addInvest(expertData.invest.production.production01, 'Y')">+ 제조항목 추가</button>
-                                            <button class="btn btn-sm btn-light border flex-grow-1" @click="addInvest(expertData.invest.sales.sales01, 'Y')">+ 판매항목 추가</button>
-                                         </div>
+                                         <div v-for="(catName, catIdx) in ['유형자산','무형자산','기타비유동자산','기타투자비용']" :key="catIdx" class="mb-4">
+                                            <div class="d-flex justify-content-between align-items-center mb-2 bg-white p-2 rounded shadow-sm">
+                                                <h6 class="fw-bold mb-0 text-primary">{{ catIdx + 1 }}. {{ catName }}</h6>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button class="btn btn-outline-primary" @click="addInvestInCategory(catIdx+1, 'production')">+ 제조 추가</button>
+                                                    <button class="btn btn-outline-info" @click="addInvestInCategory(catIdx+1, 'sales')">+ 판매 추가</button>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="table-responsive">
+                                                <table class="table table-sm small align-middle bg-white rounded shadow-sm mb-0">
+                                                    <thead class="bg-light-subtle">
+                                                        <tr class="text-center small">
+                                                            <th width="10%">부문</th>
+                                                            <th :width="catIdx < 2 ? '25%' : '55%'">항목명</th>
+                                                            <th width="20%">금액(원)</th>
+                                                            <th v-if="catIdx < 2" width="10%">년수</th>
+                                                            <th v-if="catIdx < 2" width="10%">상각</th>
+                                                            <th v-if="catIdx < 2" width="20%">월 상각비</th>
+                                                            <th width="5%"></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <!-- Production Items -->
+                                                        <tr v-for="(inv, idx) in expertData.invest.production['production0'+(catIdx+1)]" :key="'p'+idx">
+                                                            <td class="text-center"><span class="badge bg-primary-subtle text-primary">제조</span></td>
+                                                            <td>
+                                                                <select class="form-select form-select-sm" v-model="inv.investTitleCd" @change="onInvestItemChange(inv, catIdx+1)">
+                                                                    <option v-for="item in investCategoryItems[catIdx+1]" :value="item.cd">{{ item.name }}</option>
+                                                                </select>
+                                                            </td>
+                                                            <td><input type="number" class="form-control form-control-sm text-end" v-model.number="inv.investPrice"></td>
+                                                            <td v-if="catIdx < 2">
+                                                                <input v-if="(catIdx === 0 && inv.investTitleCd === '10') || (catIdx === 1 && inv.investTitleCd === '10')" type="text" class="form-control form-control-sm text-center bg-light" value="-" disabled>
+                                                                <input v-else type="number" class="form-control form-control-sm text-center" v-model.number="inv.investYear" :disabled="inv.investYn === 'N'">
+                                                            </td>
+                                                            <td v-if="catIdx < 2">
+                                                                <span v-if="(catIdx === 0 && inv.investTitleCd === '10') || (catIdx === 1 && inv.investTitleCd === '10')" class="text-muted small">N/A</span>
+                                                                <select v-else class="form-select form-select-sm" v-model="inv.investYn">
+                                                                    <option value="Y">Y</option>
+                                                                    <option value="N">N</option>
+                                                                </select>
+                                                            </td>
+                                                            <td v-if="catIdx < 2" class="text-end pe-2 fw-bold text-muted">
+                                                                {{ (catIdx === 0 && inv.investTitleCd === '10') || (catIdx === 1 && inv.investTitleCd === '10') ? '-' : formatCurrency(inv.investYearAmt || 0) }}
+                                                            </td>
+                                                            <td class="text-center"><button class="btn-close small" @click="expertData.invest.production['production0'+(catIdx+1)].splice(idx,1)"></button></td>
+                                                        </tr>
+                                                        <!-- Sales Items -->
+                                                        <tr v-for="(inv, idx) in expertData.invest.sales['sales0'+(catIdx+1)]" :key="'s'+idx">
+                                                            <td class="text-center"><span class="badge bg-info-subtle text-info">판매</span></td>
+                                                            <td>
+                                                                <select class="form-select form-select-sm" v-model="inv.investTitleCd" @change="onInvestItemChange(inv, catIdx+1)">
+                                                                    <option v-for="item in investCategoryItems[catIdx+1]" :value="item.cd">{{ item.name }}</option>
+                                                                </select>
+                                                            </td>
+                                                            <td><input type="number" class="form-control form-control-sm text-end" v-model.number="inv.investPrice"></td>
+                                                            <td v-if="catIdx < 2">
+                                                                <input v-if="(catIdx === 0 && inv.investTitleCd === '10') || (catIdx === 1 && inv.investTitleCd === '10')" type="text" class="form-control form-control-sm text-center bg-light" value="-" disabled>
+                                                                <input v-else type="number" class="form-control form-control-sm text-center" v-model.number="inv.investYear" :disabled="inv.investYn === 'N'">
+                                                            </td>
+                                                            <td v-if="catIdx < 2">
+                                                                <span v-if="(catIdx === 0 && inv.investTitleCd === '10') || (catIdx === 1 && inv.investTitleCd === '10')" class="text-muted small">N/A</span>
+                                                                <select v-else class="form-select form-select-sm" v-model="inv.investYn">
+                                                                    <option value="Y">Y</option>
+                                                                    <option value="N">N</option>
+                                                                </select>
+                                                            </td>
+                                                            <td v-if="catIdx < 2" class="text-end pe-2 fw-bold text-muted">
+                                                                {{ (catIdx === 0 && inv.investTitleCd === '10') || (catIdx === 1 && inv.investTitleCd === '10') ? '-' : formatCurrency(inv.investYearAmt || 0) }}
+                                                            </td>
+                                                            <td class="text-center"><button class="btn-close small" @click="expertData.invest.sales['sales0'+(catIdx+1)].splice(idx,1)"></button></td>
+                                                        </tr>
+                                                        <tr v-if="expertData.invest.production['production0'+(catIdx+1)].length === 0 && expertData.invest.sales['sales0'+(catIdx+1)].length === 0">
+                                                            <td :colspan="catIdx < 2 ? 7 : 4" class="text-center py-3 text-muted small">등록된 항목이 없습니다.</td>
+                                                        </tr>
+                                                    </tbody>
+                                                    <tfoot v-if="expertData.invest.production['production0'+(catIdx+1)].length > 0 || expertData.invest.sales['sales0'+(catIdx+1)].length > 0" class="bg-light-subtle">
+                                                        <!-- Production Subtotal -->
+                                                        <tr v-if="expertData.invest.production['production0'+(catIdx+1)].length > 0" class="text-primary-emphasis" style="font-size: 0.8rem;">
+                                                            <td colspan="2" class="text-center fw-bold">제조 소계</td>
+                                                            <td class="text-end pe-2 fw-bold">{{ formatCurrency(calcInvestTotals(catIdx).production.price) }}</td>
+                                                            <td v-if="catIdx < 2" colspan="2"></td>
+                                                            <td v-if="catIdx < 2" class="text-end pe-2 fw-bold">{{ formatCurrency(calcInvestTotals(catIdx).production.depr) }}</td>
+                                                            <td></td>
+                                                        </tr>
+                                                        <!-- Sales Subtotal -->
+                                                        <tr v-if="expertData.invest.sales['sales0'+(catIdx+1)].length > 0" class="text-info-emphasis" style="font-size: 0.8rem;">
+                                                            <td colspan="2" class="text-center fw-bold">판매 소계</td>
+                                                            <td class="text-end pe-2 fw-bold">{{ formatCurrency(calcInvestTotals(catIdx).sales.price) }}</td>
+                                                            <td v-if="catIdx < 2" colspan="2"></td>
+                                                            <td v-if="catIdx < 2" class="text-end pe-2 fw-bold">{{ formatCurrency(calcInvestTotals(catIdx).sales.depr) }}</td>
+                                                            <td></td>
+                                                        </tr>
+                                                        <!-- Grand Total -->
+                                                        <tr class="bg-secondary-subtle border-top border-secondary">
+                                                            <td colspan="2" class="text-center fw-bold">합계</td>
+                                                            <td class="text-end pe-2 fw-bold">{{ formatCurrency(calcInvestTotals(catIdx).total.price) }}</td>
+                                                            <td v-if="catIdx < 2" colspan="2"></td>
+                                                            <td v-if="catIdx < 2" class="text-end pe-2 fw-bold text-primary">{{ formatCurrency(calcInvestTotals(catIdx).total.depr) }}</td>
+                                                            <td></td>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                             </div>
+                                          </div>
+                                          <!-- Investment Grand Summary -->
+                                          <div class="mt-2 p-3 bg-white rounded-3 shadow-sm border border-primary border-opacity-25">
+                                              <h6 class="fw-bold text-primary mb-3"><i class="bi bi-graph-up-arrow me-2"></i>투자 계획 총괄 요약</h6>
+                                              <div class="table-responsive">
+                                                  <table class="table table-sm align-middle mb-0" style="font-size: 0.85rem;">
+                                                      <thead class="table-light">
+                                                          <tr class="text-center">
+                                                              <th>구분</th>
+                                                              <th>총 투자 금액</th>
+                                                              <th>월 총 상각비</th>
+                                                          </tr>
+                                                      </thead>
+                                                      <tbody>
+                                                          <tr class="text-primary-emphasis">
+                                                              <td class="text-center fw-bold">제조 부문 총 합계</td>
+                                                              <td class="text-end pe-3 fw-bold">{{ formatCurrency(calcAllInvestTotals().production.price) }}</td>
+                                                              <td class="text-end pe-3 fw-bold">{{ formatCurrency(calcAllInvestTotals().production.depr) }}</td>
+                                                          </tr>
+                                                          <tr class="text-info-emphasis">
+                                                              <td class="text-center fw-bold">판매 부문 총 합계</td>
+                                                              <td class="text-end pe-3 fw-bold">{{ formatCurrency(calcAllInvestTotals().sales.price) }}</td>
+                                                              <td class="text-end pe-3 fw-bold">{{ formatCurrency(calcAllInvestTotals().sales.depr) }}</td>
+                                                          </tr>
+                                                          <tr class="table-primary border-top border-primary border-2">
+                                                              <td class="text-center fw-bold fs-6">전체 투자 총 합계</td>
+                                                              <td class="text-end pe-3 fw-bold fs-6">{{ formatCurrency(calcAllInvestTotals().total.price) }}</td>
+                                                              <td class="text-end pe-3 fw-bold fs-6 text-primary">{{ formatCurrency(calcAllInvestTotals().total.depr) }}</td>
+                                                          </tr>
+                                                      </tbody>
+                                                  </table>
+                                              </div>
+                                          </div>
                                      </div>
                                  </div>
                              </div>
@@ -562,7 +657,7 @@
                     </div>
 
                     <!-- Right: Dashboard -->
-                    <div class="col-lg-6">
+                    <div class="col-lg-5">
                         <div class="sticky-top" style="top: 20px; z-index: 900;">
                              <div class="card-expert bg-white shadow-lg border-0" style="border: 2px solid var(--primary-color);">
                                 <div class="expert-header bg-white">
@@ -1855,6 +1950,32 @@
                 };
                 processExp(expertData.expense.production);
                 processExp(expertData.expense.sales);
+                // 4. Investment Projections (New Sync)
+                const processInvestments = (section) => {
+                    if(!section) return;
+                    Object.keys(section).forEach(key => {
+                        const list = section[key] || [];
+                        const catNum = parseInt(key.slice(-1)); // 1, 2, 3, 4
+                        list.forEach(inv => {
+                            // Enforce Non-Depreciable Rules
+                            const isLand = (catNum === 1 && inv.investTitleCd === '10');
+                            const isPremium = (catNum === 2 && inv.investTitleCd === '10');
+                            const isCat34 = (catNum >= 3);
+
+                            if (isLand || isPremium || isCat34) {
+                                inv.investYn = 'N';
+                                inv.investYear = 0;
+                                inv.investYearAmt = 0;
+                            } else if (inv.investYn === 'Y' && inv.investYear > 0) {
+                                inv.investYearAmt = Math.round(inv.investPrice / (inv.investYear * 12));
+                            } else {
+                                inv.investYearAmt = 0;
+                            }
+                        });
+                    });
+                };
+                processInvestments(expertData.invest.production);
+                processInvestments(expertData.invest.sales);
             };
 
             // Watch for changes (Defensive & Specific to avoid recursion)
@@ -1869,7 +1990,8 @@
                         prodJobs: expertData.job.production.map(j => ({ c: j.jobCnt, q: j.jobQty, r: j.jobAmtRate, cd: j.jobAmtCd })),
                         salesJobs: expertData.job.sales.map(j => ({ c: j.jobCnt, q: j.jobQty, r: j.jobAmtRate, cd: j.jobAmtCd })),
                         prodExp: expertData.expense.production.map(e => ({ a: e.expenseTVaAmt })),
-                        salesExp: expertData.expense.sales.map(e => ({ a: e.expenseTVaAmt }))
+                        salesExp: expertData.expense.sales.map(e => ({ a: e.expenseTVaAmt })),
+                        invest: { p: expertData.invest.production, s: expertData.invest.sales }
                     });
                 },
                 (newVal, oldVal) => {
@@ -2189,9 +2311,96 @@
                 jobAmtYear: [0, 0, 0], 
                 jobAmtCd: '1', jobAmtRate: 0 
             });
-            const addInvest = (list, yn='Y') => list.push({ 
-                investTitle: '', investPrice: 0, investYear: 5, investYearAmt: 0, investYn: yn 
-            });
+
+            const investCategoryItems = {
+                '1': [
+                    { cd: '10', name: '토지' }, { cd: '20', name: '건물' }, { cd: '30', name: '시설공사비' },
+                    { cd: '40', name: '기계장치' }, { cd: '50', name: '차량운반구' }, { cd: '60', name: '비품구입비' },
+                    { cd: '70', name: '기타 유형자산' }
+                ],
+                '2': [
+                    { cd: '10', name: '영업권(권리금)' }, { cd: '20', name: '산업재산권' }, { cd: '30', name: '개발비' },
+                    { cd: '40', name: '가맹비(소멸성)' }, { cd: '50', name: '기타 무형자산' }
+                ],
+                '3': [{ cd: '10', name: '임차보증금' }, { cd: '20', name: '가맹보증금' }],
+                '4': [
+                    { cd: '10', name: '초동상품(재료)비' }, { cd: '20', name: '개업전 급료' }, { cd: '30', name: '개업전 지급임차료' },
+                    { cd: '40', name: '개업전 홍보비용' }, { cd: '50', name: '개업전 지급수수료' }, { cd: '99', name: '기타 투자비용' }
+                ]
+            };
+
+            const addInvest = (list, yn='Y', defaultItem = {}) => {
+                list.push({ 
+                    investTitle: defaultItem.name || '', 
+                    investTitleCd: defaultItem.cd || '',
+                    investPrice: 0, 
+                    investYear: (yn === 'Y' ? 5 : 0), 
+                    investYearAmt: 0, 
+                    investYn: yn 
+                });
+            };
+
+            const addInvestInCategory = (catIdx, sector) => {
+                const key = sector === 'production' ? `production0${catIdx}` : `sales0${catIdx}`;
+                const list = expertData.invest[sector][key];
+                const yn = (catIdx <= 2) ? 'Y' : 'N';
+                const items = investCategoryItems[catIdx] || [];
+                addInvest(list, yn, items[0] || {});
+            };
+
+            const onInvestItemChange = (inv, catIdx) => {
+                const items = investCategoryItems[catIdx] || [];
+                const matched = items.find(i => i.cd === inv.investTitleCd);
+                if(matched) {
+                    inv.investTitle = matched.name;
+                    // Land (1-10) and Premium (2-10) are non-depreciable
+                    if ((catIdx === 1 && inv.investTitleCd === '10') || (catIdx === 2 && inv.investTitleCd === '10')) {
+                        inv.investYn = 'N';
+                        inv.investYear = 0;
+                        inv.investYearAmt = 0;
+                    } else if (catIdx <= 2) {
+                        // Default back to Y for other items in cat 1,2
+                        inv.investYn = 'Y';
+                        inv.investYear = 5;
+                    }
+                }
+            };
+
+            const calcInvestTotals = (catIdx) => {
+                const keyNum = catIdx + 1;
+                const prodList = (expertData.invest && expertData.invest.production) ? expertData.invest.production[`production0${keyNum}`] || [] : [];
+                const salesList = (expertData.invest && expertData.invest.sales) ? expertData.invest.sales[`sales0${keyNum}`] || [] : [];
+                
+                const sum = (list) => list.reduce((acc, curr) => {
+                    acc.price += (curr.investPrice || 0);
+                    acc.depr += (curr.investYearAmt || 0);
+                    return acc;
+                }, { price: 0, depr: 0 });
+
+                return {
+                    production: sum(prodList),
+                    sales: sum(salesList),
+                    total: sum([...prodList, ...salesList])
+                };
+            };
+
+            const calcAllInvestTotals = () => {
+                const results = {
+                    production: { price: 0, depr: 0 },
+                    sales: { price: 0, depr: 0 },
+                    total: { price: 0, depr: 0 }
+                };
+                for(let i=0; i<4; i++) {
+                    const cat = calcInvestTotals(i);
+                    results.production.price += cat.production.price;
+                    results.production.depr += cat.production.depr;
+                    results.sales.price += cat.sales.price;
+                    results.sales.depr += cat.sales.depr;
+                    results.total.price += cat.total.price;
+                    results.total.depr += cat.total.depr;
+                }
+                return results;
+            };
             const addLoan = (list, isDebt=false) => {
                 const item = { loanTitle: '', loanYear: [0, 0, 0] };
                 if(isDebt) {
@@ -2300,12 +2509,32 @@
                         if(data.sale) Object.assign(expertData.sale, data.sale);
                         if(data.cost) Object.assign(expertData.cost, data.cost);
                         
-                        // Handle Job nesting if old format
+                        // Handle Job nesting
                         if(data.job) {
-                            if(data.job.job01) expertData.job.production = data.job.job01;
-                            if(data.job.job02) expertData.job.sales = data.job.job02;
                             if(data.job.production) expertData.job.production = data.job.production;
                             if(data.job.sales) expertData.job.sales = data.job.sales;
+                        }
+
+                        // Handle Invest
+                        if(data.invest) {
+                            if(data.invest.production) {
+                                Object.assign(expertData.invest.production, data.invest.production);
+                            }
+                            if(data.invest.sales) {
+                                Object.assign(expertData.invest.sales, data.invest.sales);
+                            }
+                        }
+
+                        // Handle Loan
+                        if(data.loan) {
+                            if(data.loan.equity) expertData.loan.equity = data.loan.equity;
+                            if(data.loan.debt) expertData.loan.debt = data.loan.debt;
+                        }
+
+                        // Handle Expense
+                        if(data.expense) {
+                            if(data.expense.production) expertData.expense.production = data.expense.production;
+                            if(data.expense.sales) expertData.expense.sales = data.expense.sales;
                         }
 
                         // Ensure required arrays exist
@@ -2352,9 +2581,10 @@
                 showYearlyModal, currentMenu, currentYearly,
                 openYearlyModal, closeYearlyModal, saveYearlyModal, calcYearly, calcYearlyDirect, onYMenuCdChange,
                 showMaterialYearlyModal, currentMaterialYearly, openMaterialYearlyModal, closeMaterialYearlyModal, saveMaterialYearly, calcMaterialYearly,
-                showLaborModal, expertData,
+                showLaborModal,
                 showLaborYearlyModal, currentLaborYearly, openLaborYearlyModal, closeLaborYearlyModal, saveLaborYearly, calcLaborYearly,
-                investCategories, loanCategories
+                investCategories, loanCategories,
+                addInvestInCategory, investCategoryItems, onInvestItemChange, calcInvestTotals, calcAllInvestTotals
             };
         }
     }).mount('#app');
