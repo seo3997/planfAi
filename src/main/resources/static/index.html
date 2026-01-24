@@ -371,19 +371,7 @@
                                 <div id="collapseLabor" class="accordion-collapse collapse" data-bs-parent="#expertAccordion">
                                     <div class="accordion-body bg-light">
                                         
-                                        <!-- Job 02 Sales/Admin -->
-                                        <h6 class="small text-muted fw-bold mb-2">판매/관리직 (판관비)</h6>
-                                        <div v-for="(job, idx) in expertData.JOB.job02" :key="'j2'+idx" class="d-flex gap-2 mb-2 align-items-center">
-                                            <input type="text" class="form-control form-control-sm" v-model="job.JobTitle" placeholder="직책/성명" style="width: 30%">
-                                            <input type="number" class="form-control form-control-sm" v-model.number="job.JobCnt" placeholder="인원" style="width: 20%">
-                                            <input type="number" class="form-control form-control-sm" v-model.number="job.JobQty" placeholder="월 급여" style="width: 40%">
-                                            <button class="btn-close" @click="expertData.JOB.job02.splice(idx, 1)"></button>
-                                        </div>
-                                        <button class="btn btn-sm btn-light w-100 border mb-3" @click="addJob(expertData.JOB.job02)">+ 인원 추가</button>
-
-
-
-                                        <!-- Job 01 Mfg -->
+                                        <!-- Job 01 Mfg (Moved to Top) -->
                                         <h6 class="small text-muted fw-bold mb-2">생산/제조직 (제조원가)</h6>
                                         <div v-for="(job, idx) in expertData.JOB.job01" :key="'j1'+idx" class="d-flex gap-2 mb-2 align-items-center">
                                             <input type="text" class="form-control form-control-sm" v-model="job.JobTitle" placeholder="직책" style="width: 30%">
@@ -391,7 +379,17 @@
                                             <input type="number" class="form-control form-control-sm" v-model.number="job.JobQty" placeholder="월 급여" style="width: 40%">
                                             <button class="btn-close" @click="expertData.JOB.job01.splice(idx, 1)"></button>
                                         </div>
-                                        <button class="btn btn-sm btn-light w-100 border" @click="addJob(expertData.JOB.job01)">+ 인원 추가</button>
+                                        <button class="btn btn-sm btn-light w-100 border mb-4" @click="addJob(expertData.JOB.job01)">+ 인원 추가</button>
+
+                                        <!-- Job 02 Sales/Admin (Moved to Bottom) -->
+                                        <h6 class="small text-muted fw-bold mb-2">판매/관리직 (판관비)</h6>
+                                        <div v-for="(job, idx) in expertData.JOB.job02" :key="'j2'+idx" class="d-flex gap-2 mb-2 align-items-center">
+                                            <input type="text" class="form-control form-control-sm" v-model="job.JobTitle" placeholder="직책/성명" style="width: 30%">
+                                            <input type="number" class="form-control form-control-sm" v-model.number="job.JobCnt" placeholder="인원" style="width: 20%">
+                                            <input type="number" class="form-control form-control-sm" v-model.number="job.JobQty" placeholder="월 급여" style="width: 40%">
+                                            <button class="btn-close" @click="expertData.JOB.job02.splice(idx, 1)"></button>
+                                        </div>
+                                        <button class="btn btn-sm btn-light w-100 border" @click="addJob(expertData.JOB.job02)">+ 인원 추가</button>
                                     </div>
                                 </div>
                             </div>
@@ -530,8 +528,10 @@
                                                 <td class="text-end fw-bold">{{ formatCurrency(expertResult.totalMaterialCost) }}</td>
                                                 <td class="text-end text-muted" style="width: 40px">{{ expertResult.materialRatio }}%</td>
                                             </tr>
-                                            <tr>
-                                                <td class="text-muted">(-) 인건비</td>
+                                             <tr>
+                                                <td class="text-muted clickable-link" @click="showLaborModal = true" style="cursor: pointer;">
+                                                    (-) 인건비 <span class="small text-primary" style="text-decoration: underline;">(상세)</span>
+                                                </td>
                                                 <td class="text-end fw-bold">{{ formatCurrency(expertResult.totalLaborCost) }}</td>
                                                 <td class="text-end text-muted">{{ expertResult.laborRatio }}%</td>
                                             </tr>
@@ -977,6 +977,239 @@
         </div>
     </div> <!-- End showMaterialModal -->
 
+    <!-- Labor Cost Detail Modal -->
+    <div v-if="showLaborModal" class="modal-backdrop fade show"></div>
+    <div v-if="showLaborModal" class="modal fade show d-block" tabindex="-1" style="z-index: 1055;">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">👥 예상 인건비 상세 (Labor Cost Projection)</h5>
+                    <button type="button" class="btn-close" @click="showLaborModal = false"></button>
+                </div>
+                <div class="modal-body bg-light">
+                    
+                    <!-- Top Summary Card -->
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body bg-white py-3">
+                            <h5 class="fw-bold mb-3 border-bottom pb-2">인건비 요약</h5>
+                            <div class="row text-center">
+                                <div class="col-6 border-end">
+                                    <small class="text-muted d-block">월 예상 인건비</small>
+                                    <strong class="fs-5">{{ formatCurrency(expertResult.totalLaborCost) }}</strong>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted d-block">1차년도 연 예상 인건비</small>
+                                    <strong class="fs-5 text-danger">{{ formatCurrency(expertResult.totalLaborCost * 12) }}</strong> 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabs -->
+                    <ul class="nav nav-tabs mb-3" id="laborTabs">
+                        <li class="nav-item">
+                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabLaborMonthly" type="button">1차년도 월별 상세 (Monthly)</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabLaborYearly" type="button">3개년 예상 인건비 (Yearly)</button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+                        
+                        <!-- TAB 1: Monthly -->
+                        <div class="tab-pane fade show active" id="tabLaborMonthly">
+                             <div class="card border-0 shadow-sm">
+                                <div class="card-body p-0 table-responsive">
+                                    <table class="table table-bordered mb-0 text-center align-middle small table-striped">
+                                        <thead class="bg-light sticky-top">
+                                            <tr>
+                                                <th>구분</th>
+                                                <th>직위(부분)</th>
+                                                <th>인원</th>
+                                                <th v-for="n in 12" :key="n" style="min-width: 70px;">{{n}}월</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Mfg -->
+                                            <template v-for="(j, idx) in expertData.JOB.job01" :key="'mfgM'+idx">
+                                                <tr>
+                                                    <td class="bg-white">제조</td>
+                                                    <td class="text-start bg-white fw-bold">{{ j.JobTitle }}</td>
+                                                    <td>{{ j.JobCnt }}</td>
+                                                    <td v-for="amt in expertData.JOB.job01M[idx]?.MJobAmt" class="text-end pe-2">{{ formatNumber(Math.round(amt/1000)) }}</td>
+                                                </tr>
+                                            </template>
+                                            <tr class="table-light italic small" v-if="expertData.JOB.job01.length > 0">
+                                                <td colspan="2">제조 소계</td>
+                                                <td>{{ expertData.JOB.job01.reduce((s,c)=>s+(c.JobCnt||0), 0) }}</td>
+                                                <td v-for="n in 12" class="text-end pe-2">{{ formatNumber(Math.round(sumArrayIdx(expertData.JOB.job01M, 'MJobAmt', n-1)/1000)) }}</td>
+                                            </tr>
+
+                                            <!-- Sales -->
+                                            <template v-for="(j, idx) in expertData.JOB.job02" :key="'salesM'+idx">
+                                                <tr>
+                                                    <td class="bg-white">판매</td>
+                                                    <td class="text-start bg-white fw-bold">{{ j.JobTitle }}</td>
+                                                    <td>{{ j.JobCnt }}</td>
+                                                    <td v-for="amt in expertData.JOB.job02M[idx]?.MJobAmt" class="text-end pe-2">{{ formatNumber(Math.round(amt/1000)) }}</td>
+                                                </tr>
+                                            </template>
+                                            <tr class="table-light italic small" v-if="expertData.JOB.job02.length > 0">
+                                                <td colspan="2">판매 소계</td>
+                                                <td>{{ expertData.JOB.job02.reduce((s,c)=>s+(c.JobCnt||0), 0) }}</td>
+                                                <td v-for="n in 12" class="text-end pe-2">{{ formatNumber(Math.round(sumArrayIdx(expertData.JOB.job02M, 'MJobAmt', n-1)/1000)) }}</td>
+                                            </tr>
+
+                                             <!-- Total Footer -->
+                                            <tr class="table-secondary fw-bold">
+                                                <td colspan="2">합계</td>
+                                                <td>{{ expertData.JOB.job01.reduce((s,c)=>s+(c.JobCnt||0), 0) + expertData.JOB.job02.reduce((s,c)=>s+(c.JobCnt||0), 0) }}</td>
+                                                <td v-for="n in 12" class="text-end pe-2">{{ formatNumber(Math.round((sumArrayIdx(expertData.JOB.job01M, 'MJobAmt', n-1) + sumArrayIdx(expertData.JOB.job02M, 'MJobAmt', n-1))/1000)) }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB 2: Yearly -->
+                        <div class="tab-pane fade" id="tabLaborYearly">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body p-0 table-responsive">
+                                    <table class="table table-bordered mb-0 text-center align-middle small table-hover">
+                                        <thead class="bg-light">
+                                            <tr>
+                                                <th width="10%">구분</th>
+                                                <th width="30%">직위(부분)</th>
+                                                <th width="10%">인원</th>
+                                                <th>1차년도</th>
+                                                <th>2차년도</th>
+                                                <th>3차년도</th>
+                                                <th width="10%">수정</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                             <!-- Mfg -->
+                                             <template v-for="(j, idx) in expertData.JOB.job01" :key="'mfgY'+idx">
+                                                <tr>
+                                                    <td>제조</td>
+                                                    <td class="text-start fw-bold bg-white">{{ j.JobTitle }}</td>
+                                                    <td>{{ j.JobCnt }}</td>
+                                                    <td class="text-end pe-2">{{ formatNumber(Math.round((expertData.JOB.job01Y[idx]?.YJobAmt[0]||0)/1000)) }}</td>
+                                                    <td class="text-end pe-2">{{ formatNumber(Math.round((expertData.JOB.job01Y[idx]?.YJobAmt[1]||0)/1000)) }}</td>
+                                                    <td class="text-end pe-2">{{ formatNumber(Math.round((expertData.JOB.job01Y[idx]?.YJobAmt[2]||0)/1000)) }}</td>
+                                                    <td>
+                                                        <button class="btn btn-xs btn-outline-secondary" @click="openLaborYearlyModal(idx, 'mfg')">수정</button>
+                                                    </td>
+                                                </tr>
+                                            </template>
+                                            <tr class="table-light italic small" v-if="expertData.JOB.job01.length > 0">
+                                                <td colspan="2">제조 소계</td>
+                                                <td>{{ expertData.JOB.job01.reduce((s,c)=>s+(c.JobCnt||0), 0) }}</td>
+                                                <td class="text-end pe-2">{{ formatNumber(Math.round(sumArrayIdx(expertData.JOB.job01Y, 'YJobAmt', 0)/1000)) }}</td>
+                                                <td class="text-end pe-2">{{ formatNumber(Math.round(sumArrayIdx(expertData.JOB.job01Y, 'YJobAmt', 1)/1000)) }}</td>
+                                                <td class="text-end pe-2">{{ formatNumber(Math.round(sumArrayIdx(expertData.JOB.job01Y, 'YJobAmt', 2)/1000)) }}</td>
+                                                <td></td>
+                                            </tr>
+
+                                            <!-- Sales -->
+                                             <template v-for="(j, idx) in expertData.JOB.job02" :key="'salesY'+idx">
+                                                <tr>
+                                                    <td>판매</td>
+                                                    <td class="text-start fw-bold bg-white">{{ j.JobTitle }}</td>
+                                                    <td>{{ j.JobCnt }}</td>
+                                                    <td class="text-end pe-2">{{ formatNumber(Math.round((expertData.JOB.job02Y[idx]?.YJobAmt[0]||0)/1000)) }}</td>
+                                                    <td class="text-end pe-2">{{ formatNumber(Math.round((expertData.JOB.job02Y[idx]?.YJobAmt[1]||0)/1000)) }}</td>
+                                                    <td class="text-end pe-2">{{ formatNumber(Math.round((expertData.JOB.job02Y[idx]?.YJobAmt[2]||0)/1000)) }}</td>
+                                                    <td>
+                                                        <button class="btn btn-xs btn-outline-secondary" @click="openLaborYearlyModal(idx, 'sales')">수정</button>
+                                                    </td>
+                                                </tr>
+                                            </template>
+                                            <tr class="table-light italic small" v-if="expertData.JOB.job02.length > 0">
+                                                <td colspan="2">판매 소계</td>
+                                                <td>{{ expertData.JOB.job02.reduce((s,c)=>s+(c.JobCnt||0), 0) }}</td>
+                                                <td class="text-end pe-2">{{ formatNumber(Math.round(sumArrayIdx(expertData.JOB.job02Y, 'YJobAmt', 0)/1000)) }}</td>
+                                                <td class="text-end pe-2">{{ formatNumber(Math.round(sumArrayIdx(expertData.JOB.job02Y, 'YJobAmt', 1)/1000)) }}</td>
+                                                <td class="text-end pe-2">{{ formatNumber(Math.round(sumArrayIdx(expertData.JOB.job02Y, 'YJobAmt', 2)/1000)) }}</td>
+                                                <td></td>
+                                            </tr>
+                                            
+                                            <!-- Total Footer -->
+                                            <tr class="table-secondary fw-bold">
+                                                <td colspan="2">합계</td>
+                                                <td>{{ expertData.JOB.job01.reduce((s,c)=>s+(c.JobCnt||0), 0) + expertData.JOB.job02.reduce((s,c)=>s+(c.JobCnt||0), 0) }}</td>
+                                                <td class="text-end pe-2">{{ formatNumber(Math.round((sumArrayIdx(expertData.JOB.job01Y, 'YJobAmt', 0) + sumArrayIdx(expertData.JOB.job02Y, 'YJobAmt', 0))/1000)) }}</td>
+                                                <td class="text-end pe-2">{{ formatNumber(Math.round((sumArrayIdx(expertData.JOB.job01Y, 'YJobAmt', 1) + sumArrayIdx(expertData.JOB.job02Y, 'YJobAmt', 1))/1000)) }}</td>
+                                                <td class="text-end pe-2">{{ formatNumber(Math.round((sumArrayIdx(expertData.JOB.job01Y, 'YJobAmt', 2) + sumArrayIdx(expertData.JOB.job02Y, 'YJobAmt', 2))/1000)) }}</td>
+                                                <td></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div> <!-- End Tab Content -->
+                </div>
+                <div class="modal-footer bg-light">
+                    <div class="small text-muted me-auto">* 단위(천원) 표기 참고</div>
+                    <button type="button" class="btn btn-secondary" @click="showLaborModal = false">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div> <!-- End showLaborModal -->
+
+    <!-- Yearly Labor Registration Modal -->
+    <div v-if="showLaborYearlyModal" class="modal-backdrop fade show" style="z-index: 1065;"></div>
+    <div v-if="showLaborYearlyModal" class="modal fade show d-block" tabindex="-1" style="z-index: 1070;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">연도별 인건비 등록</h5>
+                    <button type="button" class="btn-close" @click="closeLaborYearlyModal"></button>
+                </div>
+                <div class="modal-body">
+                     <div class="row mb-3">
+                         <label class="col-sm-3 col-form-label text-end small fw-bold">직위/성명</label>
+                         <div class="col-sm-9 d-flex align-items-center">
+                             <span class="fw-bold">{{ currentLaborYearly.JobTitle }}</span>
+                         </div>
+                     </div>
+                     <div class="row mb-4">
+                         <label class="col-sm-3 col-form-label text-end small fw-bold">인건비<br>증감율</label>
+                         <div class="col-sm-9 d-flex align-items-center">
+                             <div class="input-group input-group-sm" style="width: 150px;">
+                                <input type="number" class="form-control text-end" v-model.number="currentLaborYearly.YJobRate" @input="calcLaborYearly">
+                                <span class="input-group-text">%</span>
+                             </div>
+                             <span class="small text-muted ms-2">(2,3차년도 자동계산)</span>
+                         </div>
+                     </div>
+                     <table class="table table-bordered small align-middle text-center">
+                         <thead class="table-light">
+                             <tr>
+                                 <th>년도</th>
+                                 <th>인건비(천원)</th>
+                             </tr>
+                         </thead>
+                         <tbody>
+                             <tr v-for="(amt, i) in currentLaborYearly.YJobAmt" :key="i">
+                                 <td class="bg-light">{{ i+1 }}차년도</td>
+                                 <td class="text-end pe-2">{{ formatNumber(Math.round(amt/1000)) }}</td>
+                             </tr>
+                         </tbody>
+                     </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger btn-sm text-white" @click="saveLaborYearly" style="background-color: #ff8a80; border-color: #ff8a80;">수정</button>
+                    <button type="button" class="btn btn-secondary btn-sm" @click="closeLaborYearlyModal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Yearly Sales Modal (Per Menu) -->
     <div v-if="showYearlyModal" class="modal-backdrop fade show" style="z-index: 1075;"></div>
     <div v-if="showYearlyModal" class="modal fade show d-block" tabindex="-1" style="z-index: 1080;">
@@ -1184,6 +1417,7 @@
             const currentReportId = ref(null);
             const showProjectionModal = ref(false);
             const showMaterialModal = ref(false);
+            const showLaborModal = ref(false);
 
             // Yearly Sales Logic
             const showYearlyModal = ref(false);
@@ -1350,6 +1584,52 @@
                     target.YMenuCost = [...currentMaterialYearly.YCostAmt]; 
                 }
                 closeMaterialYearlyModal();
+            };
+
+            // Labor Yearly Logic
+            const showLaborYearlyModal = ref(false);
+            const currentJobIdx = ref(-1);
+            const currentJobType = ref(''); // 'mfg' or 'sales'
+            const currentLaborYearly = reactive({
+                 JobTitle: '', YJobRate: 0,
+                 YJobAmt: [0,0,0], BaseMonthly: 0
+            });
+
+            const openLaborYearlyModal = (idx, type) => {
+                currentJobIdx.value = idx;
+                currentJobType.value = type;
+                const job = (type === 'mfg') ? expertData.JOB.job01[idx] : expertData.JOB.job02[idx];
+                const jobY = (type === 'mfg') ? expertData.JOB.job01Y[idx] : expertData.JOB.job02Y[idx];
+                
+                currentLaborYearly.JobTitle = job.JobTitle;
+                currentLaborYearly.YJobRate = jobY ? (jobY.YJobRate || 0) : 0;
+                currentLaborYearly.BaseMonthly = (job.JobCnt || 0) * (job.JobQty || 0);
+                
+                calcLaborYearly();
+                showLaborYearlyModal.value = true;
+            };
+
+            const closeLaborYearlyModal = () => { showLaborYearlyModal.value = false; };
+
+            const calcLaborYearly = () => {
+                const rate = (currentLaborYearly.YJobRate || 0)/100;
+                const baseYearly = currentLaborYearly.BaseMonthly * 12;
+                
+                currentLaborYearly.YJobAmt[0] = baseYearly;
+                currentLaborYearly.YJobAmt[1] = Math.round(baseYearly * (1 + rate));
+                currentLaborYearly.YJobAmt[2] = Math.round(currentLaborYearly.YJobAmt[1] * (1 + rate));
+            };
+
+            const saveLaborYearly = () => {
+                const targetList = (currentJobType.value === 'mfg') ? expertData.JOB.job01Y : expertData.JOB.job02Y;
+                if(!targetList[currentJobIdx.value]) {
+                    targetList[currentJobIdx.value] = { YJobAmt: [0,0,0], YJobRate: 0 };
+                }
+                targetList[currentJobIdx.value].YJobRate = currentLaborYearly.YJobRate;
+                targetList[currentJobIdx.value].YJobAmt = [...currentLaborYearly.YJobAmt];
+                
+                closeLaborYearlyModal();
+                updateProjections(); // Force refresh
             };
 
             
@@ -1535,11 +1815,38 @@
                  if (expertData.COST.costY.length > expertData.SALE.menu.length) {
                     expertData.COST.costY.splice(expertData.SALE.menu.length);
                 }
+
+                // 2. Labor Projections
+                expertData.JOB.job01M = [];
+                expertData.JOB.job02M = [];
+                
+                const processJob = (jobList, mList, yList) => {
+                    jobList.forEach((j, idx) => {
+                        const monthly = (j.JobCnt || 0) * (j.JobQty || 0);
+                        mList.push({ MJobAmt: Array(12).fill(monthly) });
+                        
+                        // Yearly init
+                        if(!yList[idx]) {
+                            yList[idx] = { YJobAmt: [monthly*12, monthly*12, monthly*12], YJobRate: 0 };
+                        } else {
+                            // Sync Y1
+                            yList[idx].YJobAmt[0] = monthly * 12;
+                            // Recalc Y2, Y3 if needed? For now just keep or calc based on rate if we add it.
+                            const rate = (yList[idx].YJobRate || 0) / 100;
+                            yList[idx].YJobAmt[1] = Math.round(yList[idx].YJobAmt[0] * (1 + rate));
+                            yList[idx].YJobAmt[2] = Math.round(yList[idx].YJobAmt[1] * (1 + rate));
+                        }
+                    });
+                    if(yList.length > jobList.length) yList.splice(jobList.length);
+                };
+
+                processJob(expertData.JOB.job01, expertData.JOB.job01M, expertData.JOB.job01Y);
+                processJob(expertData.JOB.job02, expertData.JOB.job02M, expertData.JOB.job02Y);
             };
 
-            // Watch for changes that affect projection (Removed growthRate from watch)
+            // Watch for changes that affect projection (Added JOB)
             watch(
-                () => [expertData.SALE.menu, expertData.BASIC.saleMode, expertData.BASIC.workDay],
+                () => [expertData.SALE.menu, expertData.BASIC.saleMode, expertData.BASIC.workDay, expertData.JOB.job01, expertData.JOB.job02],
                 () => {
                    updateProjections();
                 },
@@ -2086,6 +2393,8 @@
                 showYearlyModal, currentMenu, currentYearly,
                 openYearlyModal, closeYearlyModal, saveYearlyModal, calcYearly, calcYearlyDirect, onYMenuCdChange,
                 showMaterialYearlyModal, currentMaterialYearly, openMaterialYearlyModal, closeMaterialYearlyModal, saveMaterialYearly, calcMaterialYearly,
+                showLaborModal, expertData,
+                showLaborYearlyModal, currentLaborYearly, openLaborYearlyModal, closeLaborYearlyModal, saveLaborYearly, calcLaborYearly
 
 
             };
