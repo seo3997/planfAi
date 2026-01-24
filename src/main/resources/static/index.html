@@ -728,9 +728,9 @@
                                                         {{ expertData.SALE.menu[idx]?.MenuTitle }}
                                                     </td>
                                                     <td class="bg-light">판매수량</td>
-                                                    <td>{{ formatNumber(m.YMenuQty[0]) }}</td>
-                                                    <td>{{ formatNumber(m.YMenuQty[1]) }}</td>
-                                                    <td>{{ formatNumber(m.YMenuQty[2]) }}</td>
+                                                    <td class="text-end pe-2">{{ formatNumber(m.YMenuQty[0]) }}</td>
+                                                    <td class="text-end pe-2">{{ formatNumber(m.YMenuQty[1]) }}</td>
+                                                    <td class="text-end pe-2">{{ formatNumber(m.YMenuQty[2]) }}</td>
                                                     <td rowspan="3">
                                                         <!-- Updated to open new Yearly Modal -->
                                                         <button class="btn btn-xs btn-outline-secondary" @click="openYearlyModal(idx)">수정</button>
@@ -742,17 +742,17 @@
                                                         {{ formatCurrency(expertData.SALE.menu[idx]?.MenuPrice) }}
                                                     </td>
                                                     <td class="bg-light">판매단가</td>
-                                                    <td>{{ formatNumber(m.YMenuPrice[0]) }}</td>
-                                                    <td>{{ formatNumber(m.YMenuPrice[1]) }}</td>
-                                                    <td>{{ formatNumber(m.YMenuPrice[2]) }}</td>
+                                                    <td class="text-end pe-2">{{ formatNumber(m.YMenuPrice[0]) }}</td>
+                                                    <td class="text-end pe-2">{{ formatNumber(m.YMenuPrice[1]) }}</td>
+                                                    <td class="text-end pe-2">{{ formatNumber(m.YMenuPrice[2]) }}</td>
                                                 </tr>
                                                 <!-- Row 3: Amount -->
                                                 <tr>
                                                     <td class="bg-white border-top-0"></td>
                                                     <td class="bg-light">판매금액</td>
-                                                    <td class="fw-bold bg-info-subtle">{{ formatNumber(m.YMenuAmt[0]/1000) }}</td>
-                                                    <td class="fw-bold bg-info-subtle">{{ formatNumber(m.YMenuAmt[1]/1000) }}</td>
-                                                    <td class="fw-bold bg-info-subtle">{{ formatNumber(m.YMenuAmt[2]/1000) }}</td>
+                                                    <td class="fw-bold bg-info-subtle text-end pe-2">{{ formatNumber(m.YMenuAmt[0]/1000) }}</td>
+                                                    <td class="fw-bold bg-info-subtle text-end pe-2">{{ formatNumber(m.YMenuAmt[1]/1000) }}</td>
+                                                    <td class="fw-bold bg-info-subtle text-end pe-2">{{ formatNumber(m.YMenuAmt[2]/1000) }}</td>
                                                 </tr>
                                             </template>
                                             
@@ -761,23 +761,16 @@
                                                 <td colspan="2" rowspan="2">합계</td>
                                                 <td>판매수량</td>
                                                 <!-- Sum Y1 Qty -->
-                                                <td>{{ formatNumber(sumArrayIdx(expertData.SALE.menuY, 'YMenuQty', 0)) }}</td>
-                                                <td>{{ formatNumber(sumArrayIdx(expertData.SALE.menuY, 'YMenuQty', 1)) }}</td>
-                                                <td>{{ formatNumber(sumArrayIdx(expertData.SALE.menuY, 'YMenuQty', 2)) }}</td>
+                                                <td class="text-end pe-2">{{ formatNumber(sumArrayIdx(expertData.SALE.menuY, 'YMenuQty', 0)) }}</td>
+                                                <td class="text-end pe-2">{{ formatNumber(sumArrayIdx(expertData.SALE.menuY, 'YMenuQty', 1)) }}</td>
+                                                <td class="text-end pe-2">{{ formatNumber(sumArrayIdx(expertData.SALE.menuY, 'YMenuQty', 2)) }}</td>
                                                 <td rowspan="2"></td>
                                             </tr>
                                             <tr class="table-secondary fw-bold">
                                                 <td>판매금액</td>
-                                                <td>{{ formatNumber(sumArrayIdx(expertData.SALE.menuY, 'YMenuAmt', 0)/1000) }}</td>
-                                                <td>{{ formatNumber(sumArrayIdx(expertData.SALE.menuY, 'YMenuAmt', 1)/1000) }}</td>
-                                                <td>{{ formatNumber(sumArrayIdx(expertData.SALE.menuY, 'YMenuAmt', 2)/1000) }}</td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="3" class="text-end small">매출율 증가율</td>
-                                                <td>-</td>
-                                                <td class="text-danger small">-</td>
-                                                <td class="text-danger small">-</td>
-                                                <td></td>
+                                                <td class="text-end pe-2">{{ formatNumber(sumArrayIdx(expertData.SALE.menuY, 'YMenuAmt', 0)/1000) }}</td>
+                                                <td class="text-end pe-2">{{ formatNumber(sumArrayIdx(expertData.SALE.menuY, 'YMenuAmt', 1)/1000) }}</td>
+                                                <td class="text-end pe-2">{{ formatNumber(sumArrayIdx(expertData.SALE.menuY, 'YMenuAmt', 2)/1000) }}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -808,23 +801,23 @@
                                                         <div class="small fw-normal text-muted">{{ formatCurrency(expertData.SALE.menu[idx]?.MenuPrice) }}</div>
                                                     </td>
                                                     <td class="bg-light">판매수량</td>
-                                                    <td v-for="q in m.MMenuQty">{{ formatNumber(q) }}</td>
+                                                    <td v-for="q in m.MMenuQty" class="text-end pe-2">{{ formatNumber(q) }}</td>
                                                 </tr>
                                                 <!-- Amt -->
                                                 <tr>
                                                     <td class="bg-light text-primary">판매금액</td>
-                                                    <td v-for="a in m.MMenuAmt" class="text-end pe-1">{{ formatNumber(a/1000) }}</td>
+                                                    <td v-for="a in m.MMenuAmt" class="text-end pe-2">{{ formatNumber(a/1000) }}</td>
                                                 </tr>
                                             </template>
                                              <!-- Footer -->
                                             <tr class="table-secondary fw-bold border-top-2">
                                                 <td colspan="2" rowspan="2">합계</td>
                                                 <td>판매수량</td>
-                                                <td v-for="n in 12">{{ formatNumber(sumArrayIdx(expertData.SALE.menuM, 'MMenuQty', n-1)) }}</td>
+                                                <td v-for="n in 12" class="text-end pe-2">{{ formatNumber(sumArrayIdx(expertData.SALE.menuM, 'MMenuQty', n-1)) }}</td>
                                             </tr>
                                             <tr class="table-secondary fw-bold">
                                                  <td>판매금액</td>
-                                                 <td v-for="n in 12">{{ formatNumber(sumArrayIdx(expertData.SALE.menuM, 'MMenuAmt', n-1)/1000) }}</td>
+                                                 <td v-for="n in 12" class="text-end pe-2">{{ formatNumber(sumArrayIdx(expertData.SALE.menuM, 'MMenuAmt', n-1)/1000) }}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -874,19 +867,19 @@
                      <!-- Rates (Visible if Cd=1) -->
                      <div v-if="currentYearly.YMenuCd === '1'">
                          <div class="row mb-2">
-                             <label class="col-sm-3 col-form-label text-end small">판매수량 증감율</label>
-                             <div class="col-sm-9">
+                             <label class="col-sm-3 col-form-label text-end small">판매수량<br>증감율</label>
+                             <div class="col-sm-9 d-flex align-items-center">
                                  <div class="input-group input-group-sm">
-                                    <input type="number" class="form-control" v-model.number="currentYearly.YMenuQtyRate" @input="calcYearly">
+                                    <input type="number" class="form-control text-end" v-model.number="currentYearly.YMenuQtyRate" @input="calcYearly">
                                     <span class="input-group-text">%</span>
                                  </div>
                              </div>
                          </div>
                          <div class="row mb-3">
-                             <label class="col-sm-3 col-form-label text-end small">판매단가 증감율</label>
-                             <div class="col-sm-9">
+                             <label class="col-sm-3 col-form-label text-end small">판매단가<br>증감율</label>
+                             <div class="col-sm-9 d-flex align-items-center">
                                  <div class="input-group input-group-sm">
-                                    <input type="number" class="form-control" v-model.number="currentYearly.YMenuPriceRate" @input="calcYearly">
+                                    <input type="number" class="form-control text-end" v-model.number="currentYearly.YMenuPriceRate" @input="calcYearly">
                                     <span class="input-group-text">%</span>
                                  </div>
                              </div>
@@ -894,48 +887,48 @@
                      </div>
 
                      <!-- Table -->
-                     <table class="table table-bordered text-center small align-middle">
-                         <thead class="table-light">
+                     <table class="table table-bordered small align-middle">
+                         <thead class="table-light text-center">
                              <tr>
                                  <th>년도</th>
                                  <th>판매수량</th>
                                  <th>판매단가</th>
-                                 <th>판매금액</th>
+                                 <th>판매금액(천원)</th>
                              </tr>
                          </thead>
                          <tbody>
                              <!-- Year 1 (Fixed) -->
                              <tr>
-                                 <td class="bg-light">1차년도</td>
-                                 <td class="bg-light">{{ formatNumber(currentYearly.YMenuQty[0]) }}</td>
-                                 <td class="bg-light">{{ formatNumber(currentYearly.YMenuPrice[0]) }}</td>
-                                 <td class="bg-light">{{ formatNumber(currentYearly.YMenuAmt[0]) }}</td>
+                                 <td class="bg-light text-center">1차년도</td>
+                                 <td class="bg-light text-end pe-2">{{ formatNumber(currentYearly.YMenuQty[0]) }}</td>
+                                 <td class="bg-light text-end pe-2">{{ formatNumber(currentYearly.YMenuPrice[0]) }}</td>
+                                 <td class="bg-light text-end pe-2">{{ formatNumber(currentYearly.YMenuAmt[0]/1000) }}</td>
                              </tr>
                              <!-- Year 2 -->
                              <tr>
-                                 <td class="bg-light">2차년도</td>
-                                 <td>
-                                     <input v-if="currentYearly.YMenuCd === '2'" type="number" class="form-control form-control-sm text-center" v-model.number="currentYearly.YMenuQty[1]" @input="calcYearlyDirect">
+                                 <td class="bg-light text-center">2차년도</td>
+                                 <td class="text-end pe-2">
+                                     <input v-if="currentYearly.YMenuCd === '2'" type="number" class="form-control form-control-sm text-end" v-model.number="currentYearly.YMenuQty[1]" @input="calcYearlyDirect">
                                      <span v-else>{{ formatNumber(currentYearly.YMenuQty[1]) }}</span>
                                  </td>
-                                 <td>
-                                     <input v-if="currentYearly.YMenuCd === '2'" type="number" class="form-control form-control-sm text-center" v-model.number="currentYearly.YMenuPrice[1]" @input="calcYearlyDirect">
+                                 <td class="text-end pe-2">
+                                     <input v-if="currentYearly.YMenuCd === '2'" type="number" class="form-control form-control-sm text-end" v-model.number="currentYearly.YMenuPrice[1]" @input="calcYearlyDirect">
                                      <span v-else>{{ formatNumber(currentYearly.YMenuPrice[1]) }}</span>
                                  </td>
-                                 <td class="bg-light">{{ formatNumber(currentYearly.YMenuAmt[1]) }}</td>
+                                 <td class="bg-light text-end pe-2">{{ formatNumber(currentYearly.YMenuAmt[1]/1000) }}</td>
                              </tr>
                              <!-- Year 3 -->
                              <tr>
-                                 <td class="bg-light">3차년도</td>
-                                  <td>
-                                     <input v-if="currentYearly.YMenuCd === '2'" type="number" class="form-control form-control-sm text-center" v-model.number="currentYearly.YMenuQty[2]" @input="calcYearlyDirect">
+                                 <td class="bg-light text-center">3차년도</td>
+                                  <td class="text-end pe-2">
+                                     <input v-if="currentYearly.YMenuCd === '2'" type="number" class="form-control form-control-sm text-end" v-model.number="currentYearly.YMenuQty[2]" @input="calcYearlyDirect">
                                      <span v-else>{{ formatNumber(currentYearly.YMenuQty[2]) }}</span>
                                  </td>
-                                 <td>
-                                     <input v-if="currentYearly.YMenuCd === '2'" type="number" class="form-control form-control-sm text-center" v-model.number="currentYearly.YMenuPrice[2]" @input="calcYearlyDirect">
+                                 <td class="text-end pe-2">
+                                     <input v-if="currentYearly.YMenuCd === '2'" type="number" class="form-control form-control-sm text-end" v-model.number="currentYearly.YMenuPrice[2]" @input="calcYearlyDirect">
                                      <span v-else>{{ formatNumber(currentYearly.YMenuPrice[2]) }}</span>
                                  </td>
-                                 <td class="bg-light">{{ formatNumber(currentYearly.YMenuAmt[2]) }}</td>
+                                 <td class="bg-light text-end pe-2">{{ formatNumber(currentYearly.YMenuAmt[2]/1000) }}</td>
                              </tr>
                          </tbody>
                      </table>
