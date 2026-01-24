@@ -373,21 +373,31 @@
                                         
                                         <!-- Job 01 Mfg (Moved to Top) -->
                                         <h6 class="small text-muted fw-bold mb-2">생산/제조직 (제조원가)</h6>
-                                        <div v-for="(job, idx) in expertData.JOB.job01" :key="'j1'+idx" class="d-flex gap-2 mb-2 align-items-center">
-                                            <input type="text" class="form-control form-control-sm" v-model="job.JobTitle" placeholder="직책" style="width: 30%">
-                                            <input type="number" class="form-control form-control-sm" v-model.number="job.JobCnt" placeholder="인원" style="width: 20%">
-                                            <input type="number" class="form-control form-control-sm" v-model.number="job.JobQty" placeholder="월 급여" style="width: 40%">
-                                            <button class="btn-close" @click="expertData.JOB.job01.splice(idx, 1)"></button>
+                                        <div v-for="(job, idx) in expertData.JOB.job01" :key="'j1'+idx" class="mb-3 p-2 bg-white rounded border border-light shadow-sm">
+                                            <div class="d-flex gap-2 mb-2 align-items-center">
+                                                <input type="text" class="form-control form-control-sm" v-model="job.JobTitle" placeholder="직책" style="width: 30%">
+                                                <input type="number" class="form-control form-control-sm" v-model.number="job.JobCnt" placeholder="인원" style="width: 20%">
+                                                <input type="number" class="form-control form-control-sm" v-model.number="job.JobQty" placeholder="월 급여" style="width: 40%">
+                                                <button class="btn-close" @click="expertData.JOB.job01.splice(idx, 1)"></button>
+                                            </div>
+                                            <div class="text-end small text-muted px-1">
+                                                월 인건비: <strong class="text-primary">{{ formatCurrency((job.JobCnt || 0) * (job.JobQty || 0)) }}</strong>
+                                            </div>
                                         </div>
                                         <button class="btn btn-sm btn-light w-100 border mb-4" @click="addJob(expertData.JOB.job01)">+ 인원 추가</button>
 
                                         <!-- Job 02 Sales/Admin (Moved to Bottom) -->
                                         <h6 class="small text-muted fw-bold mb-2">판매/관리직 (판관비)</h6>
-                                        <div v-for="(job, idx) in expertData.JOB.job02" :key="'j2'+idx" class="d-flex gap-2 mb-2 align-items-center">
-                                            <input type="text" class="form-control form-control-sm" v-model="job.JobTitle" placeholder="직책/성명" style="width: 30%">
-                                            <input type="number" class="form-control form-control-sm" v-model.number="job.JobCnt" placeholder="인원" style="width: 20%">
-                                            <input type="number" class="form-control form-control-sm" v-model.number="job.JobQty" placeholder="월 급여" style="width: 40%">
-                                            <button class="btn-close" @click="expertData.JOB.job02.splice(idx, 1)"></button>
+                                        <div v-for="(job, idx) in expertData.JOB.job02" :key="'j2'+idx" class="mb-3 p-2 bg-white rounded border border-light shadow-sm">
+                                            <div class="d-flex gap-2 mb-2 align-items-center">
+                                                <input type="text" class="form-control form-control-sm" v-model="job.JobTitle" placeholder="직책/성명" style="width: 30%">
+                                                <input type="number" class="form-control form-control-sm" v-model.number="job.JobCnt" placeholder="인원" style="width: 20%">
+                                                <input type="number" class="form-control form-control-sm" v-model.number="job.JobQty" placeholder="월 급여" style="width: 40%">
+                                                <button class="btn-close" @click="expertData.JOB.job02.splice(idx, 1)"></button>
+                                            </div>
+                                            <div class="text-end small text-muted px-1">
+                                                월 인건비: <strong class="text-primary">{{ formatCurrency((job.JobCnt || 0) * (job.JobQty || 0)) }}</strong>
+                                            </div>
                                         </div>
                                         <button class="btn btn-sm btn-light w-100 border" @click="addJob(expertData.JOB.job02)">+ 인원 추가</button>
                                     </div>
@@ -1143,6 +1153,29 @@
                                                 <td class="text-end pe-2">{{ formatNumber(Math.round((sumArrayIdx(expertData.JOB.job01Y, 'YJobAmt', 0) + sumArrayIdx(expertData.JOB.job02Y, 'YJobAmt', 0))/1000)) }}</td>
                                                 <td class="text-end pe-2">{{ formatNumber(Math.round((sumArrayIdx(expertData.JOB.job01Y, 'YJobAmt', 1) + sumArrayIdx(expertData.JOB.job02Y, 'YJobAmt', 1))/1000)) }}</td>
                                                 <td class="text-end pe-2">{{ formatNumber(Math.round((sumArrayIdx(expertData.JOB.job01Y, 'YJobAmt', 2) + sumArrayIdx(expertData.JOB.job02Y, 'YJobAmt', 2))/1000)) }}</td>
+                                                <td></td>
+                                            </tr>
+
+                                            <!-- KPI Rows -->
+                                            <tr class="fw-bold">
+                                                <td colspan="3" class="bg-light">인건비 비율</td>
+                                                <td v-for="k in [0,1,2]" class="text-end pe-2 text-danger">
+                                                    {{ ((sumArrayIdx(expertData.JOB.job01Y, 'YJobAmt', k) + sumArrayIdx(expertData.JOB.job02Y, 'YJobAmt', k)) / (sumArrayIdx(expertData.SALE.menuY, 'YMenuAmt', k) || 1) * 100).toFixed(1) }}%
+                                                </td>
+                                                <td></td>
+                                            </tr>
+                                            <tr class="fw-bold">
+                                                <td colspan="3" class="bg-light">1인당 매출액(천원)</td>
+                                                <td v-for="k in [0,1,2]" class="text-end pe-2 text-danger">
+                                                    {{ formatNumber(Math.round(sumArrayIdx(expertData.SALE.menuY, 'YMenuAmt', k) / (expertData.JOB.job01.reduce((s,c)=>s+(c.JobCnt||0), 0) + expertData.JOB.job02.reduce((s,c)=>s+(c.JobCnt||0), 0) || 1) / 1000)) }}
+                                                </td>
+                                                <td></td>
+                                            </tr>
+                                            <tr class="fw-bold">
+                                                <td colspan="3" class="bg-light">1인당 인건비(천원)</td>
+                                                <td v-for="k in [0,1,2]" class="text-end pe-2 text-danger">
+                                                    {{ formatNumber(Math.round((sumArrayIdx(expertData.JOB.job01Y, 'YJobAmt', k) + sumArrayIdx(expertData.JOB.job02Y, 'YJobAmt', k)) / (expertData.JOB.job01.reduce((s,c)=>s+(c.JobCnt||0), 0) + expertData.JOB.job02.reduce((s,c)=>s+(c.JobCnt||0), 0) || 1) / 1000)) }}
+                                                </td>
                                                 <td></td>
                                             </tr>
                                         </tbody>
