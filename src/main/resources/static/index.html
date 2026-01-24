@@ -687,17 +687,64 @@
                     <!-- Tabs for Monthly vs Yearly -->
                     <ul class="nav nav-tabs mb-3" id="projTabs">
                         <li class="nav-item">
-                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabYearly" type="button">3개년 예상 매출 (Yearly)</button>
+                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabMonthly" type="button">1차년도 월별 상세 (Monthly)</button>
                         </li>
                         <li class="nav-item">
-                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabMonthly" type="button">1차년도 월별 상세 (Monthly)</button>
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabYearly" type="button">3개년 예상 매출 (Yearly)</button>
                         </li>
                     </ul>
 
                     <div class="tab-content" id="projTabContent">
                         
-                        <!-- TAB 1: Yearly Table -->
-                        <div class="tab-pane fade show active" id="tabYearly">
+                        <!-- TAB 1: Monthly Table -->
+                        <div class="tab-pane fade show active" id="tabMonthly">
+                             <div class="card border-0 shadow-sm">
+                                <div class="card-body p-0 table-responsive">
+                                    <table class="table table-bordered mb-0 text-center align-middle small table-striped">
+                                        <thead class="bg-light sticky-top">
+                                            <tr>
+                                                <th rowspan="1" style="min-width: 40px;">No</th>
+                                                <th rowspan="1" style="min-width: 120px;">메뉴명</th>
+                                                <th rowspan="1" style="min-width: 80px;">구분</th>
+                                                <th v-for="n in 12" :key="n" style="min-width: 70px;">{{n}}월</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <template v-for="(m, idx) in expertData.SALE.menuM" :key="'mm'+idx">
+                                                <!-- Qty -->
+                                                <tr>
+                                                    <td rowspan="2" class="bg-white">{{ idx + 1 }}</td>
+                                                    <td rowspan="2" class="text-start bg-white fw-bold">
+                                                        {{ expertData.SALE.menu[idx]?.MenuTitle }}
+                                                        <div class="small fw-normal text-muted">{{ formatCurrency(expertData.SALE.menu[idx]?.MenuPrice) }}</div>
+                                                    </td>
+                                                    <td class="bg-light">판매수량</td>
+                                                    <td v-for="q in m.MMenuQty" class="text-end pe-2">{{ formatNumber(q) }}</td>
+                                                </tr>
+                                                <!-- Amt -->
+                                                <tr>
+                                                    <td class="bg-light text-primary">판매금액</td>
+                                                    <td v-for="a in m.MMenuAmt" class="text-end pe-2">{{ formatNumber(a/1000) }}</td>
+                                                </tr>
+                                            </template>
+                                             <!-- Footer -->
+                                            <tr class="table-secondary fw-bold border-top-2">
+                                                <td colspan="2" rowspan="2">합계</td>
+                                                <td>판매수량</td>
+                                                <td v-for="n in 12" class="text-end pe-2">{{ formatNumber(sumArrayIdx(expertData.SALE.menuM, 'MMenuQty', n-1)) }}</td>
+                                            </tr>
+                                            <tr class="table-secondary fw-bold">
+                                                 <td>판매금액</td>
+                                                 <td v-for="n in 12" class="text-end pe-2">{{ formatNumber(sumArrayIdx(expertData.SALE.menuM, 'MMenuAmt', n-1)/1000) }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB 2: Yearly Table -->
+                        <div class="tab-pane fade" id="tabYearly">
                             <div class="card border-0 shadow-sm">
                                 <div class="card-body p-0 table-responsive">
                                     <table class="table table-bordered mb-0 text-center align-middle small table-hover">
@@ -771,53 +818,6 @@
                             </div>
                         </div>
 
-                        <!-- TAB 2: Monthly Table -->
-                        <div class="tab-pane fade" id="tabMonthly">
-                             <div class="card border-0 shadow-sm">
-                                <div class="card-body p-0 table-responsive">
-                                    <table class="table table-bordered mb-0 text-center align-middle small table-striped">
-                                        <thead class="bg-light sticky-top">
-                                            <tr>
-                                                <th rowspan="1" style="min-width: 40px;">No</th>
-                                                <th rowspan="1" style="min-width: 120px;">메뉴명</th>
-                                                <th rowspan="1" style="min-width: 80px;">구분</th>
-                                                <th v-for="n in 12" :key="n" style="min-width: 70px;">{{n}}월</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <template v-for="(m, idx) in expertData.SALE.menuM" :key="'mm'+idx">
-                                                <!-- Qty -->
-                                                <tr>
-                                                    <td rowspan="2" class="bg-white">{{ idx + 1 }}</td>
-                                                    <td rowspan="2" class="text-start bg-white fw-bold">
-                                                        {{ expertData.SALE.menu[idx]?.MenuTitle }}
-                                                        <div class="small fw-normal text-muted">{{ formatCurrency(expertData.SALE.menu[idx]?.MenuPrice) }}</div>
-                                                    </td>
-                                                    <td class="bg-light">판매수량</td>
-                                                    <td v-for="q in m.MMenuQty" class="text-end pe-2">{{ formatNumber(q) }}</td>
-                                                </tr>
-                                                <!-- Amt -->
-                                                <tr>
-                                                    <td class="bg-light text-primary">판매금액</td>
-                                                    <td v-for="a in m.MMenuAmt" class="text-end pe-2">{{ formatNumber(a/1000) }}</td>
-                                                </tr>
-                                            </template>
-                                             <!-- Footer -->
-                                            <tr class="table-secondary fw-bold border-top-2">
-                                                <td colspan="2" rowspan="2">합계</td>
-                                                <td>판매수량</td>
-                                                <td v-for="n in 12" class="text-end pe-2">{{ formatNumber(sumArrayIdx(expertData.SALE.menuM, 'MMenuQty', n-1)) }}</td>
-                                            </tr>
-                                            <tr class="table-secondary fw-bold">
-                                                 <td>판매금액</td>
-                                                 <td v-for="n in 12" class="text-end pe-2">{{ formatNumber(sumArrayIdx(expertData.SALE.menuM, 'MMenuAmt', n-1)/1000) }}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-
                     </div> <!-- End Tab Content -->
                 </div>
                 <div class="modal-footer bg-light">
@@ -863,17 +863,52 @@
                     <!-- Tabs -->
                     <ul class="nav nav-tabs mb-3" id="matTabs">
                         <li class="nav-item">
-                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabMatYearly" type="button">3개년 예상 재료비 (Yearly)</button>
+                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabMatMonthly" type="button">1차년도 월별 상세 (Monthly)</button>
                         </li>
                         <li class="nav-item">
-                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabMatMonthly" type="button">1차년도 월별 상세 (Monthly)</button>
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabMatYearly" type="button">3개년 예상 재료비 (Yearly)</button>
                         </li>
                     </ul>
 
                     <div class="tab-content" id="matTabContent">
                         
-                        <!-- TAB 1: Yearly -->
-                        <div class="tab-pane fade show active" id="tabMatYearly">
+                        <!-- TAB 1: Monthly -->
+                        <div class="tab-pane fade show active" id="tabMatMonthly">
+                             <div class="card border-0 shadow-sm">
+                                <div class="card-body p-0 table-responsive">
+                                    <table class="table table-bordered mb-0 text-center align-middle small table-striped">
+                                        <thead class="bg-light sticky-top">
+                                            <tr>
+                                                <th rowspan="1" style="min-width: 40px;">No</th>
+                                                <th rowspan="1" style="min-width: 120px;">메뉴명</th>
+                                                <th rowspan="1" style="min-width: 60px;">비율</th>
+                                                <th v-for="n in 12" :key="n" style="min-width: 70px;">{{n}}월</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <template v-for="(m, idx) in expertData.COST.costM" :key="'cm'+idx">
+                                                <tr>
+                                                    <td class="bg-white">{{ idx + 1 }}</td>
+                                                    <td class="text-start bg-white fw-bold">
+                                                        {{ expertData.SALE.menu[idx]?.MenuTitle }}
+                                                    </td>
+                                                    <td class="text-muted small">{{ expertData.COST.cost[idx]?.costRate }}%</td>
+                                                    <td v-for="c in m.MMenuCost" class="text-end pe-2">{{ formatNumber(Math.round(c/1000)) }}</td>
+                                                </tr>
+                                            </template>
+                                             <!-- Footer -->
+                                            <tr class="table-secondary fw-bold border-top-2">
+                                                <td colspan="3">합계</td>
+                                                <td v-for="n in 12" class="text-end pe-2">{{ formatNumber(Math.round(sumArrayIdx(expertData.COST.costM, 'MMenuCost', n-1)/1000)) }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB 2: Yearly -->
+                        <div class="tab-pane fade" id="tabMatYearly">
                             <div class="card border-0 shadow-sm">
                                 <div class="card-body p-0 table-responsive">
                                     <table class="table table-bordered mb-0 text-center align-middle small table-hover">
@@ -925,41 +960,6 @@
                                                 <td class="text-end pe-2">{{ formatNumber(Math.round(sumArrayIdx(expertData.COST.costY, 'YMenuCost', 0)/1000)) }}</td>
                                                 <td class="text-end pe-2">{{ formatNumber(Math.round(sumArrayIdx(expertData.COST.costY, 'YMenuCost', 1)/1000)) }}</td>
                                                 <td class="text-end pe-2">{{ formatNumber(Math.round(sumArrayIdx(expertData.COST.costY, 'YMenuCost', 2)/1000)) }}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- TAB 2: Monthly -->
-                        <div class="tab-pane fade" id="tabMatMonthly">
-                             <div class="card border-0 shadow-sm">
-                                <div class="card-body p-0 table-responsive">
-                                    <table class="table table-bordered mb-0 text-center align-middle small table-striped">
-                                        <thead class="bg-light sticky-top">
-                                            <tr>
-                                                <th rowspan="1" style="min-width: 40px;">No</th>
-                                                <th rowspan="1" style="min-width: 120px;">메뉴명</th>
-                                                <th rowspan="1" style="min-width: 60px;">비율</th>
-                                                <th v-for="n in 12" :key="n" style="min-width: 70px;">{{n}}월</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <template v-for="(m, idx) in expertData.COST.costM" :key="'cm'+idx">
-                                                <tr>
-                                                    <td class="bg-white">{{ idx + 1 }}</td>
-                                                    <td class="text-start bg-white fw-bold">
-                                                        {{ expertData.SALE.menu[idx]?.MenuTitle }}
-                                                    </td>
-                                                    <td class="text-muted small">{{ expertData.COST.cost[idx]?.costRate }}%</td>
-                                                    <td v-for="c in m.MMenuCost" class="text-end pe-2">{{ formatNumber(Math.round(c/1000)) }}</td>
-                                                </tr>
-                                            </template>
-                                             <!-- Footer -->
-                                            <tr class="table-secondary fw-bold border-top-2">
-                                                <td colspan="3">합계</td>
-                                                <td v-for="n in 12" class="text-end pe-2">{{ formatNumber(Math.round(sumArrayIdx(expertData.COST.costM, 'MMenuCost', n-1)/1000)) }}</td>
                                             </tr>
                                         </tbody>
                                     </table>
