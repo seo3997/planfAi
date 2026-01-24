@@ -889,11 +889,12 @@
                                         <thead class="bg-light">
                                             <tr>
                                                 <th width="5%">No</th>
-                                                <th width="20%">메뉴명</th>
+                                                <th width="15%">메뉴명</th>
                                                 <th width="10%">내용</th>
                                                 <th>1차년도</th>
                                                 <th>2차년도</th>
                                                 <th>3차년도</th>
+                                                <th width="5%">수정</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -904,15 +905,26 @@
                                                         {{ expertData.SALE.menu[idx]?.MenuTitle }}
                                                     </td>
                                                     <td class="bg-light">재료비율</td>
-                                                    <td colspan="3" class="text-center text-muted">
-                                                        {{ expertData.COST.cost[idx]?.costRate || 0 }}%
+                                                    <td class="text-center text-muted">
+                                                        {{ expertData.COST.costY[idx]?.YCostRate?.[0] ?? expertData.COST.cost[idx]?.costRate ?? 0 }}%
+                                                    </td>
+                                                    <td class="text-center text-muted">
+                                                        {{ expertData.COST.costY[idx]?.YCostRate?.[1] ?? expertData.COST.cost[idx]?.costRate ?? 0 }}%
+                                                    </td>
+                                                    <td class="text-center text-muted">
+                                                        {{ expertData.COST.costY[idx]?.YCostRate?.[2] ?? expertData.COST.cost[idx]?.costRate ?? 0 }}%
+                                                    </td>
+                                                    
+                                                    <td rowspan="2">
+                                                        <button class="btn btn-xs btn-outline-secondary" @click="openMaterialYearlyModal(idx)">수정</button>
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <td class="bg-light">재료비</td>
-                                                    <td class="fw-bold text-end pe-2">{{ formatNumber((expertData.COST.costY[idx]?.YMenuCost[0]||0)/1000) }}</td>
-                                                    <td class="fw-bold text-end pe-2">{{ formatNumber((expertData.COST.costY[idx]?.YMenuCost[1]||0)/1000) }}</td>
-                                                    <td class="fw-bold text-end pe-2">{{ formatNumber((expertData.COST.costY[idx]?.YMenuCost[2]||0)/1000) }}</td>
+                                                    <!-- Use YMenuCost or YCostAmt. Prefer YMenuCost for display as it was populated initially -->
+                                                    <td class="fw-bold text-end pe-2">{{ formatNumber((expertData.COST.costY[idx]?.YMenuCost?.[0]||0)/1000) }}</td>
+                                                    <td class="fw-bold text-end pe-2">{{ formatNumber((expertData.COST.costY[idx]?.YMenuCost?.[1]||0)/1000) }}</td>
+                                                    <td class="fw-bold text-end pe-2">{{ formatNumber((expertData.COST.costY[idx]?.YMenuCost?.[2]||0)/1000) }}</td>
                                                 </tr>
                                             </template>
                                             
@@ -1080,6 +1092,95 @@
     </div>
 </div>
 
+    <!-- Yearly Material Cost Registration Modal -->
+    <div v-if="showMaterialYearlyModal" class="modal-backdrop fade show" style="z-index: 1065;"></div>
+    <div v-if="showMaterialYearlyModal" class="modal fade show d-block" tabindex="-1" style="z-index: 1070;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">연도별 재료비 등록</h5>
+                    <button type="button" class="btn-close" @click="closeMaterialYearlyModal"></button>
+                </div>
+                <div class="modal-body">
+                     <!-- Menu Info -->
+                     <div class="row mb-3">
+                         <label class="col-sm-3 col-form-label text-end small fw-bold">메뉴명</label>
+                         <div class="col-sm-9 d-flex align-items-center">
+                             <span class="fw-bold">{{ currentMenu?.MenuTitle }}</span>
+                         </div>
+                     </div>
+                     
+                     <!-- Increase Rate Input -->
+                     <div class="row mb-4">
+                         <label class="col-sm-3 col-form-label text-end small fw-bold">재료비비율<br>증감율</label>
+                         <div class="col-sm-9 d-flex align-items-center">
+                             <div class="input-group input-group-sm" style="width: 150px;">
+                                <input type="number" class="form-control text-end" v-model.number="currentMaterialYearly.YCostAmtRate" @input="calcMaterialYearly">
+                                <span class="input-group-text">%</span>
+                             </div>
+                             <span class="small text-muted ms-2">(2,3차년도 자동계산)</span>
+                         </div>
+                     </div>
+
+                     <!-- Table -->
+                     <table class="table table-bordered small align-middle text-center">
+                         <thead class="table-light">
+                             <tr>
+                                 <th>년도</th>
+                                 <th>판매금액(천원)</th>
+                                 <th>재료비 비율</th>
+                                 <th>재료비(천원)</th>
+                             </tr>
+                         </thead>
+                         <tbody>
+                             <!-- Year 1 -->
+                             <tr>
+                                 <td class="bg-light">1차년도</td>
+                                 <td class="bg-light text-end pe-2">{{ formatNumber(currentMaterialYearly.DisplayYMenuAmt[0]/1000) }}</td>
+                                 <td class="bg-light">
+                                     <div class="input-group input-group-sm justify-content-end border-0 bg-transparent">
+                                        <span class="pe-1">{{ currentMaterialYearly.YCostRate[0] }}</span>%
+                                     </div>
+                                 </td>
+                                 <td class="bg-light text-end pe-2">{{ formatNumber(currentMaterialYearly.YCostAmt[0]/1000) }}</td>
+                             </tr>
+                             <!-- Year 2 -->
+                             <tr>
+                                 <td class="bg-light">2차년도</td>
+                                 <td class="bg-light text-end pe-2">{{ formatNumber(currentMaterialYearly.DisplayYMenuAmt[1]/1000) }}</td>
+                                 <td class="bg-white">
+                                     <div class="d-flex justify-content-center align-items-center">
+                                        <span class="fw-bold">{{ currentMaterialYearly.YCostRate[1] }}</span>
+                                        <span class="small ms-1">%</span>
+                                     </div>
+                                 </td>
+                                 <td class="bg-light text-end pe-2">{{ formatNumber(currentMaterialYearly.YCostAmt[1]/1000) }}</td>
+                             </tr>
+                             <!-- Year 3 -->
+                             <tr>
+                                 <td class="bg-light">3차년도</td>
+                                 <td class="bg-light text-end pe-2">{{ formatNumber(currentMaterialYearly.DisplayYMenuAmt[2]/1000) }}</td>
+                                  <td class="bg-white">
+                                     <div class="d-flex justify-content-center align-items-center">
+                                        <span class="fw-bold">{{ currentMaterialYearly.YCostRate[2] }}</span>
+                                        <span class="small ms-1">%</span>
+                                     </div>
+                                 </td>
+                                 <td class="bg-light text-end pe-2">{{ formatNumber(currentMaterialYearly.YCostAmt[2]/1000) }}</td>
+                             </tr>
+                         </tbody>
+                     </table>
+                </div>
+                 <div class="modal-footer">
+                     <!-- Button color red-ish as per user image '수정'-->
+                    <button type="button" class="btn btn-danger btn-sm text-white" @click="saveMaterialYearly" style="background-color: #ff8a80; border-color: #ff8a80;">수정</button>
+                    <button type="button" class="btn btn-secondary btn-sm" @click="closeMaterialYearlyModal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
   
     const { createApp, ref, reactive, computed, watch, onMounted } = Vue;
@@ -1163,6 +1264,104 @@
                      calcYearly();
                 }
             };
+            
+            // Material Cost Yearly Logic
+            const showMaterialYearlyModal = ref(false);
+            const currentMaterialYearly = reactive({
+                YCostCd: '1', YCostAmtRate: 0,
+                YCostRate: [0,0,0], YCostAmt: [0,0,0],
+                DisplayYMenuAmt: [0,0,0] // For reference only (Revenue)
+            });
+
+            const openMaterialYearlyModal = (idx) => {
+                currentMenuIdx.value = idx;
+                const costItem = expertData.COST.cost[idx]; // Base info
+                const costYItem = expertData.COST.costY[idx]; // Yearly info
+                const revYItem = expertData.SALE.menuY[idx]; // Yearly Revenue
+
+                // Init Defaults if missing
+                const baseRate = costItem ? (costItem.costRate || 0) : 0;
+                
+                // Set Current State
+                if (costYItem) {
+                    currentMaterialYearly.YCostCd = '1'; // Fixed as 1
+                    currentMaterialYearly.YCostAmtRate = costYItem.YCostAmtRate || 0;
+                    
+                    // If Rates exist, use them, else init from Base
+                    if(costYItem.YCostRate && costYItem.YCostRate.length === 3) {
+                         currentMaterialYearly.YCostRate = [...costYItem.YCostRate];
+                    } else {
+                         currentMaterialYearly.YCostRate = [baseRate, baseRate, baseRate];
+                    }
+                } else {
+                    currentMaterialYearly.YCostCd = '1'; 
+                    currentMaterialYearly.YCostAmtRate = 0;
+                    currentMaterialYearly.YCostRate = [baseRate, baseRate, baseRate];
+                }
+
+                // Load Revenue for Ref (Read Only)
+                if (revYItem && revYItem.YMenuAmt) {
+                    currentMaterialYearly.DisplayYMenuAmt = [...revYItem.YMenuAmt];
+                } else {
+                    currentMaterialYearly.DisplayYMenuAmt = [0,0,0]; // Should not happen if projections up to date
+                }
+
+                // Recalc to ensure consistency
+                calcMaterialYearly();
+                showMaterialYearlyModal.value = true;
+            };
+
+            const closeMaterialYearlyModal = () => { showMaterialYearlyModal.value = false; currentMenuIdx.value = -1; };
+
+            const calcMaterialYearly = () => {
+                // Logic: 
+                // Y1 Rate = Base (Fixed? Or editable? Prompt says "Increase Rate" input. Usually Y1 is fixed by Menu Setup, but let's assume Y1 starts at base and Y2 changes).
+                // Let's assume Y1 Rate is fixed from the Basic Menu Input (Input 0% increase implies keeping Y1 rate).
+                // If user changes YCostAmtRate, it applies to Y2, Y3 compounding.
+                
+                const rateIncrease = (currentMaterialYearly.YCostAmtRate || 0) / 100;
+                
+                // Y1
+                // Rate: Keep as is (or reset to base? Let's use current [0] but ensure it matches base logic if wanted. For now trust stored Y1 or base).
+                // Actually, if we want to "Input Increase Rate", we usually base it off Y1.
+                // Let's ensure Y1 Amt is correct based on Y1 Rate.
+                currentMaterialYearly.YCostAmt[0] = Math.round(currentMaterialYearly.DisplayYMenuAmt[0] * (currentMaterialYearly.YCostRate[0] / 100));
+
+                // Y2
+                // New Rate = Y1 Rate * (1 + Inc)
+                let r2 = currentMaterialYearly.YCostRate[0] * (1 + rateIncrease);
+                // Clamp max 100?
+                if(r2 > 100) r2 = 100; 
+                currentMaterialYearly.YCostRate[1] = parseFloat(r2.toFixed(2)); // clean decimals
+                currentMaterialYearly.YCostAmt[1] = Math.round(currentMaterialYearly.DisplayYMenuAmt[1] * (currentMaterialYearly.YCostRate[1] / 100));
+
+                // Y3
+                // New Rate = Y2 Rate * (1 + Inc)
+                let r3 = currentMaterialYearly.YCostRate[1] * (1 + rateIncrease);
+                if(r3 > 100) r3 = 100;
+                currentMaterialYearly.YCostRate[2] = parseFloat(r3.toFixed(2));
+                currentMaterialYearly.YCostAmt[2] = Math.round(currentMaterialYearly.DisplayYMenuAmt[2] * (currentMaterialYearly.YCostRate[2] / 100));
+            };
+
+            const saveMaterialYearly = () => {
+                if(currentMenuIdx.value >= 0) {
+                    // Update global state
+                    // Ensure object exists
+                    if (!expertData.COST.costY[currentMenuIdx.value]) {
+                        expertData.COST.costY[currentMenuIdx.value] = {};
+                    }
+                    const target = expertData.COST.costY[currentMenuIdx.value];
+                    
+                    target.YCostCd = '1';
+                    target.YCostAmtRate = currentMaterialYearly.YCostAmtRate;
+                    target.YCostRate = [...currentMaterialYearly.YCostRate];
+                    // Map Amt to YMenuCost (old name) AND YCostAmt (new name) for safety
+                    target.YCostAmt = [...currentMaterialYearly.YCostAmt];
+                    target.YMenuCost = [...currentMaterialYearly.YCostAmt]; 
+                }
+                closeMaterialYearlyModal();
+            };
+
             
 
 
@@ -1291,16 +1490,50 @@
                     const costItem = expertData.COST.cost[idx];
                     const costRate = costItem ? (costItem.costRate || 0) : 0;
 
-                    // Monthly Cost
+                    // Monthly Cost (Rate fixed for Month 1-12 in Y1)
+                    // If Y1 rate is changed in Yearly modal, should we update costItem.costRate? 
+                    // Usually Detailed Plan overrides Basic. But for now, let's keep basic sync one-way or simple.
+                    // Let's assume MMenuCost uses the Basic Rate. 
                     const mCostArr = mAmtArr.map(amt => Math.round(amt * (costRate/100)));
                     expertData.COST.costM.push({ MMenuCost: mCostArr });
 
                     // Yearly Cost
-                    if (!expertData.COST.costY[idx]) {
-                        expertData.COST.costY[idx] = { YMenuCost: [0,0,0] };
+                    // IMPORTANT: If YCostCd='1' is set by detailed modal, PRESERVE IT. 
+                    // Otherwise, Init Default.
+                    let yCostItem = expertData.COST.costY[idx];
+                    if (!yCostItem) {
+                        yCostItem = { 
+                            YCostCd: '1', YCostAmtRate: 0,
+                            YCostRate: [costRate, costRate, costRate],
+                            YCostAmt: [0,0,0], YMenuCost: [0,0,0]
+                        };
+                        expertData.COST.costY[idx] = yCostItem;
                     }
-                    const yCostArr = yItem.YMenuAmt.map(amt => Math.round(amt * (costRate/100)));
-                    expertData.COST.costY[idx].YMenuCost = yCostArr;
+                    
+                    // Always Recalc Y1 Amt based on Revenue * Y1 Rate (Fixed or User set?)
+                    // If user hasn't edited (default), YCostRate is [costRate, costRate, costRate].
+                    // If user edited, YCostRate is preserved.
+                    // BUT: Revenue (YMenuAmt) might have changed due to Sales Projection Update.
+                    // SO: We MUST re-calculate AMOUNTS based on Rates.
+                    
+                    // Sync Y1 Rate to Menu Base if not edited? 
+                    // Let's trust stored YCostRate if it exists. If empty, fill.
+                    if(!yCostItem.YCostRate || yCostItem.YCostRate.length < 3) {
+                         yCostItem.YCostRate = [costRate, costRate, costRate];
+                    } else {
+                        // Ensure Y1 Rate syncs with Basic Cost setting initially?
+                        // If user changes "Basic Cost Rate" in Accordion, it should probably propagate to Y1.
+                        // But if user manually edited Yearly Plan, maybe not?
+                        // Let's Simple Sync: If YCostAmtRate is 0 and it looks like default, update Y1.
+                        // Safest: Update Y1 Rate to matches Basic Cost Rate IF it seems like default mode.
+                        // Or Just: Always calculate Amounts using stored Rates.
+                        // AND: If YCostCd=1, we should theoretically re-run the "Increase Rate" logic if Revenue changed.
+                        // To keep it clean: We just re-calc Amounts here using stored Rates.
+                    }
+
+                    // Recalc Amounts (Rev * Rate)
+                    yCostItem.YMenuCost = yItem.YMenuAmt.map((amt, k) => Math.round(amt * (yCostItem.YCostRate[k] || 0)/100));
+                    yCostItem.YCostAmt = [...yCostItem.YMenuCost];
                 });
                 
                 // Trim menuY
@@ -1861,7 +2094,9 @@
                 calcMenuMonthlyRevenue,
                 formatCurrency, formatCurrencyCheon, formatDate, parseReport, getReportValues, loadReports, saveExpertReport, loadReportToCanvas, deleteReport, formatNumber, sumArrayIdx,
                 showYearlyModal, currentMenu, currentYearly,
-                openYearlyModal, closeYearlyModal, saveYearlyModal, calcYearly, calcYearlyDirect, onYMenuCdChange
+                openYearlyModal, closeYearlyModal, saveYearlyModal, calcYearly, calcYearlyDirect, onYMenuCdChange,
+                showMaterialYearlyModal, currentMaterialYearly, openMaterialYearlyModal, closeMaterialYearlyModal, saveMaterialYearly, calcMaterialYearly,
+
 
             };
         }
