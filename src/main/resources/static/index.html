@@ -1857,11 +1857,26 @@
                 processExp(expertData.expense.sales);
             };
 
-            // Watch for changes (Updated to new schema)
+            // Watch for changes (Defensive & Specific to avoid recursion)
             watch(
-                () => [expertData.sale?.menu, expertData.basic?.saleMode, expertData.basic?.workDay, expertData.job?.production, expertData.job?.sales],
-                () => { if(expertData.basic && expertData.sale) updateProjections(); },
-                { deep: true }
+                () => {
+                    if(!expertData.basic || !expertData.sale) return null;
+                    return JSON.stringify({
+                        saleMode: expertData.basic.saleMode,
+                        workDay: expertData.basic.workDay,
+                        menus: expertData.sale.menu.map(m => ({ p: m.menuPrice, q: m.menuQty })),
+                        costRates: expertData.cost.costRate,
+                        prodJobs: expertData.job.production.map(j => ({ c: j.jobCnt, q: j.jobQty, r: j.jobAmtRate, cd: j.jobAmtCd })),
+                        salesJobs: expertData.job.sales.map(j => ({ c: j.jobCnt, q: j.jobQty, r: j.jobAmtRate, cd: j.jobAmtCd })),
+                        prodExp: expertData.expense.production.map(e => ({ a: e.expenseTVaAmt })),
+                        salesExp: expertData.expense.sales.map(e => ({ a: e.expenseTVaAmt }))
+                    });
+                },
+                (newVal, oldVal) => {
+                    if (newVal && newVal !== oldVal) {
+                        updateProjections();
+                    }
+                }
             );
 
             // ================= PROFIT ANALYSIS ENGINE (NEW) =================
