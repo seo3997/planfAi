@@ -835,7 +835,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> <!-- End showProjectionModal -->
 
     <!-- Material Cost Detail Modal -->
     <div v-if="showMaterialModal" class="modal-backdrop fade show"></div>
@@ -922,18 +922,18 @@
                                                 <tr>
                                                     <td class="bg-light">재료비</td>
                                                     <!-- Use YMenuCost or YCostAmt. Prefer YMenuCost for display as it was populated initially -->
-                                                    <td class="fw-bold text-end pe-2">{{ formatNumber((expertData.COST.costY[idx]?.YMenuCost?.[0]||0)/1000) }}</td>
-                                                    <td class="fw-bold text-end pe-2">{{ formatNumber((expertData.COST.costY[idx]?.YMenuCost?.[1]||0)/1000) }}</td>
-                                                    <td class="fw-bold text-end pe-2">{{ formatNumber((expertData.COST.costY[idx]?.YMenuCost?.[2]||0)/1000) }}</td>
+                                                    <td class="fw-bold text-end pe-2">{{ formatNumber(Math.round((expertData.COST.costY[idx]?.YMenuCost?.[0]||0)/1000)) }}</td>
+                                                    <td class="fw-bold text-end pe-2">{{ formatNumber(Math.round((expertData.COST.costY[idx]?.YMenuCost?.[1]||0)/1000)) }}</td>
+                                                    <td class="fw-bold text-end pe-2">{{ formatNumber(Math.round((expertData.COST.costY[idx]?.YMenuCost?.[2]||0)/1000)) }}</td>
                                                 </tr>
                                             </template>
                                             
                                             <!-- Total Footer -->
                                             <tr class="table-secondary fw-bold">
                                                 <td colspan="3">합계 (재료비)</td>
-                                                <td class="text-end pe-2">{{ formatNumber(sumArrayIdx(expertData.COST.costY, 'YMenuCost', 0)/1000) }}</td>
-                                                <td class="text-end pe-2">{{ formatNumber(sumArrayIdx(expertData.COST.costY, 'YMenuCost', 1)/1000) }}</td>
-                                                <td class="text-end pe-2">{{ formatNumber(sumArrayIdx(expertData.COST.costY, 'YMenuCost', 2)/1000) }}</td>
+                                                <td class="text-end pe-2">{{ formatNumber(Math.round(sumArrayIdx(expertData.COST.costY, 'YMenuCost', 0)/1000)) }}</td>
+                                                <td class="text-end pe-2">{{ formatNumber(Math.round(sumArrayIdx(expertData.COST.costY, 'YMenuCost', 1)/1000)) }}</td>
+                                                <td class="text-end pe-2">{{ formatNumber(Math.round(sumArrayIdx(expertData.COST.costY, 'YMenuCost', 2)/1000)) }}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -962,13 +962,13 @@
                                                         {{ expertData.SALE.menu[idx]?.MenuTitle }}
                                                     </td>
                                                     <td class="text-muted small">{{ expertData.COST.cost[idx]?.costRate }}%</td>
-                                                    <td v-for="c in m.MMenuCost" class="text-end pe-2">{{ formatNumber(c/1000) }}</td>
+                                                    <td v-for="c in m.MMenuCost" class="text-end pe-2">{{ formatNumber(Math.round(c/1000)) }}</td>
                                                 </tr>
                                             </template>
                                              <!-- Footer -->
                                             <tr class="table-secondary fw-bold border-top-2">
                                                 <td colspan="3">합계</td>
-                                                <td v-for="n in 12" class="text-end pe-2">{{ formatNumber(sumArrayIdx(expertData.COST.costM, 'MMenuCost', n-1)/1000) }}</td>
+                                                <td v-for="n in 12" class="text-end pe-2">{{ formatNumber(Math.round(sumArrayIdx(expertData.COST.costM, 'MMenuCost', n-1)/1000)) }}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -984,10 +984,11 @@
                 </div>
             </div>
         </div>
+    </div> <!-- End showMaterialModal -->
 
     <!-- Yearly Sales Modal (Per Menu) -->
-    <div v-if="showYearlyModal" class="modal-backdrop fade show" style="z-index: 1055;"></div>
-    <div v-if="showYearlyModal" class="modal fade show d-block" tabindex="-1" style="z-index: 1060;">
+    <div v-if="showYearlyModal" class="modal-backdrop fade show" style="z-index: 1075;"></div>
+    <div v-if="showYearlyModal" class="modal fade show d-block" tabindex="-1" style="z-index: 1080;">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -1052,7 +1053,7 @@
                                  <td class="bg-light text-center">1차년도</td>
                                  <td class="bg-light text-end pe-2">{{ formatNumber(currentYearly.YMenuQty[0]) }}</td>
                                  <td class="bg-light text-end pe-2">{{ formatNumber(currentYearly.YMenuPrice[0]) }}</td>
-                                 <td class="bg-light text-end pe-2">{{ formatNumber(currentYearly.YMenuAmt[0]/1000) }}</td>
+                                 <td class="bg-light text-end pe-2">{{ formatNumber(Math.round(currentYearly.YMenuAmt[0]/1000)) }}</td>
                              </tr>
                              <!-- Year 2 -->
                              <tr>
@@ -1065,7 +1066,7 @@
                                      <input v-if="currentYearly.YMenuCd === '2'" type="number" class="form-control form-control-sm text-end" v-model.number="currentYearly.YMenuPrice[1]" @input="calcYearlyDirect">
                                      <span v-else>{{ formatNumber(currentYearly.YMenuPrice[1]) }}</span>
                                  </td>
-                                 <td class="bg-light text-end pe-2">{{ formatNumber(currentYearly.YMenuAmt[1]/1000) }}</td>
+                                 <td class="bg-light text-end pe-2">{{ formatNumber(Math.round(currentYearly.YMenuAmt[1]/1000)) }}</td>
                              </tr>
                              <!-- Year 3 -->
                              <tr>
@@ -1078,7 +1079,7 @@
                                      <input v-if="currentYearly.YMenuCd === '2'" type="number" class="form-control form-control-sm text-end" v-model.number="currentYearly.YMenuPrice[2]" @input="calcYearlyDirect">
                                      <span v-else>{{ formatNumber(currentYearly.YMenuPrice[2]) }}</span>
                                  </td>
-                                 <td class="bg-light text-end pe-2">{{ formatNumber(currentYearly.YMenuAmt[2]/1000) }}</td>
+                                 <td class="bg-light text-end pe-2">{{ formatNumber(Math.round(currentYearly.YMenuAmt[2]/1000)) }}</td>
                              </tr>
                          </tbody>
                      </table>
@@ -1089,9 +1090,7 @@
                 </div>
             </div>
         </div>
-    </div>
-</div>
-
+    </div> <!-- End showYearlyModal -->
     <!-- Yearly Material Cost Registration Modal -->
     <div v-if="showMaterialYearlyModal" class="modal-backdrop fade show" style="z-index: 1065;"></div>
     <div v-if="showMaterialYearlyModal" class="modal fade show d-block" tabindex="-1" style="z-index: 1070;">
@@ -1136,37 +1135,37 @@
                              <!-- Year 1 -->
                              <tr>
                                  <td class="bg-light">1차년도</td>
-                                 <td class="bg-light text-end pe-2">{{ formatNumber(currentMaterialYearly.DisplayYMenuAmt[0]/1000) }}</td>
+                                 <td class="bg-light text-end pe-2">{{ formatNumber(Math.round(currentMaterialYearly.DisplayYMenuAmt[0]/1000)) }}</td>
                                  <td class="bg-light">
                                      <div class="input-group input-group-sm justify-content-end border-0 bg-transparent">
                                         <span class="pe-1">{{ currentMaterialYearly.YCostRate[0] }}</span>%
                                      </div>
                                  </td>
-                                 <td class="bg-light text-end pe-2">{{ formatNumber(currentMaterialYearly.YCostAmt[0]/1000) }}</td>
+                                 <td class="bg-light text-end pe-2">{{ formatNumber(Math.round(currentMaterialYearly.YCostAmt[0]/1000)) }}</td>
                              </tr>
                              <!-- Year 2 -->
                              <tr>
                                  <td class="bg-light">2차년도</td>
-                                 <td class="bg-light text-end pe-2">{{ formatNumber(currentMaterialYearly.DisplayYMenuAmt[1]/1000) }}</td>
+                                 <td class="bg-light text-end pe-2">{{ formatNumber(Math.round(currentMaterialYearly.DisplayYMenuAmt[1]/1000)) }}</td>
                                  <td class="bg-white">
                                      <div class="d-flex justify-content-center align-items-center">
                                         <span class="fw-bold">{{ currentMaterialYearly.YCostRate[1] }}</span>
                                         <span class="small ms-1">%</span>
                                      </div>
                                  </td>
-                                 <td class="bg-light text-end pe-2">{{ formatNumber(currentMaterialYearly.YCostAmt[1]/1000) }}</td>
+                                 <td class="bg-light text-end pe-2">{{ formatNumber(Math.round(currentMaterialYearly.YCostAmt[1]/1000)) }}</td>
                              </tr>
                              <!-- Year 3 -->
                              <tr>
                                  <td class="bg-light">3차년도</td>
-                                 <td class="bg-light text-end pe-2">{{ formatNumber(currentMaterialYearly.DisplayYMenuAmt[2]/1000) }}</td>
+                                 <td class="bg-light text-end pe-2">{{ formatNumber(Math.round(currentMaterialYearly.DisplayYMenuAmt[2]/1000)) }}</td>
                                   <td class="bg-white">
                                      <div class="d-flex justify-content-center align-items-center">
                                         <span class="fw-bold">{{ currentMaterialYearly.YCostRate[2] }}</span>
                                         <span class="small ms-1">%</span>
                                      </div>
                                  </td>
-                                 <td class="bg-light text-end pe-2">{{ formatNumber(currentMaterialYearly.YCostAmt[2]/1000) }}</td>
+                                 <td class="bg-light text-end pe-2">{{ formatNumber(Math.round(currentMaterialYearly.YCostAmt[2]/1000)) }}</td>
                              </tr>
                          </tbody>
                      </table>
@@ -1178,8 +1177,8 @@
                 </div>
             </div>
         </div>
-    </div>
-</div>
+    </div> <!-- End showMaterialYearlyModal -->
+</div> <!-- End #app -->
 
 <script>
   
