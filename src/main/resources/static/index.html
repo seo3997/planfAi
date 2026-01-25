@@ -2747,13 +2747,9 @@
                 
                 // Construct payload
                 const cleanData = JSON.parse(JSON.stringify(expertData));
-                // 7-1-4 Filter MFG Expenses with 0 values
+                // 7-1-4 Filter MFG Expenses with 1st month value > 0
                 if(cleanData.expense && cleanData.expense.production) {
-                    cleanData.expense.production = cleanData.expense.production.filter(exp => {
-                        const m = mfgExpMapping.find(map => map.title === exp.expenseTitle);
-                        if(!m || m.baseType === 'fixed') return (exp.expenseTVaAmt || 0) > 0;
-                        return (exp.expenseTVa || 0) > 0;
-                    });
+                    cleanData.expense.production = cleanData.expense.production.filter(exp => (exp.expenseAmt && exp.expenseAmt[0] > 0));
                 }
 
                 const payload = {
