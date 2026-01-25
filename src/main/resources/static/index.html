@@ -749,10 +749,13 @@
                                     <div class="accordion-body bg-light">
                                          <!-- Manufacturing Expenses (Collapsible) -->
                                          <div class="card border-0 bg-transparent mb-3">
-                                             <div class="card-header bg-white border rounded shadow-sm mb-2 p-0 overflow-hidden">
+                                             <div class="card-header bg-white border rounded shadow-sm mb-2 p-0 overflow-hidden expense-toggle">
                                                  <button class="btn btn-sm w-100 text-start d-flex justify-content-between align-items-center py-2 px-3 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#mfgExpenseCollapse">
                                                      <span><i class="bi bi-factory me-2 text-warning"></i>제조경비 리스트 (24종 항목)</span>
-                                                     <i class="bi bi-chevron-down small"></i>
+                                                     <div class="d-flex align-items-center">
+                                                         <span class="toggle-hint me-2">클릭하여 펼치기</span>
+                                                         <i class="bi bi-chevron-down small"></i>
+                                                     </div>
                                                  </button>
                                              </div>
                                              <div id="mfgExpenseCollapse" class="collapse">
@@ -793,6 +796,13 @@
                                                                  <td class="text-end pe-2 small">{{ formatCurrency(exp.expenseAmtYear[0] || 0) }}</td>
                                                              </tr>
                                                          </tbody>
+                                                         <tfoot class="bg-light-subtle fw-bold border-top">
+                                                             <tr>
+                                                                 <td colspan="3" class="text-center small">제조경비 합계</td>
+                                                                 <td class="text-end pe-2 text-primary">{{ formatCurrency(sumArrayIdx(expertData.expense.production, 'expenseAmt', 0)) }}</td>
+                                                                 <td class="text-end pe-2 small">{{ formatCurrency(sumArrayIdx(expertData.expense.production, 'expenseAmtYear', 0)) }}</td>
+                                                             </tr>
+                                                         </tfoot>
                                                      </table>
                                                  </div>
                                                  <p class="small text-muted mb-4"><i class="bi bi-info-circle me-1"></i>제조경비 항목은 표준화되어 있으며, 값이 0인 항목은 저장 시 제외됩니다.</p>
@@ -801,10 +811,13 @@
 
                                          <!-- Sales Expenses (Collapsible) -->
                                          <div class="card border-0 bg-transparent mb-3">
-                                             <div class="card-header bg-white border rounded shadow-sm mb-2 p-0 overflow-hidden">
+                                             <div class="card-header bg-white border rounded shadow-sm mb-2 p-0 overflow-hidden expense-toggle">
                                                  <button class="btn btn-sm w-100 text-start d-flex justify-content-between align-items-center py-2 px-3 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#salesExpenseCollapse">
                                                      <span><i class="bi bi-graph-up-arrow me-2 text-success"></i>판매관리비 리스트 (30종 항목)</span>
-                                                     <i class="bi bi-chevron-down small"></i>
+                                                     <div class="d-flex align-items-center">
+                                                         <span class="toggle-hint me-2">클릭하여 펼치기</span>
+                                                         <i class="bi bi-chevron-down small"></i>
+                                                     </div>
                                                  </button>
                                              </div>
                                              <div id="salesExpenseCollapse" class="collapse">
@@ -846,6 +859,14 @@
                                                                  <td class="text-center"></td>
                                                              </tr>
                                                          </tbody>
+                                                         <tfoot class="bg-light-subtle fw-bold border-top">
+                                                             <tr>
+                                                                 <td colspan="3" class="text-center small">판매관리비 합계</td>
+                                                                 <td class="text-end pe-2 text-success">{{ formatCurrency(sumArrayIdx(expertData.expense.sales, 'expenseAmt', 0)) }}</td>
+                                                                 <td class="text-end pe-2 small">{{ formatCurrency(sumArrayIdx(expertData.expense.sales, 'expenseAmtYear', 0)) }}</td>
+                                                                 <td></td>
+                                                             </tr>
+                                                         </tfoot>
                                                      </table>
                                                  </div>
                                                  <p class="small text-muted mb-4"><i class="bi bi-info-circle me-1"></i>판매관리비 항목은 표준화되어 있으며, 값이 0인 항목은 저장 시 제외됩니다.</p>
@@ -1805,7 +1826,7 @@
 
 <script>
   
-    const { createApp, ref, reactive, computed, watch, onMounted } = Vue;
+    const { createApp, ref, reactive, computed, watch, onMounted, nextTick } = Vue;
 
     createApp({
         setup() {
@@ -2065,7 +2086,7 @@
             ];
 
             const expertData = reactive({
-                basic: { industryCd: '3', workDay: 25, monTargetPrice: 5000000, saleMode: '1' },
+                basic: { industryCd: '1', workDay: 25, monTargetPrice: 5000000, saleMode: '1' },
                 sale: {
                     menu: [],
                     menuM: [],
@@ -2963,6 +2984,18 @@
                         if(!expertData.cost.costY) expertData.cost.costY = [];
                         
                         updateProjections(); 
+
+                        // Auto-expand accordions based on Industry
+                        nextTick(() => {
+                            const industryCd = expertData.basic.industryCd;
+                            if(industryCd === '1') {
+                                const el = document.getElementById('mfgExpenseCollapse');
+                                if(el) new bootstrap.Collapse(el, {toggle: false}).show();
+                            } else {
+                                const el = document.getElementById('salesExpenseCollapse');
+                                if(el) new bootstrap.Collapse(el, {toggle: false}).show();
+                            }
+                        });
                     } else {
                         mode.value = 'lite';
                         Object.assign(liteData.basic, data.basic || {});
@@ -2986,6 +3019,23 @@
 
             onMounted(() => {
                 loadReports();
+
+                // 6단계 경비계획 아코디언이 열릴 때 업종에 따른 자동 전개
+                const expAcc = document.getElementById('collapseExpense');
+                if(expAcc) {
+                    expAcc.addEventListener('show.bs.collapse', () => {
+                        nextTick(() => {
+                            const industryCd = expertData.basic.industryCd;
+                            if(industryCd === '1') { // 제조업
+                                const el = document.getElementById('mfgExpenseCollapse');
+                                if(el) new bootstrap.Collapse(el, {toggle: false}).show();
+                            } else { // 기타 업종
+                                const el = document.getElementById('salesExpenseCollapse');
+                                if(el) new bootstrap.Collapse(el, {toggle: false}).show();
+                            }
+                        });
+                    });
+                }
             });
 
             return {
