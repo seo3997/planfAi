@@ -933,11 +933,13 @@
                                                 <td class="text-end fw-bold">{{ formatCurrency(expertResult.totalLaborCost) }}</td>
                                                 <td class="text-end text-muted">{{ expertResult.laborRatio }}%</td>
                                             </tr>
-                                            <tr>
-                                                <td class="text-muted">(-) 판관비/경비</td>
-                                                <td class="text-end fw-bold">{{ formatCurrency(expertResult.totalExpense) }}</td>
-                                                <td class="text-end text-muted">{{ expertResult.expenseRatio }}%</td>
-                                            </tr>
+                                             <tr>
+                                                 <td class="text-muted clickable-link" @click="showExpenseDetailModal = true" style="cursor: pointer;">
+                                                     (-) 판관비/경비 <span class="small text-primary" style="text-decoration: underline;">(상세보기)</span>
+                                                 </td>
+                                                 <td class="text-end fw-bold">{{ formatCurrency(expertResult.totalExpense) }}</td>
+                                                 <td class="text-end text-muted">{{ expertResult.expenseRatio }}%</td>
+                                             </tr>
                                              <tr>
                                                 <td class="text-muted ps-3 fst-italic">ㄴ 이자/감가상각 포함</td>
                                                 <td></td>
@@ -1581,6 +1583,106 @@
         </div>
     </div> <!-- End showLaborModal -->
 
+    <!-- Expense Detail Modal -->
+    <div v-if="showExpenseDetailModal" class="modal-backdrop fade show"></div>
+    <div v-if="showExpenseDetailModal" class="modal fade show d-block" tabindex="-1" style="z-index: 1055;">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content shadow-lg border-0 border-top border-4 border-primary">
+                <div class="modal-header bg-white">
+                    <h5 class="modal-title fw-bold text-primary">📊 경비 상세 내역 (판관비/제조경비)</h5>
+                    <button type="button" class="btn-close" @click="showExpenseDetailModal = false"></button>
+                </div>
+                <div class="modal-body bg-light">
+                    <!-- Manufacturing Expenses (Only if industryCd is 1) -->
+                    <div v-if="expertData.basic.industryCd === '1'" class="mb-5">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="bi bi-factory text-warning fs-4 me-2"></i>
+                            <h6 class="mb-0 fw-bold">제조경비 상세 (24종)</h6>
+                        </div>
+                        <div class="table-responsive bg-white rounded shadow-sm">
+                            <table class="table table-hover table-sm small align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr class="text-center">
+                                        <th>항목명</th>
+                                        <th>적용기준</th>
+                                        <th class="text-end pe-3">월 예상액</th>
+                                        <th class="text-end pe-3">연간 총계</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="exp in expertData.expense.production.filter(e => e.expenseAmt[0] > 0)" :key="exp.expenseTitle">
+                                        <td class="ps-3 fw-bold">{{ exp.expenseTitle }}</td>
+                                        <td class="text-center text-muted">
+                                            {{ mfgExpMapping.find(m => m.title === exp.expenseTitle)?.baseName || '-' }}
+                                        </td>
+                                        <td class="text-end pe-3 text-primary fw-bold">{{ formatCurrency(exp.expenseAmt[0]) }}</td>
+                                        <td class="text-end pe-3 small">{{ formatCurrency(exp.expenseAmtYear[0]) }}</td>
+                                    </tr>
+                                    <tr v-if="expertData.expense.production.filter(e => e.expenseAmt[0] > 0).length === 0">
+                                        <td colspan="4" class="text-center py-3 text-muted">입력된 제조경비가 없습니다.</td>
+                                    </tr>
+                                </tbody>
+                                <tfoot class="table-light fw-bold">
+                                    <tr>
+                                        <td colspan="2" class="text-center">제조경비 합계</td>
+                                        <td class="text-end pe-3 text-primary">{{ formatCurrency(sumArrayIdx(expertData.expense.production, 'expenseAmt', 0)) }}</td>
+                                        <td class="text-end pe-3 small">{{ formatCurrency(sumArrayIdx(expertData.expense.production, 'expenseAmtYear', 0)) }}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Sales Expenses -->
+                    <div>
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="bi bi-graph-up-arrow text-success fs-4 me-2"></i>
+                            <h6 class="mb-0 fw-bold">판매관리비 상세 (30종)</h6>
+                        </div>
+                        <div class="table-responsive bg-white rounded shadow-sm">
+                            <table class="table table-hover table-sm small align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr class="text-center">
+                                        <th>항목명</th>
+                                        <th>적용기준</th>
+                                        <th class="text-end pe-3">월 예상액</th>
+                                        <th class="text-end pe-3">연간 총계</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="exp in expertData.expense.sales.filter(e => e.expenseAmt[0] > 0)" :key="exp.expenseTitle">
+                                        <td class="ps-3 fw-bold">{{ exp.expenseTitle }}</td>
+                                        <td class="text-center text-muted">
+                                            {{ salesExpMapping.find(m => m.title === exp.expenseTitle)?.baseName || '-' }}
+                                        </td>
+                                        <td class="text-end pe-3 text-success fw-bold">{{ formatCurrency(exp.expenseAmt[0]) }}</td>
+                                        <td class="text-end pe-3 small">{{ formatCurrency(exp.expenseAmtYear[0]) }}</td>
+                                    </tr>
+                                    <tr v-if="expertData.expense.sales.filter(e => e.expenseAmt[0] > 0).length === 0">
+                                        <td colspan="4" class="text-center py-3 text-muted">입력된 판매관리비가 없습니다.</td>
+                                    </tr>
+                                </tbody>
+                                <tfoot class="table-light fw-bold">
+                                    <tr>
+                                        <td colspan="2" class="text-center">판매관리비 합계</td>
+                                        <td class="text-end pe-3 text-success">{{ formatCurrency(sumArrayIdx(expertData.expense.sales, 'expenseAmt', 0)) }}</td>
+                                        <td class="text-end pe-3 small">{{ formatCurrency(sumArrayIdx(expertData.expense.sales, 'expenseAmtYear', 0)) }}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <div class="mt-3 small text-muted">
+                            <i class="bi bi-info-circle me-1"></i> 이자비용 등 금융비용은 대시보드 총계에는 포함되지만, 이 리스트에는 항목별 경비만 표시됩니다.
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @click="showExpenseDetailModal = false">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Yearly Labor Registration Modal -->
     <div v-if="showLaborYearlyModal" class="modal-backdrop fade show" style="z-index: 1065;"></div>
     <div v-if="showLaborYearlyModal" class="modal fade show d-block" tabindex="-1" style="z-index: 1070;">
@@ -1838,6 +1940,7 @@
             const showProjectionModal = ref(false);
             const showMaterialModal = ref(false);
             const showLaborModal = ref(false);
+            const showExpenseDetailModal = ref(false);
 
             // Yearly Sales Logic
             const showYearlyModal = ref(false);
@@ -2279,7 +2382,7 @@
                             let amt = 0;
                             if(m.baseType === 'revenue') amt = Math.round(monthlyRevenue[i] * rate);
                             else if(m.baseType === 'labor') amt = Math.round(monthlyLabor[i] * rate);
-                            else if(m.baseType === 'asset') amt = Math.round(deprBase * rate);
+                            else if(m.baseType === 'asset') amt = Math.round((deprBase / 12) * rate);
                             else amt = Math.round(exp.expenseTVaAmt || 0);
                             exp.expenseAmt[i] = amt;
                             yearlySum += amt;
@@ -2390,25 +2493,28 @@
 
                 let Labor_total = 0;
                 let Headcount = 0;
-                data.job.production.forEach(j => { 
-                    Labor_total += (j.jobQty || 0) * (j.jobCnt || 0); 
-                    Headcount += Number(j.jobCnt || 0); 
-                });
-                data.job.sales.forEach(j => { 
-                    Labor_total += (j.jobQty || 0) * (j.jobCnt || 0); 
-                    Headcount += Number(j.jobCnt || 0); 
-                });
-
-                let Exp_total = 0;
+                let Other_Exp_total = 0;
                 let Rent_cost = 0;
-                data.expense.production.forEach(item => { 
-                    Exp_total += (item.expenseTVaAmt || 0); 
-                });
-                data.expense.sales.forEach(item => { 
-                    const amt = (item.expenseTVaAmt || 0);
-                    Exp_total += amt;
-                    if(item.expenseTitle && item.expenseTitle.includes('임차료')) Rent_cost += amt;
-                });
+
+                const processList = (list, mapping) => {
+                    list.forEach(item => {
+                        const amt = (item.expenseAmt && item.expenseAmt[0] ? item.expenseAmt[0] : 0);
+                        const map = mapping.find(m => m.title === item.expenseTitle);
+                        if (map && map.baseType === 'labor') {
+                            Labor_total += amt;
+                        } else {
+                            Other_Exp_total += amt;
+                            if (item.expenseTitle && item.expenseTitle.includes('임차료')) Rent_cost += amt;
+                        }
+                    });
+                };
+
+                processList(data.expense.production, mfgExpMapping);
+                processList(data.expense.sales, salesExpMapping);
+
+                // For Headcount, we still look at the job table
+                data.job.production.forEach(j => { Headcount += Number(j.jobCnt || 0); });
+                data.job.sales.forEach(j => { Headcount += Number(j.jobCnt || 0); });
 
                 let Interest_total = 0;
                 data.loan.debt.forEach(l => { 
@@ -2417,7 +2523,8 @@
                     Interest_total += principal * (rate/100) / 12; 
                 });
 
-                const TotalCost = MC_mon + Labor_total + Dep_total + Exp_total + Interest_total;
+                // Total Expense for OP calculation (Labor + Others + Interest + MC)
+                const TotalCost = MC_mon + Labor_total + Other_Exp_total + Interest_total;
                 const OP = S_mon - TotalCost;
                 const safeDiv = (n, d) => d > 0 ? (n/d) : 0;
                 const KPI = {
@@ -2445,7 +2552,7 @@
                     { id: 'salesPer', label: '1인매출', value: Math.round(KPI.KPI_SalesPerPerson / 10000) + '만', pass: KPI.KPI_SalesPerPerson >= std.salesPer, msg: '생산성 우수' },
                     { id: 'rent', label: '임차료율', value: KPI.KPI_RentRatio.toFixed(1) + '%', pass: KPI.KPI_RentRatio <= std.rent, msg: `기준 ${std.rent}%` }
                 ];
-                return { S_mon, MC_mon, Labor_total, Dep_total, Exp_total, Interest_total, OP, TotalInvest, KPI, diagnosis };
+                return { S_mon, MC_mon, Labor_total, Other_Exp_total, Interest_total, OP, TotalInvest, KPI, diagnosis };
             };
 
             // ================= HELPERS =================
@@ -2535,15 +2642,14 @@
                     yearlySales,
                     totalMaterialCost: analysis.MC_mon,
                     totalLaborCost: analysis.Labor_total,
-                    totalDepreciation: analysis.Dep_total,
                     totalInterest: analysis.Interest_total,
-                    totalExpense: analysis.Exp_total,
+                    totalExpense: analysis.Other_Exp_total + analysis.Interest_total,
                     opIncome: analysis.OP,
                     
                     opMargin: analysis.KPI.KPI_OPMargin.toFixed(1),
                     materialRatio: (analysis.MC_mon/analysis.S_mon*100).toFixed(1),
                     laborRatio: analysis.KPI.KPI_LaborRatio.toFixed(1),
-                    expenseRatio: (analysis.Exp_total/analysis.S_mon*100).toFixed(1),
+                    expenseRatio: ((analysis.Other_Exp_total + analysis.Interest_total)/analysis.S_mon*100).toFixed(1),
                     
                     targetGap,
                     totalFixedCost: FC,
@@ -3051,7 +3157,7 @@
                 showYearlyModal, currentMenu, currentYearly,
                 openYearlyModal, closeYearlyModal, saveYearlyModal, calcYearly, calcYearlyDirect, onYMenuCdChange,
                 showMaterialYearlyModal, currentMaterialYearly, openMaterialYearlyModal, closeMaterialYearlyModal, saveMaterialYearly, calcMaterialYearly,
-                showLaborModal,
+                showLaborModal, showExpenseDetailModal,
                 showLaborYearlyModal, currentLaborYearly, openLaborYearlyModal, closeLaborYearlyModal, saveLaborYearly, calcLaborYearly,
                 investCategories, loanCategories,
                 addInvestInCategory, investCategoryItems, onInvestItemChange, calcInvestTotals, calcAllInvestTotals,
