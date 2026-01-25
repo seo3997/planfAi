@@ -780,11 +780,11 @@
                                                                  <td>
                                                                      <div class="input-group input-group-sm">
                                                                          <template v-if="!mfgExpMapping.find(m => m.title === exp.expenseTitle) || mfgExpMapping.find(m => m.title === exp.expenseTitle).baseType === 'fixed'">
-                                                                             <input type="number" class="form-control text-end" v-model.number="exp.expenseTVaAmt" placeholder="금액">
+                                                                             <input type="number" class="form-control text-end" v-model.number="exp.expenseTVaAmt" placeholder="금액" @input="updateProjections">
                                                                              <span class="input-group-text px-1" style="font-size: 0.65rem;">원</span>
                                                                          </template>
                                                                          <template v-else>
-                                                                             <input type="number" step="0.1" class="form-control text-end" v-model.number="exp.expenseTVa" placeholder="비율">
+                                                                             <input type="number" step="0.1" class="form-control text-end" v-model.number="exp.expenseTVa" placeholder="비율" @input="updateProjections">
                                                                              <span class="input-group-text px-1" style="font-size: 0.65rem;">%</span>
                                                                          </template>
                                                                      </div>
@@ -842,11 +842,11 @@
                                                                  <td>
                                                                      <div class="input-group input-group-sm">
                                                                          <template v-if="!salesExpMapping.find(m => m.title === exp.expenseTitle) || salesExpMapping.find(m => m.title === exp.expenseTitle).baseType === 'fixed'">
-                                                                             <input type="number" class="form-control text-end" v-model.number="exp.expenseTVaAmt" placeholder="금액">
+                                                                             <input type="number" class="form-control text-end" v-model.number="exp.expenseTVaAmt" placeholder="금액" @input="updateProjections">
                                                                              <span class="input-group-text px-1" style="font-size: 0.65rem;">원</span>
                                                                          </template>
                                                                          <template v-else>
-                                                                             <input type="number" step="0.1" class="form-control text-end" v-model.number="exp.expenseTVa" placeholder="비율">
+                                                                             <input type="number" step="0.1" class="form-control text-end" v-model.number="exp.expenseTVa" placeholder="비율" @input="updateProjections">
                                                                              <span class="input-group-text px-1" style="font-size: 0.65rem;">%</span>
                                                                          </template>
                                                                      </div>
@@ -2342,8 +2342,8 @@
                         costRates: expertData.cost.costRate,
                         prodJobs: expertData.job.production.map(j => ({ c: j.jobCnt, q: j.jobQty, r: j.jobAmtRate, cd: j.jobAmtCd })),
                         salesJobs: expertData.job.sales.map(j => ({ c: j.jobCnt, q: j.jobQty, r: j.jobAmtRate, cd: j.jobAmtCd })),
-                        prodExp: expertData.expense.production.map(e => ({ a: e.expenseTVaAmt })),
-                        salesExp: expertData.expense.sales.map(e => ({ a: e.expenseTVaAmt })),
+                        prodExp: expertData.expense.production.map(e => ({ a: e.expenseTVaAmt, v: e.expenseTVa })),
+                        salesExp: expertData.expense.sales.map(e => ({ a: e.expenseTVaAmt, v: e.expenseTVa })),
                         invest: { p: expertData.invest.production, s: expertData.invest.sales },
                         debt: expertData.loan.debt
                     });
@@ -2952,9 +2952,9 @@
                                     if(match) {
                                         Object.assign(def, match);
                                     } else {
-                                        // Reset to zero if not in saved data
+                                        const m = mfgExpMapping.find(map => map.title === def.expenseTitle);
                                         def.expenseTVaAmt = 0;
-                                        def.expenseTVa = 0;
+                                        def.expenseTVa = m?.defRate || 0;
                                         def.expenseAmt = Array(12).fill(0);
                                         def.expenseAmtYear = [0, 0, 0];
                                     }
@@ -2968,8 +2968,9 @@
                                     if(match) {
                                         Object.assign(def, match);
                                     } else {
+                                        const m = salesExpMapping.find(map => map.title === def.expenseTitle);
                                         def.expenseTVaAmt = 0;
-                                        def.expenseTVa = 0;
+                                        def.expenseTVa = m?.defRate || 0;
                                         def.expenseAmt = Array(12).fill(0);
                                         def.expenseAmtYear = [0, 0, 0];
                                     }
