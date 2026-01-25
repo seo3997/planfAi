@@ -747,62 +747,110 @@
                                 </h2>
                                 <div id="collapseExpense" class="accordion-collapse collapse" data-bs-parent="#expertAccordion">
                                     <div class="accordion-body bg-light">
-                                         <h6 class="small text-muted fw-bold mb-3">제조경비 (생산 관련)</h6>
-                                         <div class="table-responsive mb-4">
-                                             <table class="table table-sm small align-middle bg-white rounded shadow-sm border">
-                                                 <thead class="table-light">
-                                                     <tr class="text-center">
-                                                         <th width="20%">항목명</th>
-                                                         <th width="15%">기준항목</th>
-                                                         <th width="25%">적용값 (원/%)</th>
-                                                         <th width="18%">월 예상액</th>
-                                                         <th width="18%">연간 총계</th>
-                                                         <th width="4%"></th>
-                                                     </tr>
-                                                 </thead>
-                                                 <tbody>
-                                                     <tr v-for="(exp, idx) in expertData.expense.production" :key="'expP'+idx">
-                                                         <td class="fw-bold ps-2">{{ exp.expenseTitle }}</td>
-                                                         <td class="text-center small text-muted">
-                                                             {{ mfgExpMapping.find(m => m.title === exp.expenseTitle)?.baseName || '기타' }}
-                                                         </td>
-                                                         <td>
-                                                             <div class="input-group input-group-sm">
-                                                                 <template v-if="!mfgExpMapping.find(m => m.title === exp.expenseTitle) || mfgExpMapping.find(m => m.title === exp.expenseTitle).baseType === 'fixed'">
-                                                                     <input type="number" class="form-control text-end" v-model.number="exp.expenseTVaAmt" placeholder="금액">
-                                                                     <span class="input-group-text px-1" style="font-size: 0.65rem;">원</span>
-                                                                 </template>
-                                                                 <template v-else>
-                                                                     <input type="number" step="0.1" class="form-control text-end" v-model.number="exp.expenseTVa" placeholder="비율">
-                                                                     <span class="input-group-text px-1" style="font-size: 0.65rem;">%</span>
-                                                                 </template>
-                                                             </div>
-                                                             <div v-if="mfgExpMapping.find(m => m.title === exp.expenseTitle) && mfgExpMapping.find(m => m.title === exp.expenseTitle).baseType !== 'fixed'" class="text-end text-muted" style="font-size: 0.6rem; margin-top: 1px;">
-                                                                 기준: {{ formatCurrency(Math.round(exp.expenseTVaAmt/12)) }} /월
-                                                             </div>
-                                                         </td>
-                                                         <td class="text-end pe-2 fw-bold text-primary">{{ formatCurrency(exp.expenseAmt[0] || 0) }}</td>
-                                                         <td class="text-end pe-2 small">{{ formatCurrency(exp.expenseAmtYear[0] || 0) }}</td>
-                                             </table>
-                                         </div>
-                                         <p class="small text-muted mb-4"><i class="bi bi-info-circle me-1"></i>제조경비 항목은 표준화되어 있으며, 값이 0인 항목은 저장 시 제외됩니다.</p>
-
-                                         <h6 class="small text-muted fw-bold mb-2">판매관리비 (영업/일반 관련)</h6>
-                                         <div v-for="(exp, idx) in expertData.expense.sales" :key="'expS'+idx" class="card mb-2 border-0 bg-white p-2">
-                                             <div class="d-flex justify-content-between mb-1">
-                                                  <input type="text" class="form-control form-control-sm border-0 fw-bold p-0" v-model="exp.expenseTitle" placeholder="항목명" style="width: 80%">
-                                                  <button class="btn-close small" @click="expertData.expense.sales.splice(idx,1)"></button>
+                                         <!-- Manufacturing Expenses (Collapsible) -->
+                                         <div class="card border-0 bg-transparent mb-3">
+                                             <div class="card-header bg-white border rounded shadow-sm mb-2 p-0 overflow-hidden">
+                                                 <button class="btn btn-sm w-100 text-start d-flex justify-content-between align-items-center py-2 px-3 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#mfgExpenseCollapse">
+                                                     <span><i class="bi bi-factory me-2 text-warning"></i>제조경비 리스트 (24종 항목)</span>
+                                                     <i class="bi bi-chevron-down small"></i>
+                                                 </button>
                                              </div>
-                                             <div class="row g-2 align-items-center">
-                                                 <div class="col-8">
-                                                     <div class="input-group input-group-sm">
-                                                         <input type="number" class="form-control" v-model.number="exp.expenseTVaAmt" placeholder="월간 비용">
-                                                         <span class="input-group-text">원</span>
-                                                     </div>
+                                             <div id="mfgExpenseCollapse" class="collapse">
+                                                 <div class="table-responsive mb-2">
+                                                     <table class="table table-sm small align-middle bg-white rounded shadow-sm border">
+                                                         <thead class="table-light">
+                                                             <tr class="text-center">
+                                                                 <th width="20%">항목명</th>
+                                                                 <th width="15%">기준항목</th>
+                                                                 <th width="25%">적용값 (원/%)</th>
+                                                                 <th width="18%">월 예상액</th>
+                                                                 <th width="18%">연간 총계</th>
+                                                                 <th width="4%"></th>
+                                                             </tr>
+                                                         </thead>
+                                                         <tbody>
+                                                             <tr v-for="(exp, idx) in expertData.expense.production" :key="'expP'+idx">
+                                                                 <td class="fw-bold ps-2">{{ exp.expenseTitle }}</td>
+                                                                 <td class="text-center small text-muted">
+                                                                     {{ mfgExpMapping.find(m => m.title === exp.expenseTitle)?.baseName || '기타' }}
+                                                                 </td>
+                                                                 <td>
+                                                                     <div class="input-group input-group-sm">
+                                                                         <template v-if="!mfgExpMapping.find(m => m.title === exp.expenseTitle) || mfgExpMapping.find(m => m.title === exp.expenseTitle).baseType === 'fixed'">
+                                                                             <input type="number" class="form-control text-end" v-model.number="exp.expenseTVaAmt" placeholder="금액">
+                                                                             <span class="input-group-text px-1" style="font-size: 0.65rem;">원</span>
+                                                                         </template>
+                                                                         <template v-else>
+                                                                             <input type="number" step="0.1" class="form-control text-end" v-model.number="exp.expenseTVa" placeholder="비율">
+                                                                             <span class="input-group-text px-1" style="font-size: 0.65rem;">%</span>
+                                                                         </template>
+                                                                     </div>
+                                                                     <div v-if="mfgExpMapping.find(m => m.title === exp.expenseTitle) && mfgExpMapping.find(m => m.title === exp.expenseTitle).baseType !== 'fixed'" class="text-end text-muted" style="font-size: 0.6rem; margin-top: 1px;">
+                                                                         기준: {{ formatCurrency(Math.round(exp.expenseTVaAmt/12)) }} /월
+                                                                     </div>
+                                                                 </td>
+                                                                 <td class="text-end pe-2 fw-bold text-primary">{{ formatCurrency(exp.expenseAmt[0] || 0) }}</td>
+                                                                 <td class="text-end pe-2 small">{{ formatCurrency(exp.expenseAmtYear[0] || 0) }}</td>
+                                                             </tr>
+                                                         </tbody>
+                                                     </table>
                                                  </div>
+                                                 <p class="small text-muted mb-4"><i class="bi bi-info-circle me-1"></i>제조경비 항목은 표준화되어 있으며, 값이 0인 항목은 저장 시 제외됩니다.</p>
                                              </div>
                                          </div>
-                                         <button class="btn btn-sm btn-light w-100 border" @click="addExpense(expertData.expense.sales)">+ 판매관리비 추가</button>
+
+                                         <!-- Sales Expenses (Collapsible) -->
+                                         <div class="card border-0 bg-transparent mb-3">
+                                             <div class="card-header bg-white border rounded shadow-sm mb-2 p-0 overflow-hidden">
+                                                 <button class="btn btn-sm w-100 text-start d-flex justify-content-between align-items-center py-2 px-3 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#salesExpenseCollapse">
+                                                     <span><i class="bi bi-graph-up-arrow me-2 text-success"></i>판매관리비 리스트 (30종 항목)</span>
+                                                     <i class="bi bi-chevron-down small"></i>
+                                                 </button>
+                                             </div>
+                                             <div id="salesExpenseCollapse" class="collapse">
+                                                 <div class="table-responsive mb-2">
+                                                     <table class="table table-sm small align-middle bg-white rounded shadow-sm border">
+                                                         <thead class="table-light">
+                                                             <tr class="text-center">
+                                                                 <th width="20%">항목명</th>
+                                                                 <th width="15%">기준항목</th>
+                                                                 <th width="25%">적용값 (원/%)</th>
+                                                                 <th width="18%">월 예상액</th>
+                                                                 <th width="18%">연간 총계</th>
+                                                                 <th width="4%"></th>
+                                                             </tr>
+                                                         </thead>
+                                                         <tbody>
+                                                             <tr v-for="(exp, idx) in expertData.expense.sales" :key="'expS'+idx">
+                                                                 <td class="fw-bold ps-2">{{ exp.expenseTitle }}</td>
+                                                                 <td class="text-center small text-muted">
+                                                                     {{ salesExpMapping.find(m => m.title === exp.expenseTitle)?.baseName || '기타' }}
+                                                                 </td>
+                                                                 <td>
+                                                                     <div class="input-group input-group-sm">
+                                                                         <template v-if="!salesExpMapping.find(m => m.title === exp.expenseTitle) || salesExpMapping.find(m => m.title === exp.expenseTitle).baseType === 'fixed'">
+                                                                             <input type="number" class="form-control text-end" v-model.number="exp.expenseTVaAmt" placeholder="금액">
+                                                                             <span class="input-group-text px-1" style="font-size: 0.65rem;">원</span>
+                                                                         </template>
+                                                                         <template v-else>
+                                                                             <input type="number" step="0.1" class="form-control text-end" v-model.number="exp.expenseTVa" placeholder="비율">
+                                                                             <span class="input-group-text px-1" style="font-size: 0.65rem;">%</span>
+                                                                         </template>
+                                                                     </div>
+                                                                     <div v-if="salesExpMapping.find(m => m.title === exp.expenseTitle) && salesExpMapping.find(m => m.title === exp.expenseTitle).baseType !== 'fixed'" class="text-end text-muted" style="font-size: 0.6rem; margin-top: 1px;">
+                                                                         기준: {{ formatCurrency(Math.round(exp.expenseTVaAmt/12)) }} /월
+                                                                     </div>
+                                                                 </td>
+                                                                 <td class="text-end pe-2 fw-bold text-success">{{ formatCurrency(exp.expenseAmt[0] || 0) }}</td>
+                                                                 <td class="text-end pe-2 small">{{ formatCurrency(exp.expenseAmtYear[0] || 0) }}</td>
+                                                                 <td class="text-center"></td>
+                                                             </tr>
+                                                         </tbody>
+                                                     </table>
+                                                 </div>
+                                                 <p class="small text-muted mb-4"><i class="bi bi-info-circle me-1"></i>판매관리비 항목은 표준화되어 있으며, 값이 0인 항목은 저장 시 제외됩니다.</p>
+                                             </div>
+                                         </div>
                                     </div>
                                 </div>
                             </div>
@@ -1983,6 +2031,39 @@
                 { title: '잡비', baseType: 'fixed', baseName: '월정액' }
             ];
 
+            const salesExpMapping = [
+                { title: '급여', baseType: 'labor', baseName: '인건비', defRate: 100 },
+                { title: '제수당', baseType: 'labor', baseName: '인건비' },
+                { title: '잡급', baseType: 'fixed', baseName: '월정액' },
+                { title: '퇴직급여', baseType: 'labor', baseName: '인건비' },
+                { title: '복리후생비', baseType: 'labor', baseName: '인건비' },
+                { title: '여비교통비', baseType: 'fixed', baseName: '월정액' },
+                { title: '접대비', baseType: 'fixed', baseName: '월정액' },
+                { title: '통신비', baseType: 'fixed', baseName: '월정액' },
+                { title: '수도광열비', baseType: 'revenue', baseName: '매출액' },
+                { title: '세금과공과금', baseType: 'fixed', baseName: '월정액' },
+                { title: '감가상각비', baseType: 'asset', baseName: '기준액' },
+                { title: '지급임차료', baseType: 'fixed', baseName: '월정액' },
+                { title: '수선비', baseType: 'fixed', baseName: '월정액' },
+                { title: '보험료', baseType: 'fixed', baseName: '월정액' },
+                { title: '차량유지비', baseType: 'revenue', baseName: '매출액' },
+                { title: '운반비', baseType: 'revenue', baseName: '매출액' },
+                { title: '교육훈련비', baseType: 'fixed', baseName: '월정액' },
+                { title: '도서인쇄비', baseType: 'fixed', baseName: '월정액' },
+                { title: '포장비', baseType: 'revenue', baseName: '매출액' },
+                { title: '소모품비', baseType: 'revenue', baseName: '매출액' },
+                { title: '지급수수료', baseType: 'revenue', baseName: '매출액' },
+                { title: '전력비', baseType: 'revenue', baseName: '매출액' },
+                { title: '광고선전비', baseType: 'fixed', baseName: '월정액' },
+                { title: '판매촉진비', baseType: 'revenue', baseName: '매출액' },
+                { title: '대손상각비', baseType: 'revenue', baseName: '매출액' },
+                { title: '수출제비용', baseType: 'fixed', baseName: '월정액' },
+                { title: '판매수수료', baseType: 'revenue', baseName: '매출액' },
+                { title: '경상개발비', baseType: 'fixed', baseName: '월정액' },
+                { title: '견본비', baseType: 'fixed', baseName: '월정액' },
+                { title: '잡비', baseType: 'fixed', baseName: '월정액' }
+            ];
+
             const expertData = reactive({
                 basic: { industryCd: '3', workDay: 25, monTargetPrice: 5000000, saleMode: '1' },
                 sale: {
@@ -2019,7 +2100,13 @@
                         expenseAmt: Array(12).fill(0),
                         expenseAmtYear: [0, 0, 0]
                     })),
-                    sales: []
+                    sales: salesExpMapping.map(m => ({
+                        expenseTitle: m.title,
+                        expenseTVaAmt: 0,
+                        expenseTVa: m.defRate || 0,
+                        expenseAmt: Array(12).fill(0),
+                        expenseAmtYear: [0, 0, 0]
+                    }))
                 }
             });
 
@@ -2126,68 +2213,61 @@
                 processJob(expertData.job.production);
                 processJob(expertData.job.sales);
 
-                // 3. Expense Projections
-                const processExp = (expList, isProduction=false) => {
-                    if(isProduction) {
-                        const monthlyRevenue = Array(12).fill(0);
-                        (expertData.sale.menuM || []).forEach(m => {
-                            for(let i=0; i<12; i++) monthlyRevenue[i] += (m.menuAmt[i] || 0);
+                const processExp = (expList, targetType='production') => {
+                    const isProd = targetType === 'production';
+                    const mappingList = isProd ? mfgExpMapping : salesExpMapping;
+
+                    const monthlyRevenue = Array(12).fill(0);
+                    (expertData.sale.menuM || []).forEach(m => {
+                        for(let i=0; i<12; i++) monthlyRevenue[i] += (m.menuAmt[i] || 0);
+                    });
+
+                    // Labors - either prod or sales
+                    const monthlyLabor = Array(12).fill(0);
+                    const laborSource = isProd ? expertData.job.production : expertData.job.sales;
+                    (laborSource || []).forEach(j => {
+                        for(let i=0; i<12; i++) monthlyLabor[i] += (j.jobAmt[i] || 0);
+                    });
+
+                    // Depreciation - production uses cat 1,2. sales uses cat 1,2
+                    let deprBase = 0;
+                    const investSource = isProd ? expertData.invest.production : expertData.invest.sales;
+                    const keys = isProd ? ['production01', 'production02'] : ['sales01', 'sales02'];
+                    keys.forEach(key => {
+                        (investSource[key] || []).forEach(inv => {
+                            if(inv.investYn === 'Y') deprBase += (inv.investYearAmt || 0);
                         });
+                    });
 
-                        const monthlyLaborProd = Array(12).fill(0);
-                        (expertData.job.production || []).forEach(j => {
-                            for(let i=0; i<12; i++) monthlyLaborProd[i] += (j.jobAmt[i] || 0);
-                        });
+                    expList.forEach(exp => {
+                        const m = mappingList.find(map => map.title === exp.expenseTitle);
+                        if(!m) {
+                            const monthly = (exp.expenseTVaAmt || 0);
+                            exp.expenseAmt = Array(12).fill(monthly);
+                            exp.expenseAmtYear = [monthly*12, monthly*12, monthly*12];
+                            return;
+                        }
 
-                        let deprBase = 0;
-                        const pInvest = expertData.invest.production;
-                        ['production01', 'production02'].forEach(key => {
-                            (pInvest[key] || []).forEach(inv => {
-                                if(inv.investYn === 'Y') deprBase += (inv.investYearAmt || 0);
-                            });
-                        });
+                        if(m.baseType === 'revenue') exp.expenseTVaAmt = monthlyRevenue.reduce((a,b)=>a+b, 0); 
+                        else if(m.baseType === 'labor') exp.expenseTVaAmt = monthlyLabor.reduce((a,b)=>a+b, 0); 
+                        else if(m.baseType === 'asset') exp.expenseTVaAmt = deprBase;
 
-                        expList.forEach(exp => {
-                            const mapping = mfgExpMapping.find(m => m.title === exp.expenseTitle);
-                            if(!mapping) {
-                                const monthly = (exp.expenseTVaAmt || 0);
-                                exp.expenseAmt = Array(12).fill(monthly);
-                                exp.expenseAmtYear = [monthly*12, monthly*12, monthly*12];
-                                return;
-                            }
-
-                            if(mapping.baseType === 'revenue') {
-                                exp.expenseTVaAmt = monthlyRevenue.reduce((a,b)=>a+b, 0); 
-                            } else if(mapping.baseType === 'labor') {
-                                exp.expenseTVaAmt = monthlyLaborProd.reduce((a,b)=>a+b, 0); 
-                            } else if(mapping.baseType === 'asset') {
-                                exp.expenseTVaAmt = deprBase;
-                            }
-
-                            const rate = (exp.expenseTVa || 0) / 100;
-                            let yearlySum = 0;
-                            for(let i=0; i<12; i++) {
-                                let amt = 0;
-                                if(mapping.baseType === 'revenue') amt = Math.round(monthlyRevenue[i] * rate);
-                                else if(mapping.baseType === 'labor') amt = Math.round(monthlyLaborProd[i] * rate);
-                                else if(mapping.baseType === 'asset') amt = Math.round(deprBase * rate);
-                                else amt = Math.round(exp.expenseTVaAmt || 0); // Fixed Fixed
-
-                                exp.expenseAmt[i] = amt;
-                                yearlySum += amt;
-                            }
-                            exp.expenseAmtYear = [yearlySum, yearlySum, yearlySum];
-                        });
-                    } else {
-                        expList.forEach(e => {
-                            const monthly = (e.expenseTVaAmt || 0);
-                            e.expenseAmt = Array(12).fill(monthly);
-                            e.expenseAmtYear = [monthly*12, monthly*12, monthly*12];
-                        });
-                    }
+                        const rate = (exp.expenseTVa || 0) / 100;
+                        let yearlySum = 0;
+                        for(let i=0; i<12; i++) {
+                            let amt = 0;
+                            if(m.baseType === 'revenue') amt = Math.round(monthlyRevenue[i] * rate);
+                            else if(m.baseType === 'labor') amt = Math.round(monthlyLabor[i] * rate);
+                            else if(m.baseType === 'asset') amt = Math.round(deprBase * rate);
+                            else amt = Math.round(exp.expenseTVaAmt || 0);
+                            exp.expenseAmt[i] = amt;
+                            yearlySum += amt;
+                        }
+                        exp.expenseAmtYear = [yearlySum, yearlySum, yearlySum];
+                    });
                 };
-                processExp(expertData.expense.production, true);
-                processExp(expertData.expense.sales, false);
+                processExp(expertData.expense.production, 'production');
+                processExp(expertData.expense.sales, 'sales');
                 // 4. Investment Projections (New Sync)
                 const processInvestments = (section) => {
                     if(!section) return;
@@ -2751,6 +2831,9 @@
                 if(cleanData.expense && cleanData.expense.production) {
                     cleanData.expense.production = cleanData.expense.production.filter(exp => (exp.expenseAmt && exp.expenseAmt[0] > 0));
                 }
+                if(cleanData.expense && cleanData.expense.sales) {
+                    cleanData.expense.sales = cleanData.expense.sales.filter(exp => (exp.expenseAmt && exp.expenseAmt[0] > 0));
+                }
 
                 const payload = {
                     mode: 'expert',
@@ -2856,7 +2939,21 @@
                                     }
                                 });
                             }
-                            if(data.expense.sales) expertData.expense.sales = data.expense.sales;
+                            if(data.expense.sales) {
+                                // Merge into fixed 30 items
+                                const loadedS = data.expense.sales;
+                                expertData.expense.sales.forEach(def => {
+                                    const match = loadedS.find(l => l.expenseTitle === def.expenseTitle);
+                                    if(match) {
+                                        Object.assign(def, match);
+                                    } else {
+                                        def.expenseTVaAmt = 0;
+                                        def.expenseTVa = 0;
+                                        def.expenseAmt = Array(12).fill(0);
+                                        def.expenseAmtYear = [0, 0, 0];
+                                    }
+                                });
+                            }
                         }
 
                         // Ensure required arrays exist
@@ -2908,7 +3005,7 @@
                 investCategories, loanCategories,
                 addInvestInCategory, investCategoryItems, onInvestItemChange, calcInvestTotals, calcAllInvestTotals,
                 equityCategoryItems, onEquityCdChange, onDebtValueChange, calcLoanTotals,
-                mfgExpMapping
+                mfgExpMapping, salesExpMapping
             };
         }
     }).mount('#app');
