@@ -571,38 +571,168 @@
                                 </h2>
                                 <div id="collapseLoan" class="accordion-collapse collapse" data-bs-parent="#expertAccordion">
                                     <div class="accordion-body bg-light">
-                                         <div class="table-responsive">
-                                             <table class="table table-sm small align-middle bg-white rounded shadow-sm">
-                                                 <thead class="bg-light">
-                                                     <tr class="text-center">
-                                                         <th width="20%">구분</th>
-                                                         <th width="30%">항목명</th>
-                                                         <th width="25%">금액</th>
-                                                         <th width="15%">이자율(%)</th>
-                                                         <th width="10%"></th>
-                                                     </tr>
-                                                 </thead>
-                                                 <tbody>
-                                                     <tr v-for="(ln, idx) in expertData.loan.equity" :key="'eq'+idx">
-                                                         <td class="text-center">자기자금</td>
-                                                         <td><input type="text" class="form-control form-control-sm" v-model="ln.loanTitle"></td>
-                                                         <td><input type="number" class="form-control form-control-sm text-end" v-model.number="ln.loanYear[0]"></td>
-                                                         <td class="text-center">-</td>
-                                                         <td class="text-center"><button class="btn-close small" @click="expertData.loan.equity.splice(idx,1)"></button></td>
-                                                     </tr>
-                                                     <tr v-for="(ln, idx) in expertData.loan.debt" :key="'db'+idx">
-                                                         <td class="text-center">타인자금</td>
-                                                         <td><input type="text" class="form-control form-control-sm" v-model="ln.loanTitle"></td>
-                                                         <td><input type="number" class="form-control form-control-sm text-end" v-model.number="ln.loanYear[0]"></td>
-                                                         <td class="text-center"><input type="number" step="0.1" class="form-control form-control-sm text-end" v-model.number="ln.loanRate[0]"></td>
-                                                         <td class="text-center"><button class="btn-close small" @click="expertData.loan.debt.splice(idx,1)"></button></td>
-                                                     </tr>
-                                                 </tbody>
-                                             </table>
+                                         <!-- 1. Own Funds (Equity) -->
+                                         <div class="mb-4">
+                                             <div class="d-flex justify-content-between align-items-center mb-2 px-1">
+                                                 <h6 class="small fw-bold text-success mb-0">● 자기자금 (Equity)</h6>
+                                                 <button class="btn btn-sm btn-outline-success py-1 px-3" @click="addLoan(expertData.loan.equity, false)" style="font-size: 0.75rem;">+ 자기자금 추가</button>
+                                             </div>
+                                             <div class="table-responsive">
+                                                 <table class="table table-sm small align-middle bg-white rounded shadow-sm mb-0">
+                                                      <thead class="bg-light-subtle">
+                                                          <tr class="text-center">
+                                                              <th width="30%">항목명</th>
+                                                              <th width="20%">1차년도(원)</th>
+                                                              <th width="20%">2차년도(원)</th>
+                                                              <th width="20%">3차년도(원)</th>
+                                                              <th width="10%"></th>
+                                                          </tr>
+                                                      </thead>
+                                                      <tbody>
+                                                          <tr v-for="(ln, idx) in expertData.loan.equity" :key="'eq'+idx">
+                                                              <td>
+                                                                  <select class="form-select form-select-sm" v-model="ln.loanTitleCd" @change="onEquityCdChange(ln)">
+                                                                      <option v-for="item in equityCategoryItems" :value="item.cd">{{ item.name }}</option>
+                                                                  </select>
+                                                              </td>
+                                                              <td><input type="number" class="form-control form-control-sm text-end" v-model.number="ln.loanYear[0]"></td>
+                                                              <td><input type="number" class="form-control form-control-sm text-end" v-model.number="ln.loanYear[1]"></td>
+                                                              <td><input type="number" class="form-control form-control-sm text-end" v-model.number="ln.loanYear[2]"></td>
+                                                              <td class="text-center"><button class="btn-close small" @click="expertData.loan.equity.splice(idx,1)"></button></td>
+                                                          </tr>
+                                                          <tr v-if="expertData.loan.equity.length === 0">
+                                                              <td colspan="5" class="text-center py-3 text-muted small">등록된 자기자금이 없습니다.</td>
+                                                          </tr>
+                                                      </tbody>
+                                                      <tfoot v-if="expertData.loan.equity.length > 0" class="bg-light-subtle fw-bold">
+                                                          <tr>
+                                                              <td class="text-center small">자기자금 소계</td>
+                                                              <td class="text-end pe-2">{{ formatCurrency(calcLoanTotals().eq[0]) }}</td>
+                                                              <td class="text-end pe-2">{{ formatCurrency(calcLoanTotals().eq[1]) }}</td>
+                                                              <td class="text-end pe-2">{{ formatCurrency(calcLoanTotals().eq[2]) }}</td>
+                                                              <td></td>
+                                                          </tr>
+                                                      </tfoot>
+                                                  </table>
+                                             </div>
                                          </div>
-                                         <div class="d-flex gap-2">
-                                             <button class="btn btn-sm btn-light border flex-grow-1" @click="addLoan(expertData.loan.equity, false)">+ 자기자금 추가</button>
-                                             <button class="btn btn-sm btn-light border flex-grow-1" @click="addLoan(expertData.loan.debt, true)">+ 타인자금 추가</button>
+
+                                         <!-- 2. Borrowed Funds (Debt) -->
+                                         <div>
+                                             <div class="d-flex justify-content-between align-items-center mb-2 px-1">
+                                                 <h6 class="small fw-bold text-warning mb-0">● 타인자금 (Debt)</h6>
+                                                 <button class="btn btn-sm btn-outline-warning py-1 px-3" @click="addLoan(expertData.loan.debt, true)" style="font-size: 0.75rem;">+ 타인자금 추가</button>
+                                             </div>
+                                             <div class="table-responsive">
+                                                 <table class="table table-sm small align-middle bg-white rounded shadow-sm mb-0">
+                                                      <thead class="bg-light-subtle">
+                                                          <tr class="text-center">
+                                                               <th width="20%">항목명</th>
+                                                              <th width="24%">1차년도 (금액/율/이자)</th>
+                                                              <th width="24%">2차년도 (금액/율/이자)</th>
+                                                              <th width="24%">3차년도 (금액/율/이자)</th>
+                                                              <th width="8%"></th>
+                                                          </tr>
+                                                      </thead>
+                                                      <tbody>
+                                                          <tr v-for="(ln, idx) in expertData.loan.debt" :key="'db'+idx">
+                                                              <td>
+                                                                  <input type="text" class="form-control form-control-sm fw-bold" v-model="ln.loanTitle" placeholder="금융기관명 등">
+                                                              </td>
+                                                              <!-- Y1 -->
+                                                              <td>
+                                                                  <input type="number" class="form-control form-control-sm text-end mb-1" v-model.number="ln.loanYear[0]" placeholder="원금">
+                                                                  <div class="input-group input-group-sm mb-1">
+                                                                      <span class="input-group-text p-1" style="font-size: 0.6rem;">%</span>
+                                                                      <input type="number" step="0.1" class="form-control form-control-sm text-end" v-model.number="ln.loanRate[0]" @input="onDebtValueChange(ln, 'rate', 0)">
+                                                                  </div>
+                                                                  <div class="text-end small text-primary fw-bold" style="font-size: 0.7rem;">이자: {{ formatCurrency(ln.loanRateAmt[0] || 0) }}</div>
+                                                              </td>
+                                                              <!-- Y2 -->
+                                                              <td>
+                                                                  <input type="number" class="form-control form-control-sm text-end mb-1" v-model.number="ln.loanYear[1]" placeholder="원금증감">
+                                                                  <div class="input-group input-group-sm mb-1">
+                                                                      <span class="input-group-text p-1" style="font-size: 0.6rem;">%</span>
+                                                                      <input type="number" step="0.1" class="form-control form-control-sm text-end" v-model.number="ln.loanRate[1]" @input="onDebtValueChange(ln, 'rate', 1)">
+                                                                  </div>
+                                                                  <div class="text-end small text-primary fw-bold" style="font-size: 0.7rem;">이자: {{ formatCurrency(ln.loanRateAmt[1] || 0) }}</div>
+                                                              </td>
+                                                              <!-- Y3 -->
+                                                              <td>
+                                                                  <input type="number" class="form-control form-control-sm text-end mb-1" v-model.number="ln.loanYear[2]" placeholder="원금증감">
+                                                                  <div class="input-group input-group-sm mb-1">
+                                                                      <span class="input-group-text p-1" style="font-size: 0.6rem;">%</span>
+                                                                      <input type="number" step="0.1" class="form-control form-control-sm text-end" v-model.number="ln.loanRate[2]" @input="onDebtValueChange(ln, 'rate', 2)">
+                                                                  </div>
+                                                                  <div class="text-end small text-primary fw-bold" style="font-size: 0.7rem;">이자: {{ formatCurrency(ln.loanRateAmt[2] || 0) }}</div>
+                                                              </td>
+                                                              <td class="text-center"><button class="btn-close small" @click="expertData.loan.debt.splice(idx,1)"></button></td>
+                                                          </tr>
+                                                          <tr v-if="expertData.loan.debt.length === 0">
+                                                              <td colspan="5" class="text-center py-3 text-muted small">등록된 타인자금이 없습니다.</td>
+                                                          </tr>
+                                                      </tbody>
+                                                      <tfoot v-if="expertData.loan.debt.length > 0" class="bg-light-subtle fw-bold">
+                                                          <tr class="text-info-emphasis">
+                                                              <td class="text-center small">타인자금 소계</td>
+                                                              <td class="text-end pe-2">{{ formatCurrency(calcLoanTotals().db[0]) }}</td>
+                                                              <td class="text-end pe-2">{{ formatCurrency(calcLoanTotals().db[1]) }}</td>
+                                                              <td class="text-end pe-2">{{ formatCurrency(calcLoanTotals().db[2]) }}</td>
+                                                              <td></td>
+                                                          </tr>
+                                                          <tr class="table-warning border-top">
+                                                              <td class="text-center small">연 이자비용 합계</td>
+                                                              <td class="text-end pe-2 text-danger" style="font-size: 0.75rem;">{{ formatCurrency(calcLoanTotals().intr[0]) }}</td>
+                                                              <td class="text-end pe-2 text-danger" style="font-size: 0.75rem;">{{ formatCurrency(calcLoanTotals().intr[1]) }}</td>
+                                                              <td class="text-end pe-2 text-danger" style="font-size: 0.75rem;">{{ formatCurrency(calcLoanTotals().intr[2]) }}</td>
+                                                              <td></td>
+                                                          </tr>
+                                                      </tfoot>
+                                                  </table>
+                                             </div>
+                                         </div>
+
+                                         <!-- Financing Grand Summary -->
+                                         <div class="mt-4 p-3 bg-white rounded-3 shadow-sm border border-success border-opacity-25">
+                                             <h6 class="fw-bold text-success mb-3"><i class="bi bi-wallet2 me-2"></i>자금조달 계획 총괄 요약</h6>
+                                             <div class="table-responsive">
+                                                 <table class="table table-sm align-middle mb-0" style="font-size: 0.85rem;">
+                                                     <thead class="table-light">
+                                                         <tr class="text-center">
+                                                             <th>구분</th>
+                                                             <th>1차년도(원)</th>
+                                                             <th>2차년도(원)</th>
+                                                             <th>3차년도(원)</th>
+                                                         </tr>
+                                                     </thead>
+                                                     <tbody>
+                                                         <tr>
+                                                             <td class="text-center fw-bold text-success">자기자금(Equity) 합계</td>
+                                                             <td class="text-end pe-3">{{ formatCurrency(calcLoanTotals().eq[0]) }}</td>
+                                                             <td class="text-end pe-3">{{ formatCurrency(calcLoanTotals().eq[1]) }}</td>
+                                                             <td class="text-end pe-3">{{ formatCurrency(calcLoanTotals().eq[2]) }}</td>
+                                                         </tr>
+                                                         <tr>
+                                                             <td class="text-center fw-bold text-warning">타인자금(Debt) 합계</td>
+                                                             <td class="text-end pe-3">{{ formatCurrency(calcLoanTotals().db[0]) }}</td>
+                                                             <td class="text-end pe-3">{{ formatCurrency(calcLoanTotals().db[1]) }}</td>
+                                                             <td class="text-end pe-3">{{ formatCurrency(calcLoanTotals().db[2]) }}</td>
+                                                         </tr>
+                                                         <tr class="table-success border-top border-success border-2">
+                                                             <td class="text-center fw-bold fs-6">총 조달 자금 합계</td>
+                                                             <td class="text-end pe-3 fw-bold fs-6">{{ formatCurrency(calcLoanTotals().total[0]) }}</td>
+                                                             <td class="text-end pe-3 fw-bold fs-6">{{ formatCurrency(calcLoanTotals().total[1]) }}</td>
+                                                             <td class="text-end pe-3 fw-bold fs-6">{{ formatCurrency(calcLoanTotals().total[2]) }}</td>
+                                                         </tr>
+                                                         <tr class="table-light border-top">
+                                                             <td class="text-center fw-bold text-danger" style="font-size: 0.75rem;">총 이자비용 합계</td>
+                                                             <td class="text-end pe-3 text-danger fw-bold" style="font-size: 0.75rem;">{{ formatCurrency(calcLoanTotals().intr[0]) }}</td>
+                                                             <td class="text-end pe-3 text-danger fw-bold" style="font-size: 0.75rem;">{{ formatCurrency(calcLoanTotals().intr[1]) }}</td>
+                                                             <td class="text-end pe-3 text-danger fw-bold" style="font-size: 0.75rem;">{{ formatCurrency(calcLoanTotals().intr[2]) }}</td>
+                                                         </tr>
+                                                     </tbody>
+                                                 </table>
+                                             </div>
                                          </div>
                                     </div>
                                 </div>
@@ -617,22 +747,50 @@
                                 </h2>
                                 <div id="collapseExpense" class="accordion-collapse collapse" data-bs-parent="#expertAccordion">
                                     <div class="accordion-body bg-light">
-                                         <h6 class="small text-muted fw-bold mb-2">제조경비 (생산 관련)</h6>
-                                         <div v-for="(exp, idx) in expertData.expense.production" :key="'expP'+idx" class="card mb-2 border-0 bg-white p-2">
-                                             <div class="d-flex justify-content-between mb-1">
-                                                  <input type="text" class="form-control form-control-sm border-0 fw-bold p-0" v-model="exp.expenseTitle" placeholder="항목명" style="width: 80%">
-                                                  <button class="btn-close small" @click="expertData.expense.production.splice(idx,1)"></button>
-                                             </div>
-                                             <div class="row g-2 align-items-center">
-                                                 <div class="col-8">
-                                                     <div class="input-group input-group-sm">
-                                                         <input type="number" class="form-control" v-model.number="exp.expenseTVaAmt" placeholder="월간 비용">
-                                                         <span class="input-group-text">원</span>
-                                                     </div>
-                                                 </div>
-                                             </div>
+                                         <h6 class="small text-muted fw-bold mb-3">제조경비 (생산 관련)</h6>
+                                         <div class="table-responsive mb-4">
+                                             <table class="table table-sm small align-middle bg-white rounded shadow-sm border">
+                                                 <thead class="table-light">
+                                                     <tr class="text-center">
+                                                         <th width="20%">항목명</th>
+                                                         <th width="15%">기준항목</th>
+                                                         <th width="25%">적용값 (원/%)</th>
+                                                         <th width="18%">월 예상액</th>
+                                                         <th width="18%">연간 총계</th>
+                                                         <th width="4%"></th>
+                                                     </tr>
+                                                 </thead>
+                                                 <tbody>
+                                                     <tr v-for="(exp, idx) in expertData.expense.production" :key="'expP'+idx">
+                                                         <td class="fw-bold ps-2">{{ exp.expenseTitle }}</td>
+                                                         <td class="text-center small text-muted">
+                                                             {{ mfgExpMapping.find(m => m.title === exp.expenseTitle)?.baseName || '기타' }}
+                                                         </td>
+                                                         <td>
+                                                             <div class="input-group input-group-sm">
+                                                                 <template v-if="!mfgExpMapping.find(m => m.title === exp.expenseTitle) || mfgExpMapping.find(m => m.title === exp.expenseTitle).baseType === 'fixed'">
+                                                                     <input type="number" class="form-control text-end" v-model.number="exp.expenseTVaAmt" placeholder="금액">
+                                                                     <span class="input-group-text px-1" style="font-size: 0.65rem;">원</span>
+                                                                 </template>
+                                                                 <template v-else>
+                                                                     <input type="number" step="0.1" class="form-control text-end" v-model.number="exp.expenseTVa" placeholder="비율">
+                                                                     <span class="input-group-text px-1" style="font-size: 0.65rem;">%</span>
+                                                                 </template>
+                                                             </div>
+                                                             <div v-if="mfgExpMapping.find(m => m.title === exp.expenseTitle) && mfgExpMapping.find(m => m.title === exp.expenseTitle).baseType !== 'fixed'" class="text-end text-muted" style="font-size: 0.6rem; margin-top: 1px;">
+                                                                 기준: {{ formatCurrency(Math.round(exp.expenseTVaAmt/12)) }} /월
+                                                             </div>
+                                                         </td>
+                                                         <td class="text-end pe-2 fw-bold text-primary">{{ formatCurrency(exp.expenseAmt[0] || 0) }}</td>
+                                                         <td class="text-end pe-2 small">{{ formatCurrency(exp.expenseAmtYear[0] || 0) }}</td>
+                                                         <td class="text-center">
+                                                             <button class="btn-close" style="width: 0.5rem; height: 0.5rem;" @click="expertData.expense.production.splice(idx,1)"></button>
+                                                         </td>
+                                                     </tr>
+                                                 </tbody>
+                                             </table>
                                          </div>
-                                         <button class="btn btn-sm btn-light w-100 border mb-4" @click="addExpense(expertData.expense.production)">+ 제조경비 추가</button>
+                                         <button class="btn btn-sm btn-light w-100 border mb-4" @click="addExpense(expertData.expense.production)">+ 제조경비 직접 추가</button>
 
                                          <h6 class="small text-muted fw-bold mb-2">판매관리비 (영업/일반 관련)</h6>
                                          <div v-for="(exp, idx) in expertData.expense.sales" :key="'expS'+idx" class="card mb-2 border-0 bg-white p-2">
@@ -1803,6 +1961,33 @@
 
             // ================= EXPERT MODE STATE =================
             // Based on User JSON Schema
+            const mfgExpMapping = [
+                { title: '전력비', baseType: 'revenue', baseName: '매출액' },
+                { title: '가스수도료', baseType: 'revenue', baseName: '매출액' },
+                { title: '운반비', baseType: 'fixed', baseName: '월정액' },
+                { title: '차량유지비', baseType: 'fixed', baseName: '월정액' },
+                { title: '보관료', baseType: 'fixed', baseName: '월정액' },
+                { title: '포장비', baseType: 'revenue', baseName: '매출액' },
+                { title: '감가상각비', baseType: 'asset', baseName: '기준액' },
+                { title: '수선비', baseType: 'fixed', baseName: '월정액' },
+                { title: '외주가공비', baseType: 'revenue', baseName: '매출액' },
+                { title: '소모품비', baseType: 'revenue', baseName: '매출액' },
+                { title: '세금과공과', baseType: 'fixed', baseName: '월정액' },
+                { title: '지급임차료', baseType: 'fixed', baseName: '월정액' },
+                { title: '보험료', baseType: 'fixed', baseName: '월정액' },
+                { title: '복리후생비', baseType: 'labor', baseName: '인건비' },
+                { title: '교통비', baseType: 'fixed', baseName: '월정액' },
+                { title: '통신비', baseType: 'fixed', baseName: '월정액' },
+                { title: '접대비', baseType: 'fixed', baseName: '월정액' },
+                { title: '경상개발비', baseType: 'fixed', baseName: '월정액' },
+                { title: '도서인쇄비', baseType: 'fixed', baseName: '월정액' },
+                { title: '교육훈련비', baseType: 'fixed', baseName: '월정액' },
+                { title: '지급수수료', baseType: 'fixed', baseName: '월정액' },
+                { title: '시험비', baseType: 'fixed', baseName: '월정액' },
+                { title: '장비임차료', baseType: 'fixed', baseName: '월정액' },
+                { title: '잡비', baseType: 'fixed', baseName: '월정액' }
+            ];
+
             const expertData = reactive({
                 basic: { industryCd: '3', workDay: 25, monTargetPrice: 5000000, saleMode: '1' },
                 sale: {
@@ -1832,7 +2017,13 @@
                     debt: []
                 },
                 expense: {
-                    production: [],
+                    production: mfgExpMapping.map(m => ({
+                        expenseTitle: m.title,
+                        expenseTVaAmt: 0,
+                        expenseTVa: 0,
+                        expenseAmt: Array(12).fill(0),
+                        expenseAmtYear: [0, 0, 0]
+                    })),
                     sales: []
                 }
             });
@@ -1941,15 +2132,67 @@
                 processJob(expertData.job.sales);
 
                 // 3. Expense Projections
-                const processExp = (expList) => {
-                    expList.forEach(e => {
-                        const monthly = (e.expenseTVaAmt || 0);
-                        e.expenseAmt = Array(12).fill(monthly);
-                        e.expenseAmtYear = [monthly*12, monthly*12, monthly*12];
-                    });
+                const processExp = (expList, isProduction=false) => {
+                    if(isProduction) {
+                        const monthlyRevenue = Array(12).fill(0);
+                        (expertData.sale.menuM || []).forEach(m => {
+                            for(let i=0; i<12; i++) monthlyRevenue[i] += (m.menuAmt[i] || 0);
+                        });
+
+                        const monthlyLaborProd = Array(12).fill(0);
+                        (expertData.job.production || []).forEach(j => {
+                            for(let i=0; i<12; i++) monthlyLaborProd[i] += (j.jobAmt[i] || 0);
+                        });
+
+                        let deprBase = 0;
+                        const pInvest = expertData.invest.production;
+                        ['production01', 'production02'].forEach(key => {
+                            (pInvest[key] || []).forEach(inv => {
+                                if(inv.investYn === 'Y') deprBase += (inv.investYearAmt || 0);
+                            });
+                        });
+
+                        expList.forEach(exp => {
+                            const mapping = mfgExpMapping.find(m => m.title === exp.expenseTitle);
+                            if(!mapping) {
+                                const monthly = (exp.expenseTVaAmt || 0);
+                                exp.expenseAmt = Array(12).fill(monthly);
+                                exp.expenseAmtYear = [monthly*12, monthly*12, monthly*12];
+                                return;
+                            }
+
+                            if(mapping.baseType === 'revenue') {
+                                exp.expenseTVaAmt = monthlyRevenue.reduce((a,b)=>a+b, 0); 
+                            } else if(mapping.baseType === 'labor') {
+                                exp.expenseTVaAmt = monthlyLaborProd.reduce((a,b)=>a+b, 0); 
+                            } else if(mapping.baseType === 'asset') {
+                                exp.expenseTVaAmt = deprBase;
+                            }
+
+                            const rate = (exp.expenseTVa || 0) / 100;
+                            let yearlySum = 0;
+                            for(let i=0; i<12; i++) {
+                                let amt = 0;
+                                if(mapping.baseType === 'revenue') amt = Math.round(monthlyRevenue[i] * rate);
+                                else if(mapping.baseType === 'labor') amt = Math.round(monthlyLaborProd[i] * rate);
+                                else if(mapping.baseType === 'asset') amt = Math.round(deprBase * rate);
+                                else amt = Math.round(exp.expenseTVaAmt || 0); // Fixed Fixed
+
+                                exp.expenseAmt[i] = amt;
+                                yearlySum += amt;
+                            }
+                            exp.expenseAmtYear = [yearlySum, yearlySum, yearlySum];
+                        });
+                    } else {
+                        expList.forEach(e => {
+                            const monthly = (e.expenseTVaAmt || 0);
+                            e.expenseAmt = Array(12).fill(monthly);
+                            e.expenseAmtYear = [monthly*12, monthly*12, monthly*12];
+                        });
+                    }
                 };
-                processExp(expertData.expense.production);
-                processExp(expertData.expense.sales);
+                processExp(expertData.expense.production, true);
+                processExp(expertData.expense.sales, false);
                 // 4. Investment Projections (New Sync)
                 const processInvestments = (section) => {
                     if(!section) return;
@@ -1976,6 +2219,20 @@
                 };
                 processInvestments(expertData.invest.production);
                 processInvestments(expertData.invest.sales);
+
+                // 5. Loan/Debt Interest
+                (expertData.loan.debt || []).forEach(d => {
+                    if(!d.loanYear) d.loanYear = [0,0,0];
+                    if(!d.loanRate) d.loanRate = [0,0,0];
+                    if(!d.loanRateAmt) d.loanRateAmt = [0,0,0];
+                    
+                    let cumPrincipal = 0;
+                    for(let i=0; i<3; i++) {
+                        cumPrincipal += (d.loanYear[i] || 0);
+                        // Calculation: (CumPrincipal) * (Rate / 100)
+                        d.loanRateAmt[i] = Math.round(cumPrincipal * ((d.loanRate[i] || 0) / 100));
+                    }
+                });
             };
 
             // Watch for changes (Defensive & Specific to avoid recursion)
@@ -1991,7 +2248,8 @@
                         salesJobs: expertData.job.sales.map(j => ({ c: j.jobCnt, q: j.jobQty, r: j.jobAmtRate, cd: j.jobAmtCd })),
                         prodExp: expertData.expense.production.map(e => ({ a: e.expenseTVaAmt })),
                         salesExp: expertData.expense.sales.map(e => ({ a: e.expenseTVaAmt })),
-                        invest: { p: expertData.invest.production, s: expertData.invest.sales }
+                        invest: { p: expertData.invest.production, s: expertData.invest.sales },
+                        debt: expertData.loan.debt
                     });
                 },
                 (newVal, oldVal) => {
@@ -2401,13 +2659,61 @@
                 }
                 return results;
             };
+            const calcLoanTotals = () => {
+                const res = {
+                    eq: [0, 0, 0],
+                    db: [0, 0, 0],
+                    intr: [0, 0, 0],
+                    total: [0, 0, 0]
+                };
+                (expertData.loan.equity || []).forEach(l => {
+                    for(let i=0; i<3; i++) {
+                        const val = l.loanYear[i] || 0;
+                        res.eq[i] += val;
+                        res.total[i] += val;
+                    }
+                });
+                (expertData.loan.debt || []).forEach(l => {
+                    for(let i=0; i<3; i++) {
+                        const val = l.loanYear[i] || 0;
+                        res.db[i] += val;
+                        res.total[i] += val;
+                        res.intr[i] += (l.loanRateAmt[i] || 0);
+                    }
+                });
+                return res;
+            };
+            const equityCategoryItems = [
+                { cd: '10', name: '자본금' },
+                { cd: '20', name: '출자금' },
+                { cd: '30', name: '투자자금' },
+                { cd: '99', name: '기타자금' }
+            ];
+
             const addLoan = (list, isDebt=false) => {
-                const item = { loanTitle: '', loanYear: [0, 0, 0] };
+                const item = { 
+                    loanTitle: isDebt ? '' : equityCategoryItems[0].name, 
+                    loanTitleCd: isDebt ? '' : equityCategoryItems[0].cd,
+                    loanYear: [0, 0, 0] 
+                };
                 if(isDebt) {
                     item.loanRate = [5.0, 5.0, 5.0];
                     item.loanRateAmt = [0, 0, 0];
                 }
                 list.push(item);
+            };
+
+            const onEquityCdChange = (ln) => {
+                const matched = equityCategoryItems.find(i => i.cd === ln.loanTitleCd);
+                if(matched) ln.loanTitle = matched.name;
+            };
+
+            const onDebtValueChange = (ln, type, idx) => {
+                if(type === 'rate' && idx === 0) {
+                    ln.loanRate[1] = ln.loanRate[0];
+                    ln.loanRate[2] = ln.loanRate[0];
+                }
+                updateProjections();
             };
             const addExpense = (list) => list.push({ 
                 expenseTitle: '', expenseTVaAmt: 0, 
@@ -2584,7 +2890,9 @@
                 showLaborModal,
                 showLaborYearlyModal, currentLaborYearly, openLaborYearlyModal, closeLaborYearlyModal, saveLaborYearly, calcLaborYearly,
                 investCategories, loanCategories,
-                addInvestInCategory, investCategoryItems, onInvestItemChange, calcInvestTotals, calcAllInvestTotals
+                addInvestInCategory, investCategoryItems, onInvestItemChange, calcInvestTotals, calcAllInvestTotals,
+                equityCategoryItems, onEquityCdChange, onDebtValueChange, calcLoanTotals,
+                mfgExpMapping
             };
         }
     }).mount('#app');
