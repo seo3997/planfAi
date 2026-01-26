@@ -2975,35 +2975,59 @@
 
                 const diagnosis = [
                     { 
-                        id: 'turnover', label: '투자금액회전율', value: turnoverVal.toFixed(1) + '회', pass: turnoverVal >= turnoverStd, msg: `기준 ${turnoverStd}회 이상`,
+                        id: 'turnover', label: '투자금액회전율', 
+                        value: TotalInvestment > 0 ? turnoverVal.toFixed(1) + '회' : '입력 필요', 
+                        pass: TotalInvestment > 0 && turnoverVal >= turnoverStd, 
+                        msg: TotalInvestment > 0 ? `기준 ${turnoverStd}회 이상` : '투자금액 입력 필요',
                         tooltip: `계산: 연매출(${formatCurrency(S_year)}) ÷ 총투자(${formatCurrency(TotalInvestment)})`
                     },
                     { 
-                        id: 'margin', label: '매출영업이익률', value: adjOpMarginVal.toFixed(1) + '%', pass: adjOpMarginVal >= marginStd, msg: `기준 ${marginStd}% 이상`,
+                        id: 'margin', label: '매출영업이익률', 
+                        value: S_year > 0 ? adjOpMarginVal.toFixed(1) + '%' : '입력 필요', 
+                        pass: S_year > 0 && adjOpMarginVal >= marginStd, 
+                        msg: S_year > 0 ? `기준 ${marginStd}% 이상` : '매출액 입력 필요',
                         tooltip: `계산: 조정영업이익(${formatCurrency(Adj_OP_year)}) ÷ 연매출(${formatCurrency(S_year)})`
                     },
                     { 
-                        id: 'roa', label: '총자산영업이익률', value: (roaMonthlyVal*100).toFixed(1) + '%', pass: roaMonthlyVal >= roaStd, msg: `기준 ${(roaStd*100).toFixed(1)}% 이상`,
+                        id: 'roa', label: '총자산영업이익률', 
+                        value: TotalInvestment > 0 ? (roaMonthlyVal*100).toFixed(1) + '%' : '입력 필요', 
+                        pass: TotalInvestment > 0 && roaMonthlyVal >= roaStd, 
+                        msg: TotalInvestment > 0 ? `기준 ${(roaStd*100).toFixed(1)}% 이상` : '투자금액 입력 필요',
                         tooltip: `계산: 조정영업이익(${formatCurrency(Adj_OP_year)}) ÷ 총투자(${formatCurrency(TotalInvestment)}) ÷ 12개월`
                     },
                     { 
-                        id: 'labor', label: '인건비 비율', value: laborRatioVal.toFixed(1) + '%', pass: laborRatioVal <= laborStd, msg: `기준 ${laborStd}% 이하`,
+                        id: 'labor', label: '인건비 비율', 
+                        value: S_year > 0 ? laborRatioVal.toFixed(1) + '%' : '입력 필요', 
+                        pass: S_year > 0 && laborRatioVal <= laborStd, 
+                        msg: S_year > 0 ? `기준 ${laborStd}% 이하` : '매출액 입력 필요',
                         tooltip: `계산: 총인건비(${formatCurrency(totalLaborYear)}) ÷ 연매출(${formatCurrency(S_year)})`
                     },
                     { 
-                        id: 'salesPer', label: '1인당 월매출액', value: formatCurrency(Math.round(salesPerPersonVal)), pass: salesPerPersonVal >= personStd, msg: `기준 ${formatCurrency(personStd)} 이상`,
+                        id: 'salesPer', label: '1인당 월매출액', 
+                        value: Headcount > 0 ? formatCurrency(Math.round(salesPerPersonVal)) : '입력 필요', 
+                        pass: Headcount > 0 && salesPerPersonVal >= personStd, 
+                        msg: Headcount > 0 ? `기준 ${formatCurrency(personStd)} 이상` : '종업원수 입력 필요',
                         tooltip: `계산: 월매출(${formatCurrency(Math.round(S_year/12))}) ÷ 종업원수(${Headcount}명)`
                     },
                     { 
-                        id: 'rent', label: '임차율비율', value: rentRatioVal.toFixed(1) + '%', pass: rentRatioVal <= rentStd, msg: `기준 ${rentStd}% 이하`,
+                        id: 'rent', label: '임차율비율', 
+                        value: S_mon > 0 ? rentRatioVal.toFixed(1) + '%' : '입력 필요', 
+                        pass: S_mon > 0 && rentRatioVal <= rentStd, 
+                        msg: S_mon > 0 ? `기준 ${rentStd}% 이하` : '매출액 입력 필요',
                         tooltip: `계산: 월임차료(${formatCurrency(Rent_cost)}) ÷ 월매출(${formatCurrency(S_mon)})`
                     },
                     { 
-                        id: 'equity', label: '자기자금비율', value: equityRatioVal.toFixed(1) + '%', pass: equityRatioVal >= equityStd, msg: `기준 ${equityStd}% 이상`,
+                        id: 'equity', label: '자기자금비율', 
+                        value: TotalAssetsReported > 0 ? equityRatioVal.toFixed(1) + '%' : '입력 필요', 
+                        pass: TotalAssetsReported > 0 && equityRatioVal >= equityStd, 
+                        msg: TotalAssetsReported > 0 ? `기준 ${equityStd}% 이상` : '자본/대출 입력 필요',
                         tooltip: `계산: 자기자본(${formatCurrency(EquityTotal)}) ÷ 총자산(${formatCurrency(TotalAssetsReported)})`
                     },
                     { 
-                        id: 'bepRatio', label: '손익분기점 비율', value: bepRatioVal.toFixed(1) + '%', pass: bepRatioVal <= bepStd, msg: `기준 ${bepStd}% 이하`,
+                        id: 'bepRatio', label: '손익분기점 비율', 
+                        value: S_mon > 0 ? bepRatioVal.toFixed(1) + '%' : '입력 필요', 
+                        pass: S_mon > 0 && bepRatioVal <= bepStd, 
+                        msg: S_mon > 0 ? `기준 ${bepStd}% 이하` : '매출액 입력 필요',
                         tooltip: `계산: BEP매출(${formatCurrency(Math.round(bepRevenueVal))}) ÷ 월매출(${formatCurrency(S_mon)})`
                     }
                 ];
