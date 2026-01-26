@@ -2696,18 +2696,12 @@
                 const cogsResult = [];
                 for (let i = 0; i < 3; i++) {
                     const mMaterials = sumArrayIdx(data.cost.costY, 'costAmt', i);
-                    let currentCost = 0;
-                    let totalCogsVal = 0;
+                    
+                    // Production Expenses (제조경비/직접비용) -> COGS (All Industries)
+                    const mExpTotal = sumArrayIdx(data.expense.production, 'expenseAmtYear', i);
+                    const currentCost = mMaterials + mExpTotal;
 
-                    if (industryCd === '1') {
-                        // mMaterials + All Mfg Expenses (which includes Mfg Labor via mapping)
-                        const mExpTotal = sumArrayIdx(data.expense.production, 'expenseAmtYear', i);
-                        currentCost = mMaterials + mExpTotal;
-                    } else {
-                        currentCost = mMaterials;
-                    }
-
-                    totalCogsVal = (data.cogs?.beginningInv?.[i] || 0) + currentCost - (data.cogs?.endingInv?.[i] || 0);
+                    const totalCogsVal = (data.cogs?.beginningInv?.[i] || 0) + currentCost - (data.cogs?.endingInv?.[i] || 0);
 
                     // Sync back to state
                     if (data.cogs) {
@@ -2719,18 +2713,10 @@
 
                 // 5. Final Dashboard Values (Monthly)
                 let Dash_COGS = cogsResult[0].totalCogs / 12;
-                let Dash_Labor = 0;
-                let Dash_Exp = 0;
-
-                if (industryCd === '1') {
-                    // Dash_Labor = Only SG&A Labor (from Sales Expense list)
-                    Dash_Labor = salesExpRes.lExp; 
-                    Dash_Exp = salesExpRes.oExp;
-                } else {
-                    // Total approach for non-mfg: Labor is sum of all labor-type expenses
-                    Dash_Labor = mfgExpRes.lExp + salesExpRes.lExp;
-                    Dash_Exp = mfgExpRes.oExp + salesExpRes.oExp;
-                }
+                
+                // Dashboard Rows: Production Expense -> COGS, Sales Expense -> SG&A
+                let Dash_Labor = salesExpRes.lExp;
+                let Dash_Exp = salesExpRes.oExp;
 
                 // Operating Profit = Revenue - COGS - SG&A (Exp + Labor)
                 const OP = S_mon - Dash_COGS - Dash_Labor - Dash_Exp;
@@ -2779,14 +2765,8 @@
                     const cogs = cogsResult[i].totalCogs;
                     const gp = rev - cogs;
                     
-                    let sga = 0;
-                    if (industryCd === '1') {
-                        // Manufacturing SGA = Sales Expenses (incl. labor)
-                        sga = sumArrayIdx(data.expense.sales, 'expenseAmtYear', i);
-                    } else {
-                        // Non-Manufacturing SGA = All Expenses
-                        sga = sumArrayIdx(data.expense.production, 'expenseAmtYear', i) + sumArrayIdx(data.expense.sales, 'expenseAmtYear', i);
-                    }
+                    // Sales Expense List (All Industries) -> SGA
+                    const sga = sumArrayIdx(data.expense.sales, 'expenseAmtYear', i);
                     
                     const op = gp - sga;
                     const nonOp = sumArrayIdx(data.loan.debt, 'loanRateAmt', i);
