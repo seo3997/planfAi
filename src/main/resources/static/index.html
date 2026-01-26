@@ -3214,10 +3214,17 @@
                 }
 
                 const payload = {
-                    mode: 'expert',
-                    id: currentReportId.value, // Send ID for Update
-                    ...cleanData,
-                    summary: { ...result } // Snapshot results
+                    mode: mode.value,
+                    id: currentReportId.value,
+                    basic: mode.value === 'expert' ? cleanData.basic : liteData.basic,
+                    sale: mode.value === 'expert' ? cleanData.sale : liteData.sale,
+                    cost: mode.value === 'expert' ? cleanData.cost : undefined,
+                    job: mode.value === 'expert' ? cleanData.job : undefined,
+                    invest: mode.value === 'expert' ? cleanData.invest : undefined,
+                    loan: mode.value === 'expert' ? cleanData.loan : undefined,
+                    expense: mode.value === 'expert' ? cleanData.expense : undefined,
+                    cogs: mode.value === 'expert' ? cleanData.cogs : undefined,
+                    liteCost: mode.value === 'lite' ? liteData.liteCost : undefined
                 };
 
                 try {
