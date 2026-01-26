@@ -977,27 +977,44 @@
                                 </div>
                                 <div class="expert-body">
                                     <!-- Key Metrics -->
-                                    <div class="row text-center mb-4">
-                                        <div class="col-6 mb-3">
-                                            <small class="text-muted d-block text-uppercase" style="font-size: 0.7rem;">월 예상 매출</small>
-                                            <span class="fs-4 fw-bold text-dark">{{ formatCurrency(expertResult.totalRevenue) }}</span>
-                                            <div class="small text-muted clickable-link" @click="showProjectionModal = true" style="font-size: 0.65rem; cursor: pointer; text-decoration: underline;">
-                                                연간: {{ formatCurrency(expertResult.yearlySales) }} (상세보기)
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-6">
+                                            <div class="p-3 bg-light rounded-3 h-100">
+                                                <small class="text-muted d-block text-uppercase mb-1" style="font-size: 0.65rem;">월 예상 매출</small>
+                                                <strong class="fs-4 text-dark">{{ formatCurrency(expertResult.totalRevenue) }}</strong>
+                                                <div class="mt-1" @click="showProjectionModal = true" style="font-size: 0.65rem; cursor: pointer; text-decoration: underline; color: var(--primary-color);">
+                                                    연간 상세 보기
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="col-6 mb-3">
-                                            <small class="text-muted d-block text-uppercase" style="font-size: 0.7rem;">영업이익</small>
-                                            <span class="fs-4 fw-bold" :class="expertResult.opIncome >= 0 ? 'text-primary' : 'text-danger'">{{ formatCurrency(expertResult.opIncome) }}</span>
-                                        </div>
                                         <div class="col-6">
-                                            <small class="text-muted d-block text-uppercase" style="font-size: 0.7rem;">영업 이익률</small>
-                                            <span class="fs-5 fw-bold text-dark">{{ expertResult.opMargin }}%</span>
+                                            <div class="p-3 bg-light rounded-3 h-100">
+                                                <small class="text-muted d-block text-uppercase mb-1" style="font-size: 0.65rem;">영업이익 (순수익)</small>
+                                                <strong class="fs-4" :class="expertResult.opIncome >= 0 ? 'text-primary' : 'text-danger'">{{ formatCurrency(expertResult.opIncome) }}</strong>
+                                                <small class="d-block text-muted" style="font-size: 0.65rem;">이익률: {{ expertResult.opMargin }}%</small>
+                                            </div>
                                         </div>
-                                        <div class="col-6">
-                                             <small class="text-muted d-block text-uppercase" style="font-size: 0.7rem;">목표 달성</small>
-                                              <span class="badge rounded-pill" :class="expertResult.targetGap >= 0 ? 'bg-success' : 'bg-warning text-dark'">
-                                                {{ expertResult.targetGap >= 0 ? '달성' : '미달' }}
-                                              </span>
+
+                                        <!-- Target Status Card -->
+                                        <div class="col-12">
+                                            <div class="p-3 rounded-3 border-start border-4 shadow-sm" :class="expertResult.targetGap >= 0 ? 'bg-success-subtle border-success' : 'bg-warning-subtle border-warning'">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <small class="text-muted d-block mb-1" style="font-size: 0.7rem;">목표 달성 현황</small>
+                                                        <h5 class="fw-bold mb-0" :class="expertResult.targetGap >= 0 ? 'text-success' : 'text-warning-emphasis'">
+                                                            {{ expertResult.targetGap >= 0 ? '목표 달성 중!' : '목표까지 매출 증대 필요' }}
+                                                        </h5>
+                                                    </div>
+                                                    <div class="text-end" v-if="expertResult.targetGap < 0">
+                                                        <small class="text-muted d-block" style="font-size: 0.65rem;">추가 필요 매출액</small>
+                                                        <strong class="text-danger fs-5">+{{ formatCurrency(expertResult.revenueNeededForTarget) }}</strong>
+                                                    </div>
+                                                    <div class="text-end" v-else>
+                                                        <small class="text-muted d-block" style="font-size: 0.65rem;">목표 초과 수익</small>
+                                                        <strong class="text-success fs-5">{{ formatCurrency(expertResult.targetGap) }}</strong>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     
@@ -1226,15 +1243,28 @@
                                     </div>
                                     
                                     <!-- Action Guide -->
-                                    <div class="alert alert-light border small text-muted mb-0">
-                                        <strong class="d-block mb-1 text-dark">💡 AI 분석 코멘트</strong>
-                                        <span v-if="expertResult.targetGap < 0">
-                                            목표 이익까지 <strong>{{ formatCurrency(Math.abs(expertResult.targetGap)) }}</strong> 남았습니다. 
-                                            고정비 비중이 {{ expertResult.totalRevenue ? ((expertResult.totalFixedCost / expertResult.totalRevenue)*100).toFixed(1) : 0 }}% 입니다.
-                                        </span>
-                                        <span v-else>
-                                            목표를 달성했습니다! (초과달성: {{ formatCurrency(expertResult.targetGap) }})
-                                        </span>
+                                    <div class="alert alert-primary border-0 shadow-sm mb-0">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <span class="fs-4 me-2">💡</span>
+                                            <strong class="text-primary">분석 요약 & 가이드</strong>
+                                        </div>
+                                        <div v-if="expertResult.targetGap < 0" class="small">
+                                            <p class="mb-2">
+                                                목표 수익을 달성하려면 현재보다 매달 <strong class="text-danger fs-5">{{ formatCurrency(expertResult.revenueNeededForTarget) }}</strong>의 <strong>매출액이 더 필요</strong>합니다.
+                                            </p>
+                                            <div class="p-2 bg-white rounded-3 border border-primary border-opacity-25">
+                                                <ul class="mb-0 ps-3 text-muted" style="font-size: 0.75rem;">
+                                                    <li>목표 순이익까지 부족한 금액: <strong>{{ formatCurrency(Math.abs(expertResult.targetGap)) }}</strong></li>
+                                                    <li>현재 사장님 사업장의 고정비 비중은 <strong>{{ expertResult.totalRevenue ? ((expertResult.totalFixedCost / expertResult.totalRevenue)*100).toFixed(1) : 0 }}%</strong>입니다.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div v-else class="small">
+                                            <p class="mb-0">
+                                                🎉 <strong>축하합니다!</strong> 현재 목표치를 <strong>{{ formatCurrency(expertResult.targetGap) }}</strong> 초과 달성 중입니다. 
+                                                수익성을 유지하면서 확장을 고민해 보셔도 좋습니다.
+                                            </p>
+                                        </div>
                                     </div>
 
                                 </div>
@@ -3093,6 +3123,7 @@
                     expenseRatio: ((analysis.Dash_Exp + analysis.Interest_mon)/analysis.S_mon*100).toFixed(1),
                     
                     targetGap,
+                    revenueNeededForTarget: (targetGap < 0 && (analysis.S_mon - VC) > 0) ? (Math.abs(targetGap) / ((analysis.S_mon - VC) / analysis.S_mon)) : 0,
                     totalFixedCost: FC,
                     bepRevenue,
                     diagnosis: analysis.diagnosis,
