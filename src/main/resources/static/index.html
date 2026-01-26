@@ -875,7 +875,85 @@
                                     </div>
                                 </div>
                             </div>
-                        </div> <!-- End Accordion -->
+                             <!-- 7. COGS Statement -->
+                             <div class="accordion-item border-0 mb-3 shadow-sm rounded-3 overflow-hidden">
+                                 <h2 class="accordion-header">
+                                     <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCOGS">
+                                         <span class="section-badge">7단계</span> 매출원가 명세서 (COGS Statement)
+                                     </button>
+                                 </h2>
+                                 <div id="collapseCOGS" class="accordion-collapse collapse" data-bs-parent="#expertAccordion">
+                                     <div class="accordion-body bg-light">
+                                         <div class="table-responsive">
+                                             <table class="table table-sm small align-middle bg-white rounded shadow-sm border mb-0">
+                                                 <thead class="table-light">
+                                                     <tr class="text-center">
+                                                         <th width="25%">구분</th>
+                                                         <th width="25%">1차년도</th>
+                                                         <th width="25%">2차년도</th>
+                                                         <th width="25%">3차년도</th>
+                                                     </tr>
+                                                 </thead>
+                                                 <!-- Manufacturing COGS Statement -->
+                                                 <tbody v-if="expertData.basic.industryCd === '1'">
+                                                     <tr>
+                                                         <td class="ps-3">기초재고액 (+)</td>
+                                                         <td v-for="i in [0,1,2]"><input type="number" class="form-control form-control-sm text-end" v-model.number="expertData.cogs.beginningInv[i]"></td>
+                                                     </tr>
+                                                     <tr class="bg-light-subtle">
+                                                         <td class="ps-3">당기 제품 제조원가 (+)</td>
+                                                         <td v-for="i in [0,1,2]" class="text-end pe-3 fw-bold">
+                                                             {{ formatCurrency(expertResult.cogsYearly[i].currentPeriodCost) }}
+                                                         </td>
+                                                     </tr>
+                                                     <tr>
+                                                         <td class="ps-4 text-muted small">ㄴ 재조원가 재료비</td>
+                                                         <td v-for="i in [0,1,2]" class="text-end pe-3 text-muted small">{{ formatCurrency(sumArrayIdx(expertData.cost.costY, 'costAmt', i)) }}</td>
+                                                     </tr>
+                                                     <tr>
+                                                         <td class="ps-4 text-muted small">ㄴ 재조원가 노무비</td>
+                                                         <td v-for="i in [0,1,2]" class="text-end pe-3 text-muted small">{{ formatCurrency(sumArrayIdx(expertData.job.production, 'jobAmtYear', i)) }}</td>
+                                                     </tr>
+                                                     <tr>
+                                                         <td class="ps-4 text-muted small">ㄴ 재조원가 제조경비</td>
+                                                         <td v-for="i in [0,1,2]" class="text-end pe-3 text-muted small">{{ formatCurrency(sumArrayIdx(expertData.expense.production, 'expenseAmtYear', i)) }}</td>
+                                                     </tr>
+                                                     <tr>
+                                                         <td class="ps-3">기말재고액 (-)</td>
+                                                         <td v-for="i in [0,1,2]"><input type="number" class="form-control form-control-sm text-end" v-model.number="expertData.cogs.endingInv[i]"></td>
+                                                     </tr>
+                                                     <tr class="table-primary fw-bold">
+                                                         <td class="ps-3 text-uppercase">당기매출원가 (=)</td>
+                                                         <td v-for="i in [0,1,2]" class="text-end pe-3 fs-6">
+                                                             {{ formatCurrency(expertResult.cogsYearly[i].totalCogs) }}
+                                                         </td>
+                                                     </tr>
+                                                 </tbody>
+                                                 <!-- Non-Manufacturing COGS Statement -->
+                                                 <tbody v-else>
+                                                     <tr>
+                                                         <td class="ps-3">당기 상품매입액 (재료비)</td>
+                                                         <td v-for="i in [0,1,2]" class="text-end pe-3 fw-bold">{{ formatCurrency(sumArrayIdx(expertData.cost.costY, 'costAmt', i)) }}</td>
+                                                     </tr>
+                                                     <tr class="table-primary fw-bold">
+                                                         <td class="ps-3 text-uppercase">당기매출원가 (=)</td>
+                                                         <td v-for="i in [0,1,2]" class="text-end pe-3 fs-6">
+                                                             {{ formatCurrency(sumArrayIdx(expertData.cost.costY, 'costAmt', i)) }}
+                                                         </td>
+                                                     </tr>
+                                                 </tbody>
+                                             </table>
+                                         </div>
+                                         <div class="mt-3 p-2 bg-white rounded border border-warning-subtle">
+                                             <p class="small text-muted mb-0">
+                                                 <i class="bi bi-info-circle-fill text-warning me-1"></i>
+                                                 <strong>안내:</strong> 당기매출원가는 손익계산서의 핵심 항목입니다. 기초/기말 재고가 없는 경우 0을 유지하시면 됩니다.
+                                             </p>
+                                         </div>
+                                     </div>
+                                 </div>
+                             </div>
+                         </div> <!-- End Accordion -->
                     </div>
 
                     <!-- Right: Dashboard -->
@@ -2231,6 +2309,18 @@
                         expenseAmt: Array(12).fill(0),
                         expenseAmtYear: [0, 0, 0]
                     }))
+                },
+                cogs: {
+                    title: "매출원가 분석 (통합)",
+                    beginningInv: [0, 0, 0],   // 기초재고액
+                    endingInv: [0, 0, 0],      // 기말재고액
+                    currentPeriodCost: [0, 0, 0], // 당기 제품 제조원가 (또는 상품매입액)
+                    totalCogs: [0, 0, 0],      // 당기매출원가
+                    sourceMapping: {
+                        materials: "cost.costY",
+                        labor: "job.production",
+                        overhead: "expense.production"
+                    }
                 }
             });
 
@@ -2552,7 +2642,36 @@
                     { id: 'salesPer', label: '1인매출', value: Math.round(KPI.KPI_SalesPerPerson / 10000) + '만', pass: KPI.KPI_SalesPerPerson >= std.salesPer, msg: '생산성 우수' },
                     { id: 'rent', label: '임차료율', value: KPI.KPI_RentRatio.toFixed(1) + '%', pass: KPI.KPI_RentRatio <= std.rent, msg: `기준 ${std.rent}%` }
                 ];
-                return { S_mon, MC_mon, Labor_total, Other_Exp_total, Interest_total, OP, TotalInvest, KPI, diagnosis };
+                // Calculate Yearly COGS (Step 7)
+                const cogsResult = [];
+                for (let i = 0; i < 3; i++) {
+                    const mMaterials = sumArrayIdx(data.cost.costY, 'costAmt', i);
+                    let currentCost = 0;
+                    let totalCogsVal = 0;
+
+                    if (industryCd === '1') {
+                        const mLabor = sumArrayIdx(data.job.production, 'jobAmtYear', i);
+                        const mExpense = sumArrayIdx(data.expense.production, 'expenseAmtYear', i);
+                        currentCost = mMaterials + mLabor + mExpense;
+                        totalCogsVal = (data.cogs?.beginningInv?.[i] || 0) + currentCost - (data.cogs?.endingInv?.[i] || 0);
+                    } else {
+                        currentCost = mMaterials; 
+                        totalCogsVal = currentCost;
+                    }
+
+                    // Sync back to state for saving as JSON
+                    if (data.cogs) {
+                        data.cogs.currentPeriodCost[i] = currentCost;
+                        data.cogs.totalCogs[i] = totalCogsVal;
+                    }
+
+                    cogsResult.push({
+                        currentPeriodCost: currentCost,
+                        totalCogs: totalCogsVal
+                    });
+                }
+
+                return { S_mon, MC_mon, Labor_total, Other_Exp_total, Interest_total, OP, TotalInvest, KPI, diagnosis, cogsYearly: cogsResult };
             };
 
             // ================= HELPERS =================
@@ -2622,12 +2741,10 @@
                 const yearlySales = analysis.S_mon * 12;
                 const targetGap = analysis.OP - (expertData.basic.monTargetPrice || 0);
 
-                let fixedExp = 0;
+                let fixedExp = analysis.Other_Exp_total || 0;
                 let varExp = 0;
-                // Treat all expenses as Fixed for now in this schema unless we add a type field
-                fixedExp = (analysis.Exp_total || 0);
                 
-                const FC = analysis.Labor_total + analysis.Dep_total + analysis.Interest_total + fixedExp;
+                const FC = analysis.Labor_total + analysis.Interest_total + fixedExp;
                 const VC = analysis.MC_mon + varExp;
                 
                 let bepRevenue = 0;
@@ -2645,6 +2762,7 @@
                     totalInterest: analysis.Interest_total,
                     totalExpense: analysis.Other_Exp_total + analysis.Interest_total,
                     opIncome: analysis.OP,
+                    cogsYearly: analysis.cogsYearly,
                     
                     opMargin: analysis.KPI.KPI_OPMargin.toFixed(1),
                     materialRatio: (analysis.MC_mon/analysis.S_mon*100).toFixed(1),
@@ -3011,6 +3129,7 @@
                             else if(k.startsWith('YCost')) nk = 'cost' + k.slice(5).charAt(0).toLowerCase() + k.slice(6);
                             else if(k === 'YJobAmt') nk = 'jobAmtYear';
                             else if(k === 'YJobRate') nk = 'jobAmtRate';
+                            else if(k === 'COGS') nk = 'cogs';
                             
                             newObj[nk] = migrate(obj[k]);
                         }
@@ -3025,6 +3144,7 @@
                         Object.assign(expertData.basic, data.basic || {});
                         if(data.sale) Object.assign(expertData.sale, data.sale);
                         if(data.cost) Object.assign(expertData.cost, data.cost);
+                        if(data.cogs) Object.assign(expertData.cogs, data.cogs);
                         
                         // Handle Job nesting
                         if(data.job) {
