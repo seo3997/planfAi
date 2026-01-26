@@ -2798,24 +2798,36 @@
                     });
                 }
 
+                const FC = Dash_Labor + Dash_Exp + Interest_total;
+                const VC = Dash_COGS;
+                let bepRevenue = 0;
+                if(S_mon > 0) {
+                     const vRatio = VC / S_mon;
+                     if(vRatio < 1) bepRevenue = FC / (1 - vRatio);
+                }
+
                 return { 
                     S_mon, 
+                    totalRevenue: S_mon,
                     Dash_COGS, 
                     Dash_Labor, 
                     Dash_Exp, 
                     Interest_mon: Interest_total, 
                     OP, 
+                    opIncome: OP,
+                    bepRevenue: Math.round(bepRevenue),
                     TotalInvest, 
                     KPI, 
                     diagnosis, 
                     cogsYearly: cogsResult,
-                    yearlyPNL
+                    yearlyPNL,
+                    totalFixedCost: FC
                 };
             };
 
             // ================= HELPERS =================
             const formatCurrency = (val) => {
-                if(isNaN(val)) return '0원';
+                if(val === undefined || val === null || isNaN(val)) return '0원';
                 return new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(val);
             };
             const formatCurrencyCheon = (val) => {
@@ -2830,20 +2842,51 @@
 
             const getReportValues = (rpt) => {
                 const data = parseReport(rpt);
-                if (data.mode === 'expert' && data.summary) {
-                    return {
-                        mode: 'expert',
-                        revenue: data.summary.totalRevenue,
-                        netProfit: data.summary.opIncome,
-                        bep: data.summary.bepRevenue
-                    };
+                const mode = data.mode || 'lite';
+                
+                // If summary exists (legacy), use it. Otherwise calculate.
+                if (mode === 'expert') {
+                    if (data.summary) {
+                        return {
+                            mode: 'expert',
+                            revenue: data.summary.totalRevenue || 0,
+                            netProfit: data.summary.opIncome || 0,
+                            bep: data.summary.bepRevenue || 0
+                        };
+                    } else {
+                        // Ensure data has required sub-objects for analyze_profitability
+                        if(!data.basic) data.basic = {};
+                        if(!data.sale) data.sale = { menu: [] };
+                        if(!data.cost) data.cost = { costRate: [], costY: [] };
+                        if(!data.job) data.job = { production: [], sales: [] };
+                        if(!data.expense) data.expense = { production: [], sales: [] };
+                        if(!data.loan) data.loan = { debt: [] };
+
+                        // Re-calculate on the fly
+                        const analysis = analyze_profitability(data);
+                        return {
+                            mode: 'expert',
+                            revenue: analysis.totalRevenue || 0,
+                            netProfit: analysis.opIncome || 0,
+                            bep: analysis.bepRevenue || 0
+                        };
+                    }
                 }
-                // Fallback / Lite
+                
+                // Lite Mode Calculation
+                const b = data.basic || {};
+                let revenue = 0;
+                if(data.sale && data.sale.menu) {
+                    data.sale.menu.forEach(m => {
+                        revenue += (m.menuPrice || 0) * (m.menuQty || 0) * (b.workDay || 25);
+                    });
+                }
+                const cost = data.liteCost?.totalMonthlyCost || 0;
                 return {
-                    mode: data.mode || 'lite',
-                    revenue: data.revenue || (data.liteResult ? data.liteResult.revenue : 0),
-                    netProfit: data.netProfit || (data.liteResult ? data.liteResult.netProfit : 0),
-                    bep: data.bep || 0
+                    mode: 'lite',
+                    revenue: revenue,
+                    netProfit: revenue - cost,
+                    bep: 0
                 };
             };
 
