@@ -1118,6 +1118,92 @@
                                             </table>
                                             <div class="text-end mt-1 text-muted" style="font-size: 0.6rem;">(단위: 천원)</div>
                                         </div>
+                                    <!-- Yearly BEP Analysis (Section 11) -->
+                                    <div class="card border-0 bg-white shadow-sm p-3 mb-3 mt-3">
+                                        <h6 class="fw-bold mb-3 small text-primary">⚖️ 연도별 손익분기점(BEP) 분석</h6>
+                                        <div class="table-responsive">
+                                            <table class="table table-sm small align-middle mb-0" style="font-size: 0.7rem;">
+                                                <thead class="table-light text-center">
+                                                    <tr>
+                                                        <th class="py-2">구분</th>
+                                                        <th>1차년도</th>
+                                                        <th>2차년도</th>
+                                                        <th>3차년도</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="fw-bold bg-light-subtle">1. 매출액</td>
+                                                        <td v-for="b in expertResult.bepAnalysis" class="text-end fw-bold">{{ formatNumber(Math.round(b.rev/1000)) }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="ps-2">2. 변동비 합계</td>
+                                                        <td v-for="b in expertResult.bepAnalysis" class="text-end text-danger">{{ formatNumber(Math.round(b.totalVC/1000)) }}</td>
+                                                    </tr>
+                                                    <tr class="text-muted" style="font-size: 0.65rem;">
+                                                        <td class="ps-3 fst-italic">- 재료비/상품비</td>
+                                                        <td v-for="b in expertResult.bepAnalysis" class="text-end">{{ formatNumber(Math.round(b.materials/1000)) }}</td>
+                                                    </tr>
+                                                    <tr class="text-muted" style="font-size: 0.65rem;">
+                                                        <td class="ps-3 fst-italic">- 제조경비(변동)</td>
+                                                        <td v-for="b in expertResult.bepAnalysis" class="text-end">{{ formatNumber(Math.round(b.mfgVC/1000)) }}</td>
+                                                    </tr>
+                                                    <tr class="text-muted border-bottom" style="font-size: 0.65rem;">
+                                                        <td class="ps-3 fst-italic">- 판관비(변동)</td>
+                                                        <td v-for="b in expertResult.bepAnalysis" class="text-end">{{ formatNumber(Math.round(b.adminVC/1000)) }}</td>
+                                                    </tr>
+                                                    <tr class="table-info">
+                                                        <td class="fw-bold">3. 한계이익 (1-2)</td>
+                                                        <td v-for="b in expertResult.bepAnalysis" class="text-end fw-bold">{{ formatNumber(Math.round(b.marginalProfit/1000)) }}</td>
+                                                    </tr>
+                                                    <tr class="text-muted border-bottom" style="font-size: 0.65rem;">
+                                                        <td class="ps-3 fst-italic">4. 한계이익률</td>
+                                                        <td v-for="b in expertResult.bepAnalysis" class="text-end fw-bold text-primary">{{ b.marginalProfitRate.toFixed(1) }}%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="ps-2">5. 고정비 합계</td>
+                                                        <td v-for="b in expertResult.bepAnalysis" class="text-end text-danger">{{ formatNumber(Math.round(b.totalFC/1000)) }}</td>
+                                                    </tr>
+                                                    <tr class="text-muted" style="font-size: 0.65rem;">
+                                                        <td class="ps-3 fst-italic">- 인건비(제조)</td>
+                                                        <td v-for="b in expertResult.bepAnalysis" class="text-end">{{ formatNumber(Math.round(b.mfgLabor/1000)) }}</td>
+                                                    </tr>
+                                                    <tr class="text-muted" style="font-size: 0.65rem;">
+                                                        <td class="ps-3 fst-italic">- 제조경비(고정)</td>
+                                                        <td v-for="b in expertResult.bepAnalysis" class="text-end">{{ formatNumber(Math.round(b.mfgFC/1000)) }}</td>
+                                                    </tr>
+                                                    <tr class="text-muted" style="font-size: 0.65rem;">
+                                                        <td class="ps-3 fst-italic">- 판관비(고정)</td>
+                                                        <td v-for="b in expertResult.bepAnalysis" class="text-end">{{ formatNumber(Math.round(b.adminFC/1000)) }}</td>
+                                                    </tr>
+                                                    <tr class="text-muted border-bottom" style="font-size: 0.65rem;">
+                                                        <td class="ps-3 fst-italic">- 이자비용</td>
+                                                        <td v-for="b in expertResult.bepAnalysis" class="text-end">{{ formatNumber(Math.round(b.interest/1000)) }}</td>
+                                                    </tr>
+                                                    <tr class="table-warning">
+                                                        <td class="fw-bold text-dark">6. 손익분기점 매출액</td>
+                                                        <td v-for="b in expertResult.bepAnalysis" class="text-end fw-bold text-dark">{{ formatNumber(Math.round(b.bepPoint/1000)) }}</td>
+                                                    </tr>
+                                                    <tr class="text-muted border-bottom" style="font-size: 0.65rem;">
+                                                        <td class="ps-3 fst-italic">7. 손익분기점률</td>
+                                                        <td v-for="b in expertResult.bepAnalysis" class="text-end fw-bold">{{ b.bepRate.toFixed(1) }}%</td>
+                                                    </tr>
+                                                    <tr class="bg-light">
+                                                        <td class="ps-2">8. 목표 이익 (연간)</td>
+                                                        <td v-for="b in expertResult.bepAnalysis" class="text-end">{{ formatNumber(Math.round(b.targetProfit/1000)) }}</td>
+                                                    </tr>
+                                                    <tr class="table-primary border-top border-2">
+                                                        <td class="fw-bold">9. 목표 매출액</td>
+                                                        <td v-for="b in expertResult.bepAnalysis" class="text-end fw-bold text-primary">{{ formatNumber(Math.round(b.targetRev/1000)) }}</td>
+                                                    </tr>
+                                                    <tr class="text-muted" style="font-size: 0.65rem;">
+                                                        <td class="ps-3 fst-italic">10. 목표매출액률</td>
+                                                        <td v-for="b in expertResult.bepAnalysis" class="text-end fw-bold">{{ b.targetRevRate.toFixed(1) }}%</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <div class="text-end mt-1 text-muted" style="font-size: 0.6rem;">(단위: 천원)</div>
+                                        </div>
                                     </div>
 
                                     <!-- Diagnosis Report (New) -->
@@ -2072,6 +2158,7 @@
             </div>
         </div>
     </div> <!-- End showMaterialYearlyModal -->
+    </div> <!-- End .glass-container -->
 </div> <!-- End #app -->
 
 <script>
@@ -2798,12 +2885,60 @@
                     });
                 }
 
+                // 7. Yearly BEP Analysis (Section 11)
+                const bepAnalysis = [];
+                const targetProfitVal = (data.basic?.monTargetPrice || 0) * 12;
+                
+                for (let i = 0; i < 3; i++) {
+                    const rev = sumArrayIdx(data.sale.menuY, 'menuAmt', i);
+                    const materials = sumArrayIdx(data.cost.costY, 'costAmt', i);
+                    
+                    // Variable Costs
+                    const mfgVC = (data.expense?.production || []).reduce((sum, e) => {
+                        return sum + (e.expenseTVaCd === '매출액' ? (e.expenseAmtYear?.[i] || 0) : 0);
+                    }, 0);
+                    const adminVC = (data.expense?.sales || []).reduce((sum, e) => {
+                        return sum + (e.expenseTVaCd === '매출액' ? (e.expenseAmtYear?.[i] || 0) : 0);
+                    }, 0);
+                    const totalVC = materials + mfgVC + adminVC;
+                    
+                    const marginalProfit = rev - totalVC;
+                    const marginalProfitRate = rev > 0 ? (marginalProfit / rev) * 100 : 0;
+                    
+                    // Fixed Costs
+                    const mfgLabor = sumArrayIdx(data.job.production, 'jobAmtYear', i);
+                    const mfgFC = (data.expense?.production || []).reduce((sum, e) => {
+                        return sum + (e.expenseTVaCd !== '매출액' ? (e.expenseAmtYear?.[i] || 0) : 0);
+                    }, 0);
+                    const adminFC = (data.expense?.sales || []).reduce((sum, e) => {
+                        return sum + (e.expenseTVaCd !== '매출액' ? (e.expenseAmtYear?.[i] || 0) : 0);
+                    }, 0);
+                    const interest = sumArrayIdx(data.loan.debt, 'loanRateAmt', i);
+                    const totalFC = mfgLabor + mfgFC + adminFC + interest;
+                    
+                    const bepPoint = marginalProfitRate > 0 ? (totalFC / (marginalProfitRate / 100)) : 0;
+                    const bepRate = rev > 0 ? (bepPoint / rev) * 100 : 0;
+                    
+                    const targetRev = marginalProfitRate > 0 ? ((totalFC + targetProfitVal) / (marginalProfitRate / 100)) : 0;
+                    const targetRevRate = rev > 0 ? (targetRev / rev) * 100 : 0;
+                    
+                    bepAnalysis.push({
+                        rev, materials, mfgVC, adminVC, totalVC,
+                        marginalProfit, marginalProfitRate,
+                        mfgLabor, mfgFC, adminFC, interest, totalFC,
+                        bepPoint, bepRate,
+                        targetProfit: targetProfitVal,
+                        targetRev, targetRevRate
+                    });
+                }
+
+                // Restore monthly Dash values for the main result
                 const FC = Dash_Labor + Dash_Exp + Interest_total;
                 const VC = Dash_COGS;
-                let bepRevenue = 0;
+                let bepRevenueVal = 0;
                 if(S_mon > 0) {
                      const vRatio = VC / S_mon;
-                     if(vRatio < 1) bepRevenue = FC / (1 - vRatio);
+                     if(vRatio < 1) bepRevenueVal = FC / (1 - vRatio);
                 }
 
                 return { 
@@ -2815,13 +2950,14 @@
                     Interest_mon: Interest_total, 
                     OP, 
                     opIncome: OP,
-                    bepRevenue: Math.round(bepRevenue),
+                    bepRevenue: Math.round(bepRevenueVal),
                     TotalInvest, 
                     KPI, 
                     diagnosis, 
                     cogsYearly: cogsResult,
                     yearlyPNL,
-                    totalFixedCost: FC
+                    totalFixedCost: FC,
+                    bepAnalysis // Section 11 data
                 };
             };
 
@@ -2954,7 +3090,8 @@
                     totalFixedCost: FC,
                     bepRevenue,
                     diagnosis: analysis.diagnosis,
-                    yearlyPNL: analysis.yearlyPNL
+                    yearlyPNL: analysis.yearlyPNL,
+                    bepAnalysis: analysis.bepAnalysis
                 };
             });
 
@@ -3458,7 +3595,7 @@
                 mode, userEmail, isSaving, reports, showProjectionModal, showMaterialModal,
                 liteData, expertData,
                 liteResult, expertResult,
-                switchMode,
+                switchMode, updateProjections,
                 addMenu, removeMenu, addMenuExpert,
                 addJob, addInvest, addLoan, addExpense,
                 calcMenuMonthlyRevenue,
