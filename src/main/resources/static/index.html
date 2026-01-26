@@ -774,14 +774,7 @@
                                                          <tbody>
                                                              <tr v-for="(exp, idx) in expertData.expense.production" :key="'expP'+idx">
                                                                  <td class="fw-bold ps-2">{{ exp.expenseTitle }}</td>
-                                                                  <td class="text-center">
-                                                                      <select class="form-select form-select-sm border-0 bg-transparent text-center px-0" v-model="exp.expenseTVaCd" @change="updateProjections">
-                                                                          <option value="월정액">월정액</option>
-                                                                          <option value="매출액">매출액</option>
-                                                                          <option value="인건비">인건비</option>
-                                                                          <option value="기준액">기준액</option>
-                                                                      </select>
-                                                                  </td>
+                                                                  <td class="text-center small text-muted">{{ exp.expenseTVaCd }}</td>
                                                                   <td>
                                                                       <div class="input-group input-group-sm">
                                                                           <template v-if="exp.expenseTVaCd === '월정액'">
@@ -841,14 +834,7 @@
                                                          <tbody>
                                                              <tr v-for="(exp, idx) in expertData.expense.sales" :key="'expS'+idx">
                                                                  <td class="fw-bold ps-2">{{ exp.expenseTitle }}</td>
-                                                                  <td class="text-center">
-                                                                      <select class="form-select form-select-sm border-0 bg-transparent text-center px-0" v-model="exp.expenseTVaCd" @change="updateProjections">
-                                                                          <option value="월정액">월정액</option>
-                                                                          <option value="매출액">매출액</option>
-                                                                          <option value="인건비">인건비</option>
-                                                                          <option value="기준액">기준액</option>
-                                                                      </select>
-                                                                  </td>
+                                                                  <td class="text-center small text-muted">{{ exp.expenseTVaCd }}</td>
                                                                   <td>
                                                                       <div class="input-group input-group-sm">
                                                                           <template v-if="exp.expenseTVaCd === '월정액'">
