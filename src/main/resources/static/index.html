@@ -774,24 +774,29 @@
                                                          <tbody>
                                                              <tr v-for="(exp, idx) in expertData.expense.production" :key="'expP'+idx">
                                                                  <td class="fw-bold ps-2">{{ exp.expenseTitle }}</td>
-                                                                 <td class="text-center small text-muted">
-                                                                     {{ mfgExpMapping.find(m => m.title === exp.expenseTitle)?.baseName || '기타' }}
-                                                                 </td>
-                                                                 <td>
-                                                                     <div class="input-group input-group-sm">
-                                                                         <template v-if="!mfgExpMapping.find(m => m.title === exp.expenseTitle) || mfgExpMapping.find(m => m.title === exp.expenseTitle).baseType === 'fixed'">
-                                                                             <input type="number" class="form-control text-end" v-model.number="exp.expenseTVaAmt" placeholder="금액" @input="updateProjections">
-                                                                             <span class="input-group-text px-1" style="font-size: 0.65rem;">원</span>
-                                                                         </template>
-                                                                         <template v-else>
-                                                                             <input type="number" step="0.1" class="form-control text-end" v-model.number="exp.expenseTVa" placeholder="비율" @input="updateProjections">
-                                                                             <span class="input-group-text px-1" style="font-size: 0.65rem;">%</span>
-                                                                         </template>
-                                                                     </div>
-                                                                     <div v-if="mfgExpMapping.find(m => m.title === exp.expenseTitle) && mfgExpMapping.find(m => m.title === exp.expenseTitle).baseType !== 'fixed'" class="text-end text-muted" style="font-size: 0.6rem; margin-top: 1px;">
-                                                                         기준: {{ formatCurrency(Math.round(exp.expenseTVaAmt/12)) }} /월
-                                                                     </div>
-                                                                 </td>
+                                                                  <td class="text-center">
+                                                                      <select class="form-select form-select-sm border-0 bg-transparent text-center px-0" v-model="exp.expenseTVaCd" @change="updateProjections">
+                                                                          <option value="월정액">월정액</option>
+                                                                          <option value="매출액">매출액</option>
+                                                                          <option value="인건비">인건비</option>
+                                                                          <option value="기준액">기준액</option>
+                                                                      </select>
+                                                                  </td>
+                                                                  <td>
+                                                                      <div class="input-group input-group-sm">
+                                                                          <template v-if="exp.expenseTVaCd === '월정액'">
+                                                                              <input type="number" class="form-control text-end" v-model.number="exp.manualMonthly" placeholder="금액" @input="updateProjections">
+                                                                              <span class="input-group-text px-1" style="font-size: 0.65rem;">원</span>
+                                                                          </template>
+                                                                          <template v-else>
+                                                                              <input type="number" step="0.1" class="form-control text-end" v-model.number="exp.expenseTVa" placeholder="비율" @input="updateProjections">
+                                                                              <span class="input-group-text px-1" style="font-size: 0.65rem;">%</span>
+                                                                          </template>
+                                                                      </div>
+                                                                      <div v-if="exp.expenseTVaCd !== '월정액'" class="text-end text-muted" style="font-size: 0.6rem; margin-top: 1px;">
+                                                                          기준: {{ formatCurrency(Math.round(exp.expenseTVaAmt/12)) }} /월
+                                                                      </div>
+                                                                  </td>
                                                                  <td class="text-end pe-2 fw-bold text-primary">{{ formatCurrency(exp.expenseAmt[0] || 0) }}</td>
                                                                  <td class="text-end pe-2 small">{{ formatCurrency(exp.expenseAmtYear[0] || 0) }}</td>
                                                              </tr>
@@ -836,24 +841,29 @@
                                                          <tbody>
                                                              <tr v-for="(exp, idx) in expertData.expense.sales" :key="'expS'+idx">
                                                                  <td class="fw-bold ps-2">{{ exp.expenseTitle }}</td>
-                                                                 <td class="text-center small text-muted">
-                                                                     {{ salesExpMapping.find(m => m.title === exp.expenseTitle)?.baseName || '기타' }}
-                                                                 </td>
-                                                                 <td>
-                                                                     <div class="input-group input-group-sm">
-                                                                         <template v-if="!salesExpMapping.find(m => m.title === exp.expenseTitle) || salesExpMapping.find(m => m.title === exp.expenseTitle).baseType === 'fixed'">
-                                                                             <input type="number" class="form-control text-end" v-model.number="exp.expenseTVaAmt" placeholder="금액" @input="updateProjections">
-                                                                             <span class="input-group-text px-1" style="font-size: 0.65rem;">원</span>
-                                                                         </template>
-                                                                         <template v-else>
-                                                                             <input type="number" step="0.1" class="form-control text-end" v-model.number="exp.expenseTVa" placeholder="비율" @input="updateProjections">
-                                                                             <span class="input-group-text px-1" style="font-size: 0.65rem;">%</span>
-                                                                         </template>
-                                                                     </div>
-                                                                     <div v-if="salesExpMapping.find(m => m.title === exp.expenseTitle) && salesExpMapping.find(m => m.title === exp.expenseTitle).baseType !== 'fixed'" class="text-end text-muted" style="font-size: 0.6rem; margin-top: 1px;">
-                                                                         기준: {{ formatCurrency(Math.round(exp.expenseTVaAmt/12)) }} /월
-                                                                     </div>
-                                                                 </td>
+                                                                  <td class="text-center">
+                                                                      <select class="form-select form-select-sm border-0 bg-transparent text-center px-0" v-model="exp.expenseTVaCd" @change="updateProjections">
+                                                                          <option value="월정액">월정액</option>
+                                                                          <option value="매출액">매출액</option>
+                                                                          <option value="인건비">인건비</option>
+                                                                          <option value="기준액">기준액</option>
+                                                                      </select>
+                                                                  </td>
+                                                                  <td>
+                                                                      <div class="input-group input-group-sm">
+                                                                          <template v-if="exp.expenseTVaCd === '월정액'">
+                                                                              <input type="number" class="form-control text-end" v-model.number="exp.manualMonthly" placeholder="금액" @input="updateProjections">
+                                                                              <span class="input-group-text px-1" style="font-size: 0.65rem;">원</span>
+                                                                          </template>
+                                                                          <template v-else>
+                                                                              <input type="number" step="0.1" class="form-control text-end" v-model.number="exp.expenseTVa" placeholder="비율" @input="updateProjections">
+                                                                              <span class="input-group-text px-1" style="font-size: 0.65rem;">%</span>
+                                                                          </template>
+                                                                      </div>
+                                                                      <div v-if="exp.expenseTVaCd !== '월정액'" class="text-end text-muted" style="font-size: 0.6rem; margin-top: 1px;">
+                                                                          기준: {{ formatCurrency(Math.round(exp.expenseTVaAmt/12)) }} /월
+                                                                      </div>
+                                                                  </td>
                                                                  <td class="text-end pe-2 fw-bold text-success">{{ formatCurrency(exp.expenseAmt[0] || 0) }}</td>
                                                                  <td class="text-end pe-2 small">{{ formatCurrency(exp.expenseAmtYear[0] || 0) }}</td>
                                                                  <td class="text-center"></td>
@@ -2281,63 +2291,63 @@
             // ================= EXPERT MODE STATE =================
             // Based on User JSON Schema
             const mfgExpMapping = [
-                { title: '전력비', baseType: 'revenue', baseName: '매출액' },
-                { title: '가스수도료', baseType: 'revenue', baseName: '매출액' },
-                { title: '운반비', baseType: 'fixed', baseName: '월정액' },
-                { title: '차량유지비', baseType: 'fixed', baseName: '월정액' },
-                { title: '보관료', baseType: 'fixed', baseName: '월정액' },
-                { title: '포장비', baseType: 'revenue', baseName: '매출액' },
-                { title: '감가상각비', baseType: 'asset', baseName: '기준액' },
-                { title: '수선비', baseType: 'fixed', baseName: '월정액' },
-                { title: '외주가공비', baseType: 'revenue', baseName: '매출액' },
-                { title: '소모품비', baseType: 'revenue', baseName: '매출액' },
-                { title: '세금과공과', baseType: 'fixed', baseName: '월정액' },
-                { title: '지급임차료', baseType: 'fixed', baseName: '월정액' },
-                { title: '보험료', baseType: 'fixed', baseName: '월정액' },
-                { title: '복리후생비', baseType: 'labor', baseName: '인건비' },
-                { title: '교통비', baseType: 'fixed', baseName: '월정액' },
-                { title: '통신비', baseType: 'fixed', baseName: '월정액' },
-                { title: '접대비', baseType: 'fixed', baseName: '월정액' },
-                { title: '경상개발비', baseType: 'fixed', baseName: '월정액' },
-                { title: '도서인쇄비', baseType: 'fixed', baseName: '월정액' },
-                { title: '교육훈련비', baseType: 'fixed', baseName: '월정액' },
-                { title: '지급수수료', baseType: 'fixed', baseName: '월정액' },
-                { title: '시험비', baseType: 'fixed', baseName: '월정액' },
-                { title: '장비임차료', baseType: 'fixed', baseName: '월정액' },
-                { title: '잡비', baseType: 'fixed', baseName: '월정액' }
+                { title: '전력비', baseType: 'revenue', baseName: '매출액', code: '매출액' },
+                { title: '가스수도료', baseType: 'revenue', baseName: '매출액', code: '매출액' },
+                { title: '운반비', baseType: 'fixed', baseName: '월정액', code: '월정액' },
+                { title: '차량유지비', baseType: 'fixed', baseName: '월정액', code: '월정액' },
+                { title: '보관료', baseType: 'fixed', baseName: '월정액', code: '월정액' },
+                { title: '포장비', baseType: 'revenue', baseName: '매출액', code: '매출액' },
+                { title: '감가상각비', baseType: 'asset', baseName: '기준액', code: '기준액' },
+                { title: '수선비', baseType: 'fixed', baseName: '월정액', code: '월정액' },
+                { title: '외주가공비', baseType: 'revenue', baseName: '매출액', code: '매출액' },
+                { title: '소모품비', baseType: 'revenue', baseName: '매출액', code: '매출액' },
+                { title: '세금과공과', baseType: 'fixed', baseName: '월정액', code: '월정액' },
+                { title: '지급임차료', baseType: 'fixed', baseName: '월정액', code: '월정액' },
+                { title: '보험료', baseType: 'fixed', baseName: '월정액', code: '월정액' },
+                { title: '복리후생비', baseType: 'labor', baseName: '인건비', code: '인건비' },
+                { title: '교통비', baseType: 'fixed', baseName: '월정액', code: '월정액' },
+                { title: '통신비', baseType: 'fixed', baseName: '월정액', code: '월정액' },
+                { title: '접대비', baseType: 'fixed', baseName: '월정액', code: '월정액' },
+                { title: '경상개발비', baseType: 'fixed', baseName: '월정액', code: '월정액' },
+                { title: '도서인쇄비', baseType: 'fixed', baseName: '월정액', code: '월정액' },
+                { title: '교육훈련비', baseType: 'fixed', baseName: '월정액', code: '월정액' },
+                { title: '지급수수료', baseType: 'fixed', baseName: '월정액', code: '월정액' },
+                { title: '시험비', baseType: 'fixed', baseName: '월정액', code: '월정액' },
+                { title: '장비임차료', baseType: 'fixed', baseName: '월정액', code: '월정액' },
+                { title: '잡비', baseType: 'fixed', baseName: '월정액', code: '월정액' }
             ];
 
             const salesExpMapping = [
-                { title: '급여', baseType: 'labor', baseName: '인건비', defRate: 100 },
-                { title: '제수당', baseType: 'labor', baseName: '인건비' },
-                { title: '잡급', baseType: 'fixed', baseName: '월정액' },
-                { title: '퇴직급여', baseType: 'labor', baseName: '인건비' },
-                { title: '복리후생비', baseType: 'labor', baseName: '인건비' },
-                { title: '여비교통비', baseType: 'fixed', baseName: '월정액' },
-                { title: '접대비', baseType: 'fixed', baseName: '월정액' },
-                { title: '통신비', baseType: 'fixed', baseName: '월정액' },
-                { title: '수도광열비', baseType: 'revenue', baseName: '매출액' },
-                { title: '세금과공과금', baseType: 'fixed', baseName: '월정액' },
-                { title: '감가상각비', baseType: 'asset', baseName: '기준액' },
-                { title: '지급임차료', baseType: 'fixed', baseName: '월정액' },
-                { title: '수선비', baseType: 'fixed', baseName: '월정액' },
-                { title: '보험료', baseType: 'fixed', baseName: '월정액' },
-                { title: '차량유지비', baseType: 'revenue', baseName: '매출액' },
-                { title: '운반비', baseType: 'revenue', baseName: '매출액' },
-                { title: '교육훈련비', baseType: 'fixed', baseName: '월정액' },
-                { title: '도서인쇄비', baseType: 'fixed', baseName: '월정액' },
-                { title: '포장비', baseType: 'revenue', baseName: '매출액' },
-                { title: '소모품비', baseType: 'revenue', baseName: '매출액' },
-                { title: '지급수수료', baseType: 'revenue', baseName: '매출액' },
-                { title: '전력비', baseType: 'revenue', baseName: '매출액' },
-                { title: '광고선전비', baseType: 'fixed', baseName: '월정액' },
-                { title: '판매촉진비', baseType: 'revenue', baseName: '매출액' },
-                { title: '대손상각비', baseType: 'revenue', baseName: '매출액' },
-                { title: '수출제비용', baseType: 'fixed', baseName: '월정액' },
-                { title: '판매수수료', baseType: 'revenue', baseName: '매출액' },
-                { title: '경상개발비', baseType: 'fixed', baseName: '월정액' },
-                { title: '견본비', baseType: 'fixed', baseName: '월정액' },
-                { title: '잡비', baseType: 'fixed', baseName: '월정액' }
+                { title: '급여', baseType: 'labor', baseName: '인건비', code: '인건비', defRate: 100 },
+                { title: '제수당', baseType: 'labor', baseName: '인건비', code: '인건비' },
+                { title: '잡급', baseType: 'fixed', baseName: '월정액', code: '월정액' },
+                { title: '퇴직급여', baseType: 'labor', baseName: '인건비', code: '인건비' },
+                { title: '복리후생비', baseType: 'labor', baseName: '인건비', code: '인건비' },
+                { title: '여비교통비', baseType: 'fixed', baseName: '월정액', code: '월정액' },
+                { title: '접대비', baseType: 'fixed', baseName: '월정액', code: '월정액' },
+                { title: '통신비', baseType: 'fixed', baseName: '월정액', code: '월정액' },
+                { title: '수도광열비', baseType: 'revenue', baseName: '매출액', code: '매출액' },
+                { title: '세금과공과금', baseType: 'fixed', baseName: '월정액', code: '월정액' },
+                { title: '감가상각비', baseType: 'asset', baseName: '기준액', code: '기준액' },
+                { title: '지급임차료', baseType: 'fixed', baseName: '월정액', code: '월정액' },
+                { title: '수선비', baseType: 'fixed', baseName: '월정액', code: '월정액' },
+                { title: '보험료', baseType: 'fixed', baseName: '월정액', code: '월정액' },
+                { title: '차량유지비', baseType: 'revenue', baseName: '매출액', code: '매출액' },
+                { title: '운반비', baseType: 'revenue', baseName: '매출액', code: '매출액' },
+                { title: '교육훈련비', baseType: 'fixed', baseName: '월정액', code: '월정액' },
+                { title: '도서인쇄비', baseType: 'fixed', baseName: '월정액', code: '월정액' },
+                { title: '포장비', baseType: 'revenue', baseName: '매출액', code: '매출액' },
+                { title: '소모품비', baseType: 'revenue', baseName: '매출액', code: '매출액' },
+                { title: '지급수수료', baseType: 'revenue', baseName: '매출액', code: '매출액' },
+                { title: '전력비', baseType: 'revenue', baseName: '매출액', code: '매출액' },
+                { title: '광고선전비', baseType: 'fixed', baseName: '월정액', code: '월정액' },
+                { title: '판매촉진비', baseType: 'revenue', baseName: '매출액', code: '매출액' },
+                { title: '대손상각비', baseType: 'revenue', baseName: '매출액', code: '매출액' },
+                { title: '수출제비용', baseType: 'fixed', baseName: '월정액', code: '월정액' },
+                { title: '판매수수료', baseType: 'revenue', baseName: '매출액', code: '매출액' },
+                { title: '경상개발비', baseType: 'fixed', baseName: '월정액', code: '월정액' },
+                { title: '견본비', baseType: 'fixed', baseName: '월정액', code: '월정액' },
+                { title: '잡비', baseType: 'fixed', baseName: '월정액', code: '월정액' }
             ];
 
             const expertData = reactive({
@@ -2371,15 +2381,19 @@
                 expense: {
                     production: mfgExpMapping.map(m => ({
                         expenseTitle: m.title,
+                        expenseTVaCd: m.code,
                         expenseTVaAmt: 0,
                         expenseTVa: 0,
+                        manualMonthly: 0,
                         expenseAmt: Array(12).fill(0),
                         expenseAmtYear: [0, 0, 0]
                     })),
                     sales: salesExpMapping.map(m => ({
                         expenseTitle: m.title,
+                        expenseTVaCd: m.code,
                         expenseTVaAmt: 0,
                         expenseTVa: m.defRate || 0,
+                        manualMonthly: 0,
                         expenseAmt: Array(12).fill(0),
                         expenseAmtYear: [0, 0, 0]
                     }))
@@ -2567,25 +2581,28 @@
 
                     expList.forEach(exp => {
                         const m = mappingList.find(map => map.title === exp.expenseTitle);
-                        if(!m) {
-                            const monthly = (exp.expenseTVaAmt || 0);
-                            exp.expenseAmt = Array(12).fill(monthly);
-                            exp.expenseAmtYear = [monthly*12, monthly*12, monthly*12];
-                            return;
+                        // Initialize expenseTVaCd if missing
+                        if(!exp.expenseTVaCd) {
+                            exp.expenseTVaCd = m ? m.code : '월정액';
                         }
 
-                        if(m.baseType === 'revenue') exp.expenseTVaAmt = monthlyRevenue.reduce((a,b)=>a+b, 0); 
-                        else if(m.baseType === 'labor') exp.expenseTVaAmt = monthlyLabor.reduce((a,b)=>a+b, 0); 
-                        else if(m.baseType === 'asset') exp.expenseTVaAmt = deprBase;
+                        // Determine criterion based on expenseTVaCd (String labels)
+                        let critVal = 0;
+                        if(exp.expenseTVaCd === '매출액') critVal = monthlyRevenue.reduce((a,b)=>a+b, 0);
+                        else if(exp.expenseTVaCd === '인건비') critVal = monthlyLabor.reduce((a,b)=>a+b, 0);
+                        else if(exp.expenseTVaCd === '기준액') critVal = deprBase;
+
+                        exp.expenseTVaAmt = critVal;
 
                         const rate = (exp.expenseTVa || 0) / 100;
                         let yearlySum = 0;
                         for(let i=0; i<12; i++) {
                             let amt = 0;
-                            if(m.baseType === 'revenue') amt = Math.round(monthlyRevenue[i] * rate);
-                            else if(m.baseType === 'labor') amt = Math.round(monthlyLabor[i] * rate);
-                            else if(m.baseType === 'asset') amt = Math.round(deprBase * rate);
-                            else amt = Math.round(exp.expenseTVaAmt || 0);
+                            if(exp.expenseTVaCd === '매출액') amt = Math.round(monthlyRevenue[i] * rate);
+                            else if(exp.expenseTVaCd === '인건비') amt = Math.round(monthlyLabor[i] * rate);
+                            else if(exp.expenseTVaCd === '기준액') amt = Math.round(deprBase * rate / 12);
+                            else amt = Math.round(exp.manualMonthly || 0); // Fixed
+
                             exp.expenseAmt[i] = amt;
                             yearlySum += amt;
                         }
@@ -3204,10 +3221,10 @@
                 const cleanData = JSON.parse(JSON.stringify(expertData));
                 // 7-1-4 Filter MFG Expenses with 1st month value > 0
                 if(cleanData.expense && cleanData.expense.production) {
-                    cleanData.expense.production = cleanData.expense.production.filter(exp => (exp.expenseAmt && exp.expenseAmt[0] > 0));
+                    cleanData.expense.production = cleanData.expense.production.filter(exp => (exp.manualMonthly > 0 || exp.expenseTVa > 0));
                 }
                 if(cleanData.expense && cleanData.expense.sales) {
-                    cleanData.expense.sales = cleanData.expense.sales.filter(exp => (exp.expenseAmt && exp.expenseAmt[0] > 0));
+                    cleanData.expense.sales = cleanData.expense.sales.filter(exp => (exp.manualMonthly > 0 || exp.expenseTVa > 0));
                 }
 
                 const payload = {
