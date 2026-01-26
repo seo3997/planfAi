@@ -2567,6 +2567,12 @@
 
                     expList.forEach(exp => {
                         const m = mappingList.find(map => map.title === exp.expenseTitle);
+                        // Legacy migration: Convert numeric codes to labels if needed
+                        if(exp.expenseTVaCd === '1') exp.expenseTVaCd = '월정액';
+                        else if(exp.expenseTVaCd === '2') exp.expenseTVaCd = '매출액';
+                        else if(exp.expenseTVaCd === '3') exp.expenseTVaCd = '인건비';
+                        else if(exp.expenseTVaCd === '4') exp.expenseTVaCd = '기준액';
+
                         // Initialize expenseTVaCd if missing
                         if(!exp.expenseTVaCd) {
                             exp.expenseTVaCd = m ? m.code : '월정액';
@@ -2624,8 +2630,8 @@
                         costRates: expertData.cost.costRate,
                         prodJobs: expertData.job.production.map(j => ({ c: j.jobCnt, q: j.jobQty, r: j.jobAmtRate, cd: j.jobAmtCd })),
                         salesJobs: expertData.job.sales.map(j => ({ c: j.jobCnt, q: j.jobQty, r: j.jobAmtRate, cd: j.jobAmtCd })),
-                        prodExp: expertData.expense.production.map(e => ({ a: e.expenseTVaAmt, v: e.expenseTVa })),
-                        salesExp: expertData.expense.sales.map(e => ({ a: e.expenseTVaAmt, v: e.expenseTVa })),
+                        prodExp: expertData.expense.production.map(e => ({ a: e.expenseTVaAmt, v: e.expenseTVa, m: e.manualMonthly, cd: e.expenseTVaCd })),
+                        salesExp: expertData.expense.sales.map(e => ({ a: e.expenseTVaAmt, v: e.expenseTVa, m: e.manualMonthly, cd: e.expenseTVaCd })),
                         invest: { p: expertData.invest.production, s: expertData.invest.sales },
                         debt: expertData.loan.debt
                     });
