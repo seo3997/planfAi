@@ -124,6 +124,9 @@
                         <div class="card-expert h-100 bg-white">
                             <div class="expert-header bg-white border-bottom-0">
                                 <h5>📊 분석 결과</h5>
+                                <button class="btn btn-premium btn-sm py-1 px-3" @click="saveLiteReport" :disabled="isSaving">
+                                    {{ isSaving ? '저장 중...' : '리포트 저장' }}
+                                </button>
                             </div>
                             <div class="expert-body text-center pt-0">
                                 <div class="py-5">
@@ -273,7 +276,7 @@
             </div>
 
             <!-- EXPERT MODE -->
-            <div v-else key="expert">
+            <div v-if="mode === 'expert'" key="expert">
                 <div class="row g-4">
                     <!-- Left: Input Sections -->
                     <div class="col-lg-7">
@@ -1118,6 +1121,7 @@
                                             </table>
                                             <div class="text-end mt-1 text-muted" style="font-size: 0.6rem;">(단위: 천원)</div>
                                         </div>
+                                    </div>
                                     <!-- Yearly BEP Analysis (Section 11) -->
                                     <div class="card border-0 bg-white shadow-sm p-3 mb-3 mt-3">
                                         <h6 class="fw-bold mb-3 small text-primary">⚖️ 연도별 손익분기점(BEP) 분석</h6>
@@ -1239,7 +1243,6 @@
                     </div>
                 </div>
             </div> <!-- End Expert -->
-
         <!-- Reports List (Common) -->
         <hr class="my-5" style="opacity: 0.1">
         <div class="card-expert">
@@ -1280,9 +1283,7 @@
             </div>
         </div>
 
-    </div>
-
-    <!-- Projection Detail Modal (Advanced Layout) -->
+        <!-- Projection Detail Modal (Advanced Layout) -->
     <div v-if="showProjectionModal" class="modal-backdrop fade show"></div>
     <div v-if="showProjectionModal" class="modal fade show d-block" tabindex="-1">
         <div class="modal-dialog modal-xl modal-dialog-scrollable"> <!-- Changed to XL -->
@@ -2977,53 +2978,58 @@
             };
 
             const getReportValues = (rpt) => {
-                const data = parseReport(rpt);
-                const mode = data.mode || 'lite';
-                
-                // If summary exists (legacy), use it. Otherwise calculate.
-                if (mode === 'expert') {
-                    if (data.summary) {
-                        return {
-                            mode: 'expert',
-                            revenue: data.summary.totalRevenue || 0,
-                            netProfit: data.summary.opIncome || 0,
-                            bep: data.summary.bepRevenue || 0
-                        };
-                    } else {
-                        // Ensure data has required sub-objects for analyze_profitability
-                        if(!data.basic) data.basic = {};
-                        if(!data.sale) data.sale = { menu: [] };
-                        if(!data.cost) data.cost = { costRate: [], costY: [] };
-                        if(!data.job) data.job = { production: [], sales: [] };
-                        if(!data.expense) data.expense = { production: [], sales: [] };
-                        if(!data.loan) data.loan = { debt: [] };
+                try {
+                    const data = parseReport(rpt);
+                    const mode = data.mode || 'lite';
+                    
+                    if (mode === 'expert') {
+                        if (data.summary) {
+                            return {
+                                mode: 'expert',
+                                revenue: data.summary.totalRevenue || 0,
+                                netProfit: data.summary.opIncome || 0,
+                                bep: data.summary.bepRevenue || 0
+                            };
+                        } else {
+                            if(!data.basic) data.basic = {};
+                            if(!data.sale) data.sale = { menu: [], menuY: [] };
+                            if(!data.sale.menuY) data.sale.menuY = [];
+                            if(!data.cost) data.cost = { costRate: [], costY: [] };
+                            if(!data.cost.costY) data.cost.costY = [];
+                            if(!data.job) data.job = { production: [], sales: [] };
+                            if(!data.expense) data.expense = { production: [], sales: [] };
+                            if(!data.loan) data.loan = { debt: [] };
+                            if(!data.cogs) data.cogs = { beginningInv: [0,0,0], endingInv: [0,0,0], currentPeriodCost: [0,0,0], totalCogs: [0,0,0] };
 
-                        // Re-calculate on the fly
-                        const analysis = analyze_profitability(data);
-                        return {
-                            mode: 'expert',
-                            revenue: analysis.totalRevenue || 0,
-                            netProfit: analysis.opIncome || 0,
-                            bep: analysis.bepRevenue || 0
-                        };
+                            const analysis = analyze_profitability(data);
+                            return {
+                                mode: 'expert',
+                                revenue: analysis.totalRevenue || 0,
+                                netProfit: analysis.opIncome || 0,
+                                bep: analysis.bepRevenue || 0
+                            };
+                        }
                     }
+                    
+                    // Lite Mode Calculation
+                    const b = data.basic || {};
+                    let revenue = 0;
+                    if(data.sale && Array.isArray(data.sale.menu)) {
+                        data.sale.menu.forEach(m => {
+                            revenue += (Number(m.menuPrice) || 0) * (Number(m.menuQty) || 0) * (Number(b.workDay) || 25);
+                        });
+                    }
+                    const cost = data.liteCost?.totalMonthlyCost || 0;
+                    return {
+                        mode: 'lite',
+                        revenue: revenue,
+                        netProfit: revenue - cost,
+                        bep: 0
+                    };
+                } catch(e) {
+                    console.error("Error in getReportValues:", e);
+                    return { mode: 'error', revenue: 0, netProfit: 0, bep: 0 };
                 }
-                
-                // Lite Mode Calculation
-                const b = data.basic || {};
-                let revenue = 0;
-                if(data.sale && data.sale.menu) {
-                    data.sale.menu.forEach(m => {
-                        revenue += (m.menuPrice || 0) * (m.menuQty || 0) * (b.workDay || 25);
-                    });
-                }
-                const cost = data.liteCost?.totalMonthlyCost || 0;
-                return {
-                    mode: 'lite',
-                    revenue: revenue,
-                    netProfit: revenue - cost,
-                    bep: 0
-                };
             };
 
             // ================= LITE LOGIC =================
@@ -3385,6 +3391,34 @@
                 } catch(e) { console.error(e); }
             };
 
+            const saveLiteReport = async () => {
+                isSaving.value = true;
+                const result = liteResult.value;
+                const payload = {
+                    mode: 'lite',
+                    id: currentReportId.value,
+                    basic: liteData.basic,
+                    sale: liteData.sale,
+                    cost: liteData.cost, // expert-style placeholder
+                    liteCost: liteData.liteCost,
+                    reportData: JSON.stringify({
+                        mode: 'lite',
+                        basic: liteData.basic,
+                        sale: liteData.sale,
+                        liteCost: liteData.liteCost
+                    })
+                };
+                try {
+                    const res = await axios.post(`/api/report/`+userEmail.value, payload);
+                    alert("저장되었습니다.");
+                    currentReportId.value = res.data.id;
+                    await loadReports();
+                } catch(e) { 
+                    console.error(e); 
+                    alert("저장 중 오류가 발생했습니다.");
+                } finally { isSaving.value = false; }
+            };
+
             const saveExpertReport = async () => {
                 isSaving.value = true;
                 const result = expertResult.value;
@@ -3416,7 +3450,7 @@
                 try {
                      await axios.post('/api/report', { userId: userEmail.value, content: payload, id: currentReportId.value });
                      alert('저장되었습니다!');
-                     loadReports();
+                     await loadReports();
                 } catch(e) {
                     alert('저장 실패: ' + e.message);
                 } finally {
@@ -3599,7 +3633,7 @@
                 addMenu, removeMenu, addMenuExpert,
                 addJob, addInvest, addLoan, addExpense,
                 calcMenuMonthlyRevenue,
-                formatCurrency, formatCurrencyCheon, formatDate, parseReport, getReportValues, loadReports, saveExpertReport, loadReportToCanvas, deleteReport, formatNumber, sumArrayIdx,
+                formatCurrency, formatCurrencyCheon, formatDate, parseReport, getReportValues, loadReports, saveLiteReport, saveExpertReport, loadReportToCanvas, deleteReport, formatNumber, sumArrayIdx,
                 showYearlyModal, currentMenu, currentYearly,
                 openYearlyModal, closeYearlyModal, saveYearlyModal, calcYearly, calcYearlyDirect, onYMenuCdChange,
                 showMaterialYearlyModal, currentMaterialYearly, openMaterialYearlyModal, closeMaterialYearlyModal, saveMaterialYearly, calcMaterialYearly,
