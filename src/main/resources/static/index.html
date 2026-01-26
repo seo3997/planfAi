@@ -2961,15 +2961,54 @@
                 const equityStd = 50;
 
                 // 12-1-8 BEP Ratio
-                // Using dashboard bepRevenueVal calculated later or we calculate here
-                let bepRevenueVal = 0;
-                const FC_mon = Dash_Labor + Dash_Exp + Interest_total;
-                const VC_mon = Dash_COGS;
-                if(S_mon > 0) {
-                     const vRatio = VC_mon / S_mon;
-                     if(vRatio < 1) bepRevenueVal = FC_mon / (1 - vRatio);
+                // 7. Yearly BEP Analysis (Section 11) - Calculated first for Diagnosis
+                const bepAnalysis = [];
+                const targetProfitVal = (data.basic?.monTargetPrice || 0) * 12;
+                
+                for (let i = 0; i < 3; i++) {
+                    const rev = sumArrayIdx(data.sale.menuY, 'menuAmt', i);
+                    const materials = sumArrayIdx(data.cost.costY, 'costAmt', i);
+                    
+                    // Variable Costs
+                    const mfgVC = (data.expense?.production || []).reduce((sum, e) => {
+                        return sum + (e.expenseTVaCd === '매출액' ? (e.expenseAmtYear?.[i] || 0) : 0);
+                    }, 0);
+                    const adminVC = (data.expense?.sales || []).reduce((sum, e) => {
+                        return sum + (e.expenseTVaCd === '매출액' ? (e.expenseAmtYear?.[i] || 0) : 0);
+                    }, 0);
+                    const totalVC = materials + mfgVC + adminVC;
+                    
+                    const marginalProfit = rev - totalVC;
+                    const marginalProfitRate = rev > 0 ? (marginalProfit / rev) * 100 : 0;
+                    
+                    // Fixed Costs
+                    const mfgLabor = sumArrayIdx(data.job.production, 'jobAmtYear', i);
+                    const mfgFC = (data.expense?.production || []).reduce((sum, e) => {
+                        return sum + (e.expenseTVaCd !== '매출액' ? (e.expenseAmtYear?.[i] || 0) : 0);
+                    }, 0);
+                    const adminFC = (data.expense?.sales || []).reduce((sum, e) => {
+                        return sum + (e.expenseTVaCd !== '매출액' ? (e.expenseAmtYear?.[i] || 0) : 0);
+                    }, 0);
+                    const interest = sumArrayIdx(data.loan.debt, 'loanRateAmt', i);
+                    const totalFC = mfgLabor + mfgFC + adminFC + interest;
+                    
+                    const bepPoint = marginalProfitRate > 0 ? (totalFC / (marginalProfitRate / 100)) : 0;
+                    const bepRate = rev > 0 ? (bepPoint / rev) * 100 : 0;
+                    
+                    const targetRev = marginalProfitRate > 0 ? ((totalFC + targetProfitVal) / (marginalProfitRate / 100)) : 0;
+                    const targetRevRate = rev > 0 ? (targetRev / rev) * 100 : 0;
+                    
+                    bepAnalysis.push({
+                        rev, materials, mfgVC, adminVC, totalVC,
+                        marginalProfit, marginalProfitRate,
+                        mfgLabor, mfgFC, adminFC, interest, totalFC,
+                        bepPoint, bepRate,
+                        targetProfit: targetProfitVal,
+                        targetRev, targetRevRate
+                    });
                 }
-                const bepRatioVal = safeDiv(bepRevenueVal, S_mon) * 100;
+
+                const bepRatioVal = bepAnalysis[0]?.bepRate || 0;
                 const bepBenchmarks = { '1': 66, '2': 66, '3': 73.6, '4': 66, '5': 80 };
                 const bepStd = bepBenchmarks[industryCd] || 73.6;
 
@@ -3025,59 +3064,12 @@
                     },
                     { 
                         id: 'bepRatio', label: '손익분기점 비율', 
-                        value: S_mon > 0 ? bepRatioVal.toFixed(1) + '%' : '입력 필요', 
-                        pass: S_mon > 0 && bepRatioVal <= bepStd, 
-                        msg: S_mon > 0 ? `기준 ${bepStd}% 이하` : '매출액 입력 필요',
-                        tooltip: `계산: BEP매출(${formatCurrency(Math.round(bepRevenueVal))}) ÷ 월매출(${formatCurrency(S_mon)})`
+                        value: S_year > 0 ? bepRatioVal.toFixed(1) + '%' : '입력 필요', 
+                        pass: S_year > 0 && bepRatioVal <= bepStd, 
+                        msg: S_year > 0 ? `기준 ${bepStd}% 이하` : '매출액 입력 필요',
+                        tooltip: `계산: 연간BEP(${formatCurrency(Math.round(bepAnalysis[0]?.bepPoint || 0))}) ÷ 연매출(${formatCurrency(S_year)})`
                     }
                 ];
-
-                // 7. Yearly BEP Analysis (Section 11)
-                const bepAnalysis = [];
-                const targetProfitVal = (data.basic?.monTargetPrice || 0) * 12;
-                
-                for (let i = 0; i < 3; i++) {
-                    const rev = sumArrayIdx(data.sale.menuY, 'menuAmt', i);
-                    const materials = sumArrayIdx(data.cost.costY, 'costAmt', i);
-                    
-                    // Variable Costs
-                    const mfgVC = (data.expense?.production || []).reduce((sum, e) => {
-                        return sum + (e.expenseTVaCd === '매출액' ? (e.expenseAmtYear?.[i] || 0) : 0);
-                    }, 0);
-                    const adminVC = (data.expense?.sales || []).reduce((sum, e) => {
-                        return sum + (e.expenseTVaCd === '매출액' ? (e.expenseAmtYear?.[i] || 0) : 0);
-                    }, 0);
-                    const totalVC = materials + mfgVC + adminVC;
-                    
-                    const marginalProfit = rev - totalVC;
-                    const marginalProfitRate = rev > 0 ? (marginalProfit / rev) * 100 : 0;
-                    
-                    // Fixed Costs
-                    const mfgLabor = sumArrayIdx(data.job.production, 'jobAmtYear', i);
-                    const mfgFC = (data.expense?.production || []).reduce((sum, e) => {
-                        return sum + (e.expenseTVaCd !== '매출액' ? (e.expenseAmtYear?.[i] || 0) : 0);
-                    }, 0);
-                    const adminFC = (data.expense?.sales || []).reduce((sum, e) => {
-                        return sum + (e.expenseTVaCd !== '매출액' ? (e.expenseAmtYear?.[i] || 0) : 0);
-                    }, 0);
-                    const interest = sumArrayIdx(data.loan.debt, 'loanRateAmt', i);
-                    const totalFC = mfgLabor + mfgFC + adminFC + interest;
-                    
-                    const bepPoint = marginalProfitRate > 0 ? (totalFC / (marginalProfitRate / 100)) : 0;
-                    const bepRate = rev > 0 ? (bepPoint / rev) * 100 : 0;
-                    
-                    const targetRev = marginalProfitRate > 0 ? ((totalFC + targetProfitVal) / (marginalProfitRate / 100)) : 0;
-                    const targetRevRate = rev > 0 ? (targetRev / rev) * 100 : 0;
-                    
-                    bepAnalysis.push({
-                        rev, materials, mfgVC, adminVC, totalVC,
-                        marginalProfit, marginalProfitRate,
-                        mfgLabor, mfgFC, adminFC, interest, totalFC,
-                        bepPoint, bepRate,
-                        targetProfit: targetProfitVal,
-                        targetRev, targetRevRate
-                    });
-                }
 
                 return { 
                     S_mon, 
@@ -3088,12 +3080,12 @@
                     Interest_mon: Interest_total, 
                     OP, 
                     opIncome: OP,
-                    bepRevenue: Math.round(bepRevenueVal),
+                    bepRevenue: Math.round((bepAnalysis[0]?.bepPoint || 0) / 12),
                     TotalInvestment, 
                     diagnosis, 
                     cogsYearly: cogsResult,
                     yearlyPNL,
-                    totalFixedCost: FC_mon,
+                    totalFixedCost: Math.round((bepAnalysis[0]?.totalFC || 0) / 12),
                     bepAnalysis // Section 11 data
                 };
             };
