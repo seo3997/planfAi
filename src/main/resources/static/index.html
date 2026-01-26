@@ -929,19 +929,29 @@
                                                          </td>
                                                      </tr>
                                                  </tbody>
-                                                 <!-- Non-Manufacturing COGS Statement -->
-                                                 <tbody v-else>
-                                                     <tr>
-                                                         <td class="ps-3">당기 상품매입액 (재료비)</td>
-                                                         <td v-for="i in [0,1,2]" class="text-end pe-3 fw-bold">{{ formatCurrency(sumArrayIdx(expertData.cost.costY, 'costAmt', i)) }}</td>
-                                                     </tr>
-                                                     <tr class="table-primary fw-bold">
-                                                         <td class="ps-3 text-uppercase">당기매출원가 (=)</td>
-                                                         <td v-for="i in [0,1,2]" class="text-end pe-3 fs-6">
-                                                             {{ formatCurrency(sumArrayIdx(expertData.cost.costY, 'costAmt', i)) }}
-                                                         </td>
-                                                     </tr>
-                                                 </tbody>
+                                                  <!-- Non-Manufacturing COGS Statement -->
+                                                  <tbody v-else>
+                                                      <tr>
+                                                          <td class="ps-3">기초재고액 (+)</td>
+                                                          <td v-for="i in [0,1,2]"><input type="number" class="form-control form-control-sm text-end" v-model.number="expertData.cogs.beginningInv[i]"></td>
+                                                      </tr>
+                                                      <tr class="bg-light-subtle">
+                                                          <td class="ps-3">당기 상품매입액 (+)</td>
+                                                          <td v-for="i in [0,1,2]" class="text-end pe-3 fw-bold">
+                                                              {{ formatCurrency(expertResult.cogsYearly[i].currentPeriodCost) }}
+                                                          </td>
+                                                      </tr>
+                                                      <tr>
+                                                          <td class="ps-3">기말재고액 (-)</td>
+                                                          <td v-for="i in [0,1,2]"><input type="number" class="form-control form-control-sm text-end" v-model.number="expertData.cogs.endingInv[i]"></td>
+                                                      </tr>
+                                                      <tr class="table-primary fw-bold">
+                                                          <td class="ps-3 text-uppercase">당기매출원가 (=)</td>
+                                                          <td v-for="i in [0,1,2]" class="text-end pe-3 fs-6">
+                                                              {{ formatCurrency(expertResult.cogsYearly[i].totalCogs) }}
+                                                          </td>
+                                                      </tr>
+                                                  </tbody>
                                              </table>
                                          </div>
                                          <div class="mt-3 p-2 bg-white rounded border border-warning-subtle">
@@ -1054,6 +1064,66 @@
                                         </div>
                                     </div>
                                     
+                                    <!-- Yearly P&L Statement (Step 10) -->
+                                    <div class="card border-0 bg-white shadow-sm p-3 mb-3">
+                                        <h6 class="fw-bold mb-3 small text-primary">💰 연도별 손익분기 분석 (추정)</h6>
+                                        <div class="table-responsive">
+                                            <table class="table table-sm small align-middle mb-0" style="font-size: 0.75rem;">
+                                                <thead class="table-light text-center">
+                                                    <tr>
+                                                        <th class="py-2">구분</th>
+                                                        <th>1차년도</th>
+                                                        <th>2차년도</th>
+                                                        <th>3차년도</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="fw-bold">매출액</td>
+                                                        <td v-for="p in expertResult.yearlyPNL" class="text-end">{{ formatNumber(Math.round(p.rev/1000)) }}</td>
+                                                    </tr>
+                                                    <tr class="text-muted">
+                                                        <td>(-) 매출원가</td>
+                                                        <td v-for="p in expertResult.yearlyPNL" class="text-end text-danger">{{ formatNumber(Math.round(p.cogs/1000)) }}</td>
+                                                    </tr>
+                                                    <tr class="bg-light-subtle">
+                                                        <td class="fw-bold">(=) 매출총이익</td>
+                                                        <td v-for="p in expertResult.yearlyPNL" class="text-end fw-bold">{{ formatNumber(Math.round(p.gp/1000)) }}</td>
+                                                    </tr>
+                                                    <tr class="text-muted border-bottom" style="font-size: 0.65rem;">
+                                                        <td class="ps-3 fst-italic">매출총이익률</td>
+                                                        <td v-for="p in expertResult.yearlyPNL" class="text-end">{{ p.gpRate.toFixed(1) }}%</td>
+                                                    </tr>
+                                                    <tr class="text-muted">
+                                                        <td>(-) 판매관리비</td>
+                                                        <td v-for="p in expertResult.yearlyPNL" class="text-end text-danger">{{ formatNumber(Math.round(p.sga/1000)) }}</td>
+                                                    </tr>
+                                                    <tr class="table-info">
+                                                        <td class="fw-bold">(=) 영업이익</td>
+                                                        <td v-for="p in expertResult.yearlyPNL" class="text-end fw-bold text-primary">{{ formatNumber(Math.round(p.op/1000)) }}</td>
+                                                    </tr>
+                                                    <tr class="text-muted border-bottom" style="font-size: 0.65rem;">
+                                                        <td class="ps-3 fst-italic">매출영업이익률</td>
+                                                        <td v-for="p in expertResult.yearlyPNL" class="text-end">{{ p.opRate.toFixed(1) }}%</td>
+                                                    </tr>
+                                                    <tr class="text-muted">
+                                                        <td>(-) 영업외비용(이자)</td>
+                                                        <td v-for="p in expertResult.yearlyPNL" class="text-end text-danger">{{ formatNumber(Math.round(p.nonOp/1000)) }}</td>
+                                                    </tr>
+                                                    <tr class="table-primary fw-bold">
+                                                        <td>(=) 경상이익</td>
+                                                        <td v-for="p in expertResult.yearlyPNL" class="text-end">{{ formatNumber(Math.round(p.ord/1000)) }}</td>
+                                                    </tr>
+                                                    <tr class="text-muted" style="font-size: 0.65rem;">
+                                                        <td class="ps-3 fst-italic">매출액경상이익률</td>
+                                                        <td v-for="p in expertResult.yearlyPNL" class="text-end">{{ p.ordRate.toFixed(1) }}%</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <div class="text-end mt-1 text-muted" style="font-size: 0.6rem;">(단위: 천원)</div>
+                                        </div>
+                                    </div>
+
                                     <!-- Diagnosis Report (New) -->
                                     <div class="card border-0 bg-light p-3 mb-3">
                                         <h6 class="fw-bold mb-3 small text-primary">📊 경영 진단 리포트</h6>
@@ -1671,6 +1741,10 @@
                     <button type="button" class="btn-close" @click="showExpenseDetailModal = false"></button>
                 </div>
                 <div class="modal-body bg-light">
+                    <div class="alert alert-info py-2 small mb-3">
+                        <i class="bi bi-info-circle-fill me-1"></i>
+                        제조업의 경우, <strong>제조경비</strong>는 매출원가(COGS)에 포함되어 계산됩니다.
+                    </div>
                     <!-- Manufacturing Expenses (Only if industryCd is 1) -->
                     <div v-if="expertData.basic.industryCd === '1'" class="mb-5">
                         <div class="d-flex align-items-center mb-3">
@@ -2396,8 +2470,19 @@
                         };
                     }
                     const yCostItem = expertData.cost.costY[idx];
-                    if(!yCostItem.costRate) yCostItem.costRate = [rate, rate, rate];
-                    if(!yCostItem.costAmt) yCostItem.costAmt = [0,0,0];
+                    
+                    // Synchronize Year 1 rate to the current monthly rate
+                    yCostItem.costRate[0] = rate;
+                    
+                    // Year 2 & 3: Initially set to match Year 1 unless a manual increase rate is provided
+                    const growRate = (yCostItem.costAmtRate || 0) / 100;
+                    if (growRate === 0) {
+                        yCostItem.costRate[1] = rate;
+                        yCostItem.costRate[2] = rate;
+                    } else {
+                        yCostItem.costRate[1] = parseFloat((yCostItem.costRate[0] * (1 + growRate)).toFixed(2));
+                        yCostItem.costRate[2] = parseFloat((yCostItem.costRate[1] * (1 + growRate)).toFixed(2));
+                    }
                     
                     if(yItem.menuAmt) {
                         yCostItem.costAmt = yItem.menuAmt.map((amt, k) => Math.round(amt * (yCostItem.costRate[k] || 0)/100));
@@ -2426,6 +2511,33 @@
                 };
                 processJob(expertData.job.production);
                 processJob(expertData.job.sales);
+
+                // 4. Investment Projections (New Sync)
+                const processInvestments = (section) => {
+                    if(!section) return;
+                    Object.keys(section).forEach(key => {
+                        const list = section[key] || [];
+                        const catNum = parseInt(key.slice(-1)); // 1, 2, 3, 4
+                        list.forEach(inv => {
+                            // Enforce Non-Depreciable Rules
+                            const isLand = (catNum === 1 && inv.investTitleCd === '10');
+                            const isPremium = (catNum === 2 && inv.investTitleCd === '10');
+                            const isCat34 = (catNum >= 3);
+
+                            if (isLand || isPremium || isCat34) {
+                                inv.investYn = 'N';
+                                inv.investYear = 0;
+                                inv.investYearAmt = 0;
+                            } else if (inv.investYn === 'Y' && inv.investYear > 0) {
+                                inv.investYearAmt = Math.round(inv.investPrice / (inv.investYear * 12));
+                            } else {
+                                inv.investYearAmt = 0;
+                            }
+                        });
+                    });
+                };
+                processInvestments(expertData.invest.production);
+                processInvestments(expertData.invest.sales);
 
                 const processExp = (expList, targetType='production') => {
                     const isProd = targetType === 'production';
@@ -2472,7 +2584,7 @@
                             let amt = 0;
                             if(m.baseType === 'revenue') amt = Math.round(monthlyRevenue[i] * rate);
                             else if(m.baseType === 'labor') amt = Math.round(monthlyLabor[i] * rate);
-                            else if(m.baseType === 'asset') amt = Math.round((deprBase / 12) * rate);
+                            else if(m.baseType === 'asset') amt = Math.round(deprBase * rate);
                             else amt = Math.round(exp.expenseTVaAmt || 0);
                             exp.expenseAmt[i] = amt;
                             yearlySum += amt;
@@ -2482,32 +2594,6 @@
                 };
                 processExp(expertData.expense.production, 'production');
                 processExp(expertData.expense.sales, 'sales');
-                // 4. Investment Projections (New Sync)
-                const processInvestments = (section) => {
-                    if(!section) return;
-                    Object.keys(section).forEach(key => {
-                        const list = section[key] || [];
-                        const catNum = parseInt(key.slice(-1)); // 1, 2, 3, 4
-                        list.forEach(inv => {
-                            // Enforce Non-Depreciable Rules
-                            const isLand = (catNum === 1 && inv.investTitleCd === '10');
-                            const isPremium = (catNum === 2 && inv.investTitleCd === '10');
-                            const isCat34 = (catNum >= 3);
-
-                            if (isLand || isPremium || isCat34) {
-                                inv.investYn = 'N';
-                                inv.investYear = 0;
-                                inv.investYearAmt = 0;
-                            } else if (inv.investYn === 'Y' && inv.investYear > 0) {
-                                inv.investYearAmt = Math.round(inv.investPrice / (inv.investYear * 12));
-                            } else {
-                                inv.investYearAmt = 0;
-                            }
-                        });
-                    });
-                };
-                processInvestments(expertData.invest.production);
-                processInvestments(expertData.invest.sales);
 
                 // 5. Loan/Debt Interest
                 (expertData.loan.debt || []).forEach(d => {
@@ -2554,8 +2640,9 @@
                 const workDay = data.basic.workDay || 25;
                 const industryCd = data.basic.industryCd || '3';
 
+                // 1. Sales Calculation (Monthly)
                 let S_mon = 0;
-                let MC_mon = 0;
+                let MC_mon = 0; // Material Cost (Rate-based)
                 data.sale.menu.forEach((m, i) => {
                     const price = m.menuPrice || 0;
                     const qty = m.menuQty || 0;
@@ -2565,63 +2652,105 @@
                     MC_mon += itemSales * (rate / 100);
                 });
 
-                let Dep_total = 0;
-                let TotalInvest = 0;
-                const processInvest = (sec) => {
-                    if(!sec) return;
-                    Object.values(sec).forEach(list => {
-                        list.forEach(inv => {
-                            TotalInvest += (inv.investPrice || 0);
-                            if(inv.investYn === 'Y' && (inv.investYear || 0) > 0) {
-                                Dep_total += (inv.investPrice || 0) / (inv.investYear * 12);
-                            }
-                        });
-                    });
-                };
-                processInvest(data.invest.production);
-                processInvest(data.invest.sales);
-
-                let Labor_total = 0;
+                // 2. Headcount & Salaries (Monthly)
                 let Headcount = 0;
+                const sumJobMonthly = (list) => {
+                    let sum = 0;
+                    list.forEach(j => {
+                        sum += (j.jobAmtYear && j.jobAmtYear[0] ? j.jobAmtYear[0] : 0) / 12;
+                        Headcount += Number(j.jobCnt || 0);
+                    });
+                    return sum;
+                };
+
+                const prodLaborSalaries = sumJobMonthly(data.job.production);
+                const salesLaborSalaries = sumJobMonthly(data.job.sales);
+
+                // 3. Expenses Categorization (Monthly)
                 let Other_Exp_total = 0;
                 let Rent_cost = 0;
+                let mfgLaborExp = 0; let mfgOtherExp = 0;
+                let salesLaborExp = 0; let salesOtherExp = 0;
 
-                const processList = (list, mapping) => {
+                const processExpList = (list, mapping) => {
+                    let lExp = 0; let oExp = 0;
                     list.forEach(item => {
                         const amt = (item.expenseAmt && item.expenseAmt[0] ? item.expenseAmt[0] : 0);
                         const map = mapping.find(m => m.title === item.expenseTitle);
                         if (map && map.baseType === 'labor') {
-                            Labor_total += amt;
+                            lExp += amt;
                         } else {
-                            Other_Exp_total += amt;
+                            oExp += amt;
                             if (item.expenseTitle && item.expenseTitle.includes('임차료')) Rent_cost += amt;
                         }
                     });
+                    return { lExp, oExp };
                 };
 
-                processList(data.expense.production, mfgExpMapping);
-                processList(data.expense.sales, salesExpMapping);
+                const mfgExpRes = processExpList(data.expense.production, mfgExpMapping);
+                const salesExpRes = processExpList(data.expense.sales, salesExpMapping);
 
-                // For Headcount, we still look at the job table
-                data.job.production.forEach(j => { Headcount += Number(j.jobCnt || 0); });
-                data.job.sales.forEach(j => { Headcount += Number(j.jobCnt || 0); });
+                const Interest_total = (data.loan.debt.length > 0) ? sumArrayIdx(data.loan.debt, 'loanRateAmt', 0) / 12 : 0;
 
-                let Interest_total = 0;
-                data.loan.debt.forEach(l => { 
-                    const principal = (Array.isArray(l.loanYear) && l.loanYear[0]) || 0;
-                    const rate = (Array.isArray(l.loanRate) && l.loanRate[0]) || 0;
-                    Interest_total += principal * (rate/100) / 12; 
-                });
+                // 4. Yearly COGS Calculation (3 Years)
+                const cogsResult = [];
+                for (let i = 0; i < 3; i++) {
+                    const mMaterials = sumArrayIdx(data.cost.costY, 'costAmt', i);
+                    let currentCost = 0;
+                    let totalCogsVal = 0;
 
-                // Total Expense for OP calculation (Labor + Others + Interest + MC)
-                const TotalCost = MC_mon + Labor_total + Other_Exp_total + Interest_total;
-                const OP = S_mon - TotalCost;
+                    if (industryCd === '1') {
+                        // mMaterials + All Mfg Expenses (which includes Mfg Labor via mapping)
+                        const mExpTotal = sumArrayIdx(data.expense.production, 'expenseAmtYear', i);
+                        currentCost = mMaterials + mExpTotal;
+                    } else {
+                        currentCost = mMaterials;
+                    }
+
+                    totalCogsVal = (data.cogs?.beginningInv?.[i] || 0) + currentCost - (data.cogs?.endingInv?.[i] || 0);
+
+                    // Sync back to state
+                    if (data.cogs) {
+                        data.cogs.currentPeriodCost[i] = currentCost;
+                        data.cogs.totalCogs[i] = totalCogsVal;
+                    }
+                    cogsResult.push({ currentPeriodCost: currentCost, totalCogs: totalCogsVal });
+                }
+
+                // 5. Final Dashboard Values (Monthly)
+                let Dash_COGS = cogsResult[0].totalCogs / 12;
+                let Dash_Labor = 0;
+                let Dash_Exp = 0;
+
+                if (industryCd === '1') {
+                    // Dash_Labor = Only SG&A Labor (from Sales Expense list)
+                    Dash_Labor = salesExpRes.lExp; 
+                    Dash_Exp = salesExpRes.oExp;
+                } else {
+                    // Total approach for non-mfg: Labor is sum of all labor-type expenses
+                    Dash_Labor = mfgExpRes.lExp + salesExpRes.lExp;
+                    Dash_Exp = mfgExpRes.oExp + salesExpRes.oExp;
+                }
+
+                // Operating Profit = Revenue - COGS - SG&A (Exp + Labor)
+                const OP = S_mon - Dash_COGS - Dash_Labor - Dash_Exp;
+
+                const sumInvest = (sec) => {
+                    let total = 0;
+                    if(!sec) return 0;
+                    Object.values(sec).forEach(list => {
+                        if(Array.isArray(list)) list.forEach(inv => { total += (inv.investPrice || 0); });
+                    });
+                    return total;
+                };
+                const TotalInvest = sumInvest(data.invest.production) + sumInvest(data.invest.sales);
+
                 const safeDiv = (n, d) => d > 0 ? (n/d) : 0;
                 const KPI = {
                     KPI_Turnover: safeDiv(S_mon * 12, TotalInvest),
                     KPI_OPMargin: safeDiv(OP, S_mon) * 100,
-                    KPI_ROA: safeDiv(OP * 12, TotalInvest) * 100,
-                    KPI_LaborRatio: safeDiv(Labor_total, S_mon) * 100,
+                    KPI_ROA: safeDiv(OP * 12, TotalInvest || 1) * 100,
+                    KPI_LaborRatio: safeDiv(prodLaborSalaries + salesLaborSalaries + mfgExpRes.lExp + salesExpRes.lExp, S_mon) * 100,
                     KPI_SalesPerPerson: safeDiv(S_mon, Headcount),
                     KPI_RentRatio: safeDiv(Rent_cost, S_mon) * 100
                 };
@@ -2642,36 +2771,48 @@
                     { id: 'salesPer', label: '1인매출', value: Math.round(KPI.KPI_SalesPerPerson / 10000) + '만', pass: KPI.KPI_SalesPerPerson >= std.salesPer, msg: '생산성 우수' },
                     { id: 'rent', label: '임차료율', value: KPI.KPI_RentRatio.toFixed(1) + '%', pass: KPI.KPI_RentRatio <= std.rent, msg: `기준 ${std.rent}%` }
                 ];
-                // Calculate Yearly COGS (Step 7)
-                const cogsResult = [];
+
+                // 6. Yearly P&L Calculation (Step 10)
+                const yearlyPNL = [];
                 for (let i = 0; i < 3; i++) {
-                    const mMaterials = sumArrayIdx(data.cost.costY, 'costAmt', i);
-                    let currentCost = 0;
-                    let totalCogsVal = 0;
-
+                    const rev = sumArrayIdx(data.sale.menuY, 'menuAmt', i);
+                    const cogs = cogsResult[i].totalCogs;
+                    const gp = rev - cogs;
+                    
+                    let sga = 0;
                     if (industryCd === '1') {
-                        const mLabor = sumArrayIdx(data.job.production, 'jobAmtYear', i);
-                        const mExpense = sumArrayIdx(data.expense.production, 'expenseAmtYear', i);
-                        currentCost = mMaterials + mLabor + mExpense;
-                        totalCogsVal = (data.cogs?.beginningInv?.[i] || 0) + currentCost - (data.cogs?.endingInv?.[i] || 0);
+                        // Manufacturing SGA = Sales Expenses (incl. labor)
+                        sga = sumArrayIdx(data.expense.sales, 'expenseAmtYear', i);
                     } else {
-                        currentCost = mMaterials; 
-                        totalCogsVal = currentCost;
+                        // Non-Manufacturing SGA = All Expenses
+                        sga = sumArrayIdx(data.expense.production, 'expenseAmtYear', i) + sumArrayIdx(data.expense.sales, 'expenseAmtYear', i);
                     }
-
-                    // Sync back to state for saving as JSON
-                    if (data.cogs) {
-                        data.cogs.currentPeriodCost[i] = currentCost;
-                        data.cogs.totalCogs[i] = totalCogsVal;
-                    }
-
-                    cogsResult.push({
-                        currentPeriodCost: currentCost,
-                        totalCogs: totalCogsVal
+                    
+                    const op = gp - sga;
+                    const nonOp = sumArrayIdx(data.loan.debt, 'loanRateAmt', i);
+                    const ord = op - nonOp;
+                    
+                    yearlyPNL.push({
+                        rev, cogs, gp, sga, op, nonOp, ord,
+                        gpRate: safeDiv(gp, rev) * 100,
+                        opRate: safeDiv(op, rev) * 100,
+                        ordRate: safeDiv(ord, rev) * 100
                     });
                 }
 
-                return { S_mon, MC_mon, Labor_total, Other_Exp_total, Interest_total, OP, TotalInvest, KPI, diagnosis, cogsYearly: cogsResult };
+                return { 
+                    S_mon, 
+                    Dash_COGS, 
+                    Dash_Labor, 
+                    Dash_Exp, 
+                    Interest_mon: Interest_total, 
+                    OP, 
+                    TotalInvest, 
+                    KPI, 
+                    diagnosis, 
+                    cogsYearly: cogsResult,
+                    yearlyPNL
+                };
             };
 
             // ================= HELPERS =================
@@ -2741,11 +2882,11 @@
                 const yearlySales = analysis.S_mon * 12;
                 const targetGap = analysis.OP - (expertData.basic.monTargetPrice || 0);
 
-                let fixedExp = analysis.Other_Exp_total || 0;
-                let varExp = 0;
-                
-                const FC = analysis.Labor_total + analysis.Interest_total + fixedExp;
-                const VC = analysis.MC_mon + varExp;
+                // For BEP calculation:
+                // Fixed Costs = SG&A Labor + SG&A Expenses + Interest
+                // Variable Cost = COGS (approx)
+                const FC = analysis.Dash_Labor + analysis.Dash_Exp + analysis.Interest_mon;
+                const VC = analysis.Dash_COGS;
                 
                 let bepRevenue = 0;
                 if(analysis.S_mon > 0) {
@@ -2753,26 +2894,26 @@
                      if(vRatio < 1) bepRevenue = FC / (1 - vRatio);
                 }
 
-
                 return {
                     totalRevenue: analysis.S_mon,
                     yearlySales,
-                    totalMaterialCost: analysis.MC_mon,
-                    totalLaborCost: analysis.Labor_total,
-                    totalInterest: analysis.Interest_total,
-                    totalExpense: analysis.Other_Exp_total + analysis.Interest_total,
+                    totalMaterialCost: analysis.Dash_COGS,
+                    totalLaborCost: analysis.Dash_Labor,
+                    totalInterest: analysis.Interest_mon,
+                    totalExpense: analysis.Dash_Exp + analysis.Interest_mon,
                     opIncome: analysis.OP,
                     cogsYearly: analysis.cogsYearly,
                     
                     opMargin: analysis.KPI.KPI_OPMargin.toFixed(1),
-                    materialRatio: (analysis.MC_mon/analysis.S_mon*100).toFixed(1),
+                    materialRatio: (analysis.Dash_COGS/analysis.S_mon*100).toFixed(1),
                     laborRatio: analysis.KPI.KPI_LaborRatio.toFixed(1),
-                    expenseRatio: ((analysis.Other_Exp_total + analysis.Interest_total)/analysis.S_mon*100).toFixed(1),
+                    expenseRatio: ((analysis.Dash_Exp + analysis.Interest_mon)/analysis.S_mon*100).toFixed(1),
                     
                     targetGap,
                     totalFixedCost: FC,
                     bepRevenue,
-                    diagnosis: analysis.diagnosis
+                    diagnosis: analysis.diagnosis,
+                    yearlyPNL: analysis.yearlyPNL
                 };
             });
 
