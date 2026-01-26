@@ -2695,15 +2695,22 @@
                 // 4. Yearly COGS Calculation (3 Years)
                 const cogsResult = [];
                 for (let i = 0; i < 3; i++) {
-                    const mMaterials = sumArrayIdx(data.cost.costY, 'costAmt', i);
+                    const mMaterials = sumArrayIdx(data.cost.costY, 'costAmt', i); // 년도별 재료비 (cost.costY.costAmt)
                     
-                    // Production Expenses (제조경비/직접비용) -> COGS (All Industries)
-                    const mExpTotal = sumArrayIdx(data.expense.production, 'expenseAmtYear', i);
-                    const currentCost = mMaterials + mExpTotal;
+                    let currentCost = 0;
+                    if (industryCd === '1') {
+                        // 제조업: 당기총제조비용 = 재료비 + 제조경비(인건비/경비 합계)
+                        // Note: Mfg labor should be in the production expense list via mapping
+                        const mExpTotal = sumArrayIdx(data.expense.production, 'expenseAmtYear', i);
+                        currentCost = mMaterials + mExpTotal;
+                    } else {
+                        // 비제조업: 당기 상품매입액 = 년도별 재료비
+                        currentCost = mMaterials;
+                    }
 
                     const totalCogsVal = (data.cogs?.beginningInv?.[i] || 0) + currentCost - (data.cogs?.endingInv?.[i] || 0);
 
-                    // Sync back to state
+                    // Sync back to state for UI binding
                     if (data.cogs) {
                         data.cogs.currentPeriodCost[i] = currentCost;
                         data.cogs.totalCogs[i] = totalCogsVal;
@@ -2714,11 +2721,13 @@
                 // 5. Final Dashboard Values (Monthly)
                 let Dash_COGS = cogsResult[0].totalCogs / 12;
                 
-                // Dashboard Rows: Production Expense -> COGS, Sales Expense -> SG&A
+                // Dashboard Rows: Always show SG&A (Sales/Admin Expense) rows
+                // Manufacturing expenses are already embedded in Dash_COGS for industry '1'
+                // For non-manufacturing, they are excluded from COGS per user request.
                 let Dash_Labor = salesExpRes.lExp;
                 let Dash_Exp = salesExpRes.oExp;
 
-                // Operating Profit = Revenue - COGS - SG&A (Exp + Labor)
+                // Operating Profit = Revenue - COGS - SG&A
                 const OP = S_mon - Dash_COGS - Dash_Labor - Dash_Exp;
 
                 const sumInvest = (sec) => {
