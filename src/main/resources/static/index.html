@@ -3009,7 +3009,7 @@
                 }
 
                 const AssetTotalBS = bsAnalysis[0]?.totalAsset || 0;
-                const EquityTotalBS = bsAnalysis[0]?.capital || 0;
+                const EquityTotalBS = bsAnalysis[0]?.totalEquity || 0;
                 const equityRatioVal = safeDiv(EquityTotalBS, AssetTotalBS) * 100;
                 const equityStd = 50;
 
@@ -3179,7 +3179,7 @@
                     totalFixedCost: Math.round((bepAnalysis[0]?.totalFC || 0) / 12),
                     ordAmtYear: yearlyPNL.map(p => p.ord),
                     assetAmtYear: bsAnalysis.map(b => b.totalAsset),
-                    equityAmtYear: bsAnalysis.map(b => b.capital),
+                    equityAmtYear: bsAnalysis.map(b => b.totalEquity),
                     bepAnalysis, // Section 11 data
                     bsAnalysis // Section 12 data
                 };
