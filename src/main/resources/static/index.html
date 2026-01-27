@@ -598,9 +598,9 @@
                                                                       <option v-for="item in equityCategoryItems" :value="item.cd">{{ item.name }}</option>
                                                                   </select>
                                                               </td>
-                                                              <td><input type="number" class="form-control form-control-sm text-end" v-model.number="ln.loanYear[0]"></td>
-                                                              <td><input type="number" class="form-control form-control-sm text-end" v-model.number="ln.loanYear[1]"></td>
-                                                              <td><input type="number" class="form-control form-control-sm text-end" v-model.number="ln.loanYear[2]"></td>
+                                                              <td><input type="number" class="form-control form-control-sm text-end" v-model.number="ln.loanAmtYear[0]"></td>
+                                                              <td><input type="number" class="form-control form-control-sm text-end" v-model.number="ln.loanAmtYear[1]"></td>
+                                                              <td><input type="number" class="form-control form-control-sm text-end" v-model.number="ln.loanAmtYear[2]"></td>
                                                               <td class="text-center"><button class="btn-close small" @click="expertData.loan.equity.splice(idx,1)"></button></td>
                                                           </tr>
                                                           <tr v-if="expertData.loan.equity.length === 0">
@@ -644,30 +644,30 @@
                                                               </td>
                                                               <!-- Y1 -->
                                                               <td>
-                                                                  <input type="number" class="form-control form-control-sm text-end mb-1" v-model.number="ln.loanYear[0]" placeholder="원금">
+                                                                  <input type="number" class="form-control form-control-sm text-end mb-1" v-model.number="ln.loanAmtYear[0]" placeholder="원금">
                                                                   <div class="input-group input-group-sm mb-1">
                                                                       <span class="input-group-text p-1" style="font-size: 0.6rem;">%</span>
                                                                       <input type="number" step="0.1" class="form-control form-control-sm text-end" v-model.number="ln.loanRate[0]" @input="onDebtValueChange(ln, 'rate', 0)">
                                                                   </div>
-                                                                  <div class="text-end small text-primary fw-bold" style="font-size: 0.7rem;">이자: {{ formatCurrency(ln.loanRateAmt[0] || 0) }}</div>
+                                                                  <div class="text-end small text-primary fw-bold" style="font-size: 0.7rem;">이자: {{ formatCurrency(ln.loanRateAmtYear[0] || 0) }}</div>
                                                               </td>
                                                               <!-- Y2 -->
                                                               <td>
-                                                                  <input type="number" class="form-control form-control-sm text-end mb-1" v-model.number="ln.loanYear[1]" placeholder="원금증감">
+                                                                  <input type="number" class="form-control form-control-sm text-end mb-1" v-model.number="ln.loanAmtYear[1]" placeholder="원금증감">
                                                                   <div class="input-group input-group-sm mb-1">
                                                                       <span class="input-group-text p-1" style="font-size: 0.6rem;">%</span>
                                                                       <input type="number" step="0.1" class="form-control form-control-sm text-end" v-model.number="ln.loanRate[1]" @input="onDebtValueChange(ln, 'rate', 1)">
                                                                   </div>
-                                                                  <div class="text-end small text-primary fw-bold" style="font-size: 0.7rem;">이자: {{ formatCurrency(ln.loanRateAmt[1] || 0) }}</div>
+                                                                  <div class="text-end small text-primary fw-bold" style="font-size: 0.7rem;">이자: {{ formatCurrency(ln.loanRateAmtYear[1] || 0) }}</div>
                                                               </td>
                                                               <!-- Y3 -->
                                                               <td>
-                                                                  <input type="number" class="form-control form-control-sm text-end mb-1" v-model.number="ln.loanYear[2]" placeholder="원금증감">
+                                                                  <input type="number" class="form-control form-control-sm text-end mb-1" v-model.number="ln.loanAmtYear[2]" placeholder="원금증감">
                                                                   <div class="input-group input-group-sm mb-1">
                                                                       <span class="input-group-text p-1" style="font-size: 0.6rem;">%</span>
                                                                       <input type="number" step="0.1" class="form-control form-control-sm text-end" v-model.number="ln.loanRate[2]" @input="onDebtValueChange(ln, 'rate', 2)">
                                                                   </div>
-                                                                  <div class="text-end small text-primary fw-bold" style="font-size: 0.7rem;">이자: {{ formatCurrency(ln.loanRateAmt[2] || 0) }}</div>
+                                                                  <div class="text-end small text-primary fw-bold" style="font-size: 0.7rem;">이자: {{ formatCurrency(ln.loanRateAmtYear[2] || 0) }}</div>
                                                               </td>
                                                               <td class="text-center"><button class="btn-close small" @click="expertData.loan.debt.splice(idx,1)"></button></td>
                                                           </tr>
@@ -2726,15 +2726,15 @@
 
                 // 5. Loan/Debt Interest
                 (expertData.loan.debt || []).forEach(d => {
-                    if(!d.loanYear) d.loanYear = [0,0,0];
+                    if(!d.loanAmtYear) d.loanAmtYear = [0,0,0];
                     if(!d.loanRate) d.loanRate = [0,0,0];
-                    if(!d.loanRateAmt) d.loanRateAmt = [0,0,0];
+                    if(!d.loanRateAmtYear) d.loanRateAmtYear = [0,0,0];
                     
                     let cumPrincipal = 0;
                     for(let i=0; i<3; i++) {
-                        cumPrincipal += (d.loanYear[i] || 0);
+                        cumPrincipal += (d.loanAmtYear[i] || 0);
                         // Calculation: (CumPrincipal) * (Rate / 100)
-                        d.loanRateAmt[i] = Math.round(cumPrincipal * ((d.loanRate[i] || 0) / 100));
+                        d.loanRateAmtYear[i] = Math.round(cumPrincipal * ((d.loanRate[i] || 0) / 100));
                     }
                 });
             };
@@ -2829,7 +2829,7 @@
                 const mfgExpRes = processExpList(data.expense.production, mfgExpMapping);
                 const salesExpRes = processExpList(data.expense.sales, salesExpMapping);
 
-                const Interest_total = (data.loan.debt.length > 0) ? sumArrayIdx(data.loan.debt, 'loanRateAmt', 0) / 12 : 0;
+                const Interest_total = (data.loan.debt.length > 0) ? sumArrayIdx(data.loan.debt, 'loanRateAmtYear', 0) / 12 : 0;
 
                 // 4. Yearly COGS Calculation (3 Years)
                 const cogsResult = [];
@@ -2882,7 +2882,7 @@
                     const sga = sumArrayIdx(data.expense.sales, 'expenseAmtYear', i);
                     
                     const op = gp - sga;
-                    const nonOp = sumArrayIdx(data.loan.debt, 'loanRateAmt', i);
+                    const nonOp = sumArrayIdx(data.loan.debt, 'loanRateAmtYear', i);
                     const ord = op - nonOp;
                     
                     yearlyPNL.push({
@@ -2917,8 +2917,8 @@
                 const Adj_OP_year = OP_year - mfgDepr - salesDepr - salesBadDebt;
 
                 // 7. Equity & Debt Analysis (Year 1)
-                const EquityTotal = (data.loan.equity || []).reduce((sum, e) => sum + (e.loanYear?.[0] || 0), 0);
-                const DebtTotal = (data.loan.debt || []).reduce((sum, d) => sum + (d.loanYear?.[0] || 0), 0);
+                const EquityTotal = (data.loan.equity || []).reduce((sum, e) => sum + (e.loanAmtYear?.[0] || 0), 0);
+                const DebtTotal = (data.loan.debt || []).reduce((sum, d) => sum + (d.loanAmtYear?.[0] || 0), 0);
                 // For Equity Ratio, user says (Equity / Total Assets). Total Assets = TotalInvestment
                 const TotalAssetsReported = EquityTotal + DebtTotal; // Or use TotalInvestment? User said Total Assets, usually Equity+Debt
 
@@ -2989,7 +2989,7 @@
                     const adminFC = (data.expense?.sales || []).reduce((sum, e) => {
                         return sum + (e.expenseTVaCd !== '매출액' ? (e.expenseAmtYear?.[i] || 0) : 0);
                     }, 0);
-                    const interest = sumArrayIdx(data.loan.debt, 'loanRateAmt', i);
+                    const interest = sumArrayIdx(data.loan.debt, 'loanRateAmtYear', i);
                     const totalFC = mfgLabor + mfgFC + adminFC + interest;
                     
                     const bepPoint = marginalProfitRate > 0 ? (totalFC / (marginalProfitRate / 100)) : 0;
@@ -3436,17 +3436,17 @@
                 };
                 (expertData.loan.equity || []).forEach(l => {
                     for(let i=0; i<3; i++) {
-                        const val = (l.loanYear && l.loanYear[i]) || 0;
+                        const val = (l.loanAmtYear && l.loanAmtYear[i]) || 0;
                         res.eq[i] += val;
                         res.total[i] += val;
                     }
                 });
                 (expertData.loan.debt || []).forEach(l => {
                     for(let i=0; i<3; i++) {
-                        const val = (l.loanYear && l.loanYear[i]) || 0;
+                        const val = (l.loanAmtYear && l.loanAmtYear[i]) || 0;
                         res.db[i] += val;
                         res.total[i] += val;
-                        res.intr[i] += (l.loanRateAmt && l.loanRateAmt[i]) || 0;
+                        res.intr[i] += (l.loanRateAmtYear && l.loanRateAmtYear[i]) || 0;
                     }
                 });
                 return res;
@@ -3462,11 +3462,11 @@
                 const item = { 
                     loanTitle: isDebt ? '' : equityCategoryItems[0].name, 
                     loanTitleCd: isDebt ? '' : equityCategoryItems[0].cd,
-                    loanYear: [0, 0, 0] 
+                    loanAmtYear: [0, 0, 0] 
                 };
                 if(isDebt) {
                     item.loanRate = [5.0, 5.0, 5.0];
-                    item.loanRateAmt = [0, 0, 0];
+                    item.loanRateAmtYear = [0, 0, 0];
                 }
                 list.push(item);
             };
@@ -3612,6 +3612,8 @@
                             else if(k.startsWith('YCost')) nk = 'cost' + k.slice(5).charAt(0).toLowerCase() + k.slice(6);
                             else if(k === 'YJobAmt') nk = 'jobAmtYear';
                             else if(k === 'YJobRate') nk = 'jobAmtRate';
+                            else if(k === 'loanYear' || k === 'LoanYear') nk = 'loanAmtYear';
+                            else if(k === 'loanRateAmt' || k === 'LoanRateAmt') nk = 'loanRateAmtYear';
                             else if(k === 'COGS') nk = 'cogs';
                             
                             newObj[nk] = migrate(obj[k]);
