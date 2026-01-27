@@ -3148,6 +3148,9 @@
                 };
                 const investSalesInitial = getInvestSalesPriceSum();
 
+                let totalInvestPrice = sumInvestBudget(data.invest.production) + sumInvestBudget(data.invest.sales);
+                let cumulativeDepr = 0;
+
                 for (let i = 0; i < 3; i++) {
                     // Capital: Cumulative Equity principal
                     const yearEquity = (data.loan.equity || []).reduce((sum, e) => sum + (e.loanAmtYear?.[i] || 0), 0);
@@ -3168,21 +3171,16 @@
                     // Total Assets = Liabilities + Equity
                     const totalAsset = liability + totalEquity;
 
-                    // Non-current Assets
-                    // Formula: (Invest Sales investAmtYear Sum) - Mfg Depr - Sales Depr
-                    // Note: Following prompt field mapping literally.
-                    let invAmtAnnualSum = 0;
-                    Object.values(data.invest.sales).forEach(list => {
-                        list.forEach(inv => { invAmtAnnualSum += (inv.investAmtYear || 0); });
-                    });
-                    const invAmtAnnual = invAmtAnnualSum * 12;
-
+                    // Non-current Assets (Fixed Assets)
+                    // Accumulate depreciation from expenses
                     const mfgDepr = (data.expense.production.find(e => e.expenseTitle === '감가상각비')?.expenseAmtYear?.[i]) || 0;
                     const salesDepr = (data.expense.sales.find(e => e.expenseTitle === '감가상각비')?.expenseAmtYear?.[i]) || 0;
+                    cumulativeDepr += (mfgDepr + salesDepr);
                     
-                    const nonCurrentAsset = invAmtAnnual - mfgDepr - salesDepr;
+                    // Book Value = Total Initial Price - Accumulated Depreciation
+                    const nonCurrentAsset = Math.max(0, totalInvestPrice - cumulativeDepr);
                     
-                    // Current Assets
+                    // Current Assets (Liquid Assets)
                     const currentAsset = totalAsset - nonCurrentAsset;
 
                     bsAnalysis.push({
