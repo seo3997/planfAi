@@ -1229,6 +1229,67 @@
 
                                     <!-- Diagnosis Report (New) -->
                                     <div class="card border-0 bg-light p-3 mb-3">
+                                        <!-- 12. Statement of Financial Position -->
+                                        <div class="mb-5">
+                                            <h6 class="fw-bold mb-3 small text-primary">📊 재무상태표 (Statement of Financial Position) <span class="text-muted">(단위: 천원)</span></h6>
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered table-sm text-center align-middle" style="font-size: 0.75rem;">
+                                                    <thead class="table-dark">
+                                                        <tr>
+                                                            <th style="width: 12%;">구분</th>
+                                                            <th style="width: 20%;">계정항목</th>
+                                                            <th style="width: 23%;">1차년도</th>
+                                                            <th style="width: 23%;">2차년도</th>
+                                                            <th style="width: 23%;">3차년도</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td rowspan="3" class="fw-bold bg-light-subtle">자산</td>
+                                                            <td>유동자산</td>
+                                                            <td v-for="bs in expertResult.bsAnalysis" class="text-end pe-2">{{ formatCurrencyCheon(bs.currentAsset) }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>비유동자산</td>
+                                                            <td v-for="bs in expertResult.bsAnalysis" class="text-end pe-2">{{ formatCurrencyCheon(bs.nonCurrentAsset) }}</td>
+                                                        </tr>
+                                                        <tr class="table-info fw-bold">
+                                                            <td>자산총계</td>
+                                                            <td v-for="bs in expertResult.bsAnalysis" class="text-end pe-2">{{ formatCurrencyCheon(bs.totalAsset) }}</td>
+                                                        </tr>
+                                                        <tr class="table-warning fw-bold">
+                                                            <td class="fw-bold bg-light-subtle">부채</td>
+                                                            <td>부채총계</td>
+                                                            <td v-for="bs in expertResult.bsAnalysis" class="text-end pe-2">{{ formatCurrencyCheon(bs.liability) }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td rowspan="3" class="fw-bold bg-light-subtle">자본</td>
+                                                            <td>자본금</td>
+                                                            <td v-for="bs in expertResult.bsAnalysis" class="text-end pe-2">{{ formatCurrencyCheon(bs.capital) }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>이익잉여금</td>
+                                                            <td v-for="bs in expertResult.bsAnalysis" class="text-end pe-2" :class="bs.retainedEarnings < 0 ? 'text-danger' : ''">{{ formatCurrencyCheon(bs.retainedEarnings) }}</td>
+                                                        </tr>
+                                                        <tr class="table-success fw-bold">
+                                                            <td>자본총계</td>
+                                                            <td v-for="bs in expertResult.bsAnalysis" class="text-end pe-2">{{ formatCurrencyCheon(bs.totalEquity) }}</td>
+                                                        </tr>
+                                                        <tr class="table-secondary fw-bold">
+                                                            <td class="fw-bold bg-light-subtle">계</td>
+                                                            <td>부채와 자본총계</td>
+                                                            <td v-for="bs in expertResult.bsAnalysis" class="text-end pe-2">{{ formatCurrencyCheon(bs.totalAsset) }}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="alert alert-light border-0 p-2 mt-2" style="font-size: 0.65rem;">
+                                                <i class="bi bi-info-circle me-1"></i>
+                                                비유동자산 = (판매부문 투자 상각액 합계) - 제조/판관비 감가상각비<br>
+                                                유동자산 = (부채+자본) - 비유동자산 (회계 등식 기준)
+                                            </div>
+                                        </div>
+
                                         <h6 class="fw-bold mb-3 small text-primary">📊 경영 진단 리포트</h6>
                                         <div v-for="(diag, dIdx) in expertResult.diagnosis" :key="dIdx" 
                                              class="d-flex justify-content-between align-items-center mb-2 border-bottom pb-2"
@@ -3071,6 +3132,70 @@
                     }
                 ];
 
+                // 9. Statement of Financial Position (12. 재무상태표)
+                const bsAnalysis = [];
+                let cumulativeEquity = 0;
+                let cumulativeRE = 0;
+                let cumulativeDebt = 0;
+                
+                // Helper to sum all investPrice in sales part
+                const getInvestSalesPriceSum = () => {
+                    let total = 0;
+                    Object.values(data.invest.sales).forEach(list => {
+                        list.forEach(inv => { total += (inv.investPrice || 0); });
+                    });
+                    return total;
+                };
+                const investSalesInitial = getInvestSalesPriceSum();
+
+                for (let i = 0; i < 3; i++) {
+                    // Capital: Cumulative Equity principal
+                    const yearEquity = (data.loan.equity || []).reduce((sum, e) => sum + (e.loanAmtYear?.[i] || 0), 0);
+                    cumulativeEquity += yearEquity;
+
+                    // Retained Earnings: Cumulative Ordinary Profit
+                    const yearRE = yearlyPNL[i]?.ord || 0;
+                    cumulativeRE += yearRE;
+
+                    // Liability: Cumulative Debt principal (loanAmtYear)
+                    const yearDebt = (data.loan.debt || []).reduce((sum, d) => sum + (d.loanAmtYear?.[i] || 0), 0);
+                    cumulativeDebt += yearDebt;
+                    const liability = cumulativeDebt;
+
+                    // Equity Total
+                    const totalEquity = cumulativeEquity + cumulativeRE;
+
+                    // Total Assets = Liabilities + Equity
+                    const totalAsset = liability + totalEquity;
+
+                    // Non-current Assets
+                    // Formula: (Invest Sales investAmtYear Sum) - Mfg Depr - Sales Depr
+                    // Note: Following prompt field mapping literally.
+                    let invAmtAnnualSum = 0;
+                    Object.values(data.invest.sales).forEach(list => {
+                        list.forEach(inv => { invAmtAnnualSum += (inv.investAmtYear || 0); });
+                    });
+                    const invAmtAnnual = invAmtAnnualSum * 12;
+
+                    const mfgDepr = (data.expense.production.find(e => e.expenseTitle === '감가상각비')?.expenseAmtYear?.[i]) || 0;
+                    const salesDepr = (data.expense.sales.find(e => e.expenseTitle === '감가상각비')?.expenseAmtYear?.[i]) || 0;
+                    
+                    const nonCurrentAsset = invAmtAnnual - mfgDepr - salesDepr;
+                    
+                    // Current Assets
+                    const currentAsset = totalAsset - nonCurrentAsset;
+
+                    bsAnalysis.push({
+                        totalAsset,
+                        currentAsset,
+                        nonCurrentAsset,
+                        liability,
+                        totalEquity,
+                        capital: cumulativeEquity,
+                        retainedEarnings: cumulativeRE
+                    });
+                }
+
                 return { 
                     S_mon, 
                     totalRevenue: S_mon,
@@ -3087,7 +3212,8 @@
                     yearlyPNL,
                     totalFixedCost: Math.round((bepAnalysis[0]?.totalFC || 0) / 12),
                     ordAmtYear: yearlyPNL.map(p => p.ord),
-                    bepAnalysis // Section 11 data
+                    bepAnalysis, // Section 11 data
+                    bsAnalysis // Section 12 data
                 };
             };
 
@@ -3259,6 +3385,7 @@
                     yearlyPNL: analysis.yearlyPNL,
                     ordAmtYear: analysis.ordAmtYear,
                     bepAnalysis: analysis.bepAnalysis,
+                    bsAnalysis: analysis.bsAnalysis,
                     cogsYearly: analysis.cogsYearly
                 };
             });
