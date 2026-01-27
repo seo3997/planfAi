@@ -3086,6 +3086,7 @@
                     cogsYearly: cogsResult,
                     yearlyPNL,
                     totalFixedCost: Math.round((bepAnalysis[0]?.totalFC || 0) / 12),
+                    ordAmtYear: yearlyPNL.map(p => p.ord),
                     bepAnalysis // Section 11 data
                 };
             };
@@ -3256,6 +3257,7 @@
                     bepRevenue: analysis.bepRevenue,
                     diagnosis: analysis.diagnosis,
                     yearlyPNL: analysis.yearlyPNL,
+                    ordAmtYear: analysis.ordAmtYear,
                     bepAnalysis: analysis.bepAnalysis,
                     cogsYearly: analysis.cogsYearly
                 };
@@ -3596,6 +3598,17 @@
                 const payload = {
                     mode: mode.value,
                     id: currentReportId.value,
+                    summary: mode.value === 'expert' ? {
+                        totalRevenue: result.totalRevenue || 0,
+                        opIncome: result.opIncome || 0,
+                        bepRevenue: result.bepRevenue || 0,
+                        ordAmtYear: result.ordAmtYear || []
+                    } : {
+                        totalRevenue: liteResult.value.totalRevenue || 0,
+                        opIncome: liteResult.value.opIncome || 0,
+                        bepRevenue: 0,
+                        ordAmtYear: []
+                    },
                     basic: mode.value === 'expert' ? cleanData.basic : liteData.basic,
                     sale: mode.value === 'expert' ? cleanData.sale : liteData.sale,
                     cost: mode.value === 'expert' ? cleanData.cost : undefined,
