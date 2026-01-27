@@ -467,7 +467,7 @@
                                                                 </select>
                                                             </td>
                                                             <td v-if="catIdx < 2" class="text-end pe-2 fw-bold text-muted">
-                                                                {{ (catIdx === 0 && inv.investTitleCd === '10') || (catIdx === 1 && inv.investTitleCd === '10') ? '-' : formatCurrency(inv.investYearAmt || 0) }}
+                                                                {{ (catIdx === 0 && inv.investTitleCd === '10') || (catIdx === 1 && inv.investTitleCd === '10') ? '-' : formatCurrency(inv.investAmtYear || 0) }}
                                                             </td>
                                                             <td class="text-center"><button class="btn-close small" @click="expertData.invest.production['production0'+(catIdx+1)].splice(idx,1)"></button></td>
                                                         </tr>
@@ -492,7 +492,7 @@
                                                                 </select>
                                                             </td>
                                                             <td v-if="catIdx < 2" class="text-end pe-2 fw-bold text-muted">
-                                                                {{ (catIdx === 0 && inv.investTitleCd === '10') || (catIdx === 1 && inv.investTitleCd === '10') ? '-' : formatCurrency(inv.investYearAmt || 0) }}
+                                                                {{ (catIdx === 0 && inv.investTitleCd === '10') || (catIdx === 1 && inv.investTitleCd === '10') ? '-' : formatCurrency(inv.investAmtYear || 0) }}
                                                             </td>
                                                             <td class="text-center"><button class="btn-close small" @click="expertData.invest.sales['sales0'+(catIdx+1)].splice(idx,1)"></button></td>
                                                         </tr>
@@ -2647,11 +2647,11 @@
                             if (isLand || isPremium || isCat34) {
                                 inv.investYn = 'N';
                                 inv.investYear = 0;
-                                inv.investYearAmt = 0;
+                                inv.investAmtYear = 0;
                             } else if (inv.investYn === 'Y' && inv.investYear > 0) {
-                                inv.investYearAmt = Math.round(inv.investPrice / (inv.investYear * 12));
+                                inv.investAmtYear = Math.round(inv.investPrice / (inv.investYear * 12));
                             } else {
-                                inv.investYearAmt = 0;
+                                inv.investAmtYear = 0;
                             }
                         });
                     });
@@ -2681,7 +2681,7 @@
                     const keys = isProd ? ['production01', 'production02'] : ['sales01', 'sales02'];
                     keys.forEach(key => {
                         (investSource[key] || []).forEach(inv => {
-                            if(inv.investYn === 'Y') deprBase += (inv.investYearAmt || 0);
+                            if(inv.investYn === 'Y') deprBase += (inv.investAmtYear || 0);
                         });
                     });
 
@@ -3105,9 +3105,46 @@
                 try { return JSON.parse(rpt.reportData); } catch(e) { return {}; }
             };
 
+            const migrate = (obj) => {
+                if (!obj || typeof obj !== 'object') return obj;
+                if (Array.isArray(obj)) return obj.map(migrate);
+                const newObj = {};
+                for (let k in obj) {
+                    let nk = k;
+                    // Key mapping
+                    if(k === 'BASIC') nk = 'basic';
+                    else if(k === 'SALE') nk = 'sale';
+                    else if(k === 'COST') nk = 'cost';
+                    else if(k === 'JOB') nk = 'job';
+                    else if(k === 'INVEST') nk = 'invest';
+                    else if(k === 'LOAN') nk = 'loan';
+                    else if(k === 'EXPENSE') nk = 'expense';
+                    else if(k === 'LITE_COST') nk = 'liteCost';
+                    else if(k === 'MenuTitle') nk = 'menuTitle';
+                    else if(k === 'MenuPrice') nk = 'menuPrice';
+                    else if(k === 'MenuQty' || k === 'BaseQty') nk = 'menuQty';
+                    else if(k === 'JobTitle') nk = 'jobTitle';
+                    else if(k === 'JobCnt') nk = 'jobCnt';
+                    else if(k === 'JobQty') nk = 'jobQty';
+                    else if(k.startsWith('YMenu')) nk = 'menu' + k.slice(5).charAt(0).toLowerCase() + k.slice(6);
+                    else if(k.startsWith('YCost')) nk = 'cost' + k.slice(5).charAt(0).toLowerCase() + k.slice(6);
+                    else if(k === 'YJobAmt') nk = 'jobAmtYear';
+                    else if(k === 'YJobRate') nk = 'jobAmtRate';
+                    else if(k === 'loanYear' || k === 'LoanYear') nk = 'loanAmtYear';
+                    else if(k === 'loanRateAmt' || k === 'LoanRateAmt') nk = 'loanRateAmtYear';
+                    else if(k === 'investYearAmt' || k === 'InvestYearAmt') nk = 'investAmtYear';
+                    else if(k === 'COGS') nk = 'cogs';
+                    
+                    newObj[nk] = migrate(obj[k]);
+                }
+                return newObj;
+            };
+
             const getReportValues = (rpt) => {
+                if(!rpt || !rpt.reportData) return { mode: 'lite', revenue: 0, netProfit: 0, bep: 0 };
                 try {
-                    const data = parseReport(rpt);
+                    let data = JSON.parse(rpt.reportData);
+                    data = migrate(data); // Migrate legacy keys for correct calculation
                     const mode = data.mode || 'lite';
                     
                     if (mode === 'expert') {
@@ -3361,7 +3398,7 @@
                     investTitleCd: defaultItem.cd || '',
                     investPrice: 0, 
                     investYear: (yn === 'Y' ? 5 : 0), 
-                    investYearAmt: 0, 
+                    investAmtYear: 0, 
                     investYn: yn 
                 });
             };
@@ -3383,7 +3420,7 @@
                     if ((catIdx === 1 && inv.investTitleCd === '10') || (catIdx === 2 && inv.investTitleCd === '10')) {
                         inv.investYn = 'N';
                         inv.investYear = 0;
-                        inv.investYearAmt = 0;
+                        inv.investAmtYear = 0;
                     } else if (catIdx <= 2) {
                         // Default back to Y for other items in cat 1,2
                         inv.investYn = 'Y';
@@ -3399,7 +3436,7 @@
                 
                 const sum = (list) => list.reduce((acc, curr) => {
                     acc.price += (curr.investPrice || 0);
-                    acc.depr += (curr.investYearAmt || 0);
+                    acc.depr += (curr.investAmtYear || 0);
                     return acc;
                 }, { price: 0, depr: 0 });
 
@@ -3585,42 +3622,6 @@
                 currentReportId.value = rpt.id;
                 try {
                     let data = JSON.parse(rpt.reportData);
-
-                    // Deep Migration Helper
-                    const migrate = (obj) => {
-                        if (!obj || typeof obj !== 'object') return obj;
-                        if (Array.isArray(obj)) return obj.map(migrate);
-                        const newObj = {};
-                        for (let k in obj) {
-                            let nk = k;
-                            // Key mapping
-                            if(k === 'BASIC') nk = 'basic';
-                            else if(k === 'SALE') nk = 'sale';
-                            else if(k === 'COST') nk = 'cost';
-                            else if(k === 'JOB') nk = 'job';
-                            else if(k === 'INVEST') nk = 'invest';
-                            else if(k === 'LOAN') nk = 'loan';
-                            else if(k === 'EXPENSE') nk = 'expense';
-                            else if(k === 'LITE_COST') nk = 'liteCost';
-                            else if(k === 'MenuTitle') nk = 'menuTitle';
-                            else if(k === 'MenuPrice') nk = 'menuPrice';
-                            else if(k === 'MenuQty' || k === 'BaseQty') nk = 'menuQty';
-                            else if(k === 'JobTitle') nk = 'jobTitle';
-                            else if(k === 'JobCnt') nk = 'jobCnt';
-                            else if(k === 'JobQty') nk = 'jobQty';
-                            else if(k.startsWith('YMenu')) nk = 'menu' + k.slice(5).charAt(0).toLowerCase() + k.slice(6);
-                            else if(k.startsWith('YCost')) nk = 'cost' + k.slice(5).charAt(0).toLowerCase() + k.slice(6);
-                            else if(k === 'YJobAmt') nk = 'jobAmtYear';
-                            else if(k === 'YJobRate') nk = 'jobAmtRate';
-                            else if(k === 'loanYear' || k === 'LoanYear') nk = 'loanAmtYear';
-                            else if(k === 'loanRateAmt' || k === 'LoanRateAmt') nk = 'loanRateAmtYear';
-                            else if(k === 'COGS') nk = 'cogs';
-                            
-                            newObj[nk] = migrate(obj[k]);
-                        }
-                        return newObj;
-                    };
-
                     data = migrate(data);
 
                     if(data.mode === 'expert') {
