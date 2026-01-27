@@ -2977,11 +2977,41 @@
                 // Adjusted OP (Year 1)
                 const Adj_OP_year = OP_year - mfgDepr - salesDepr - salesBadDebt;
 
-                // 7. Equity & Debt Analysis (Year 1)
-                const EquityTotal = (data.loan.equity || []).reduce((sum, e) => sum + (e.loanAmtYear?.[0] || 0), 0);
-                const DebtTotal = (data.loan.debt || []).reduce((sum, d) => sum + (d.loanAmtYear?.[0] || 0), 0);
-                // For Equity Ratio, user says (Equity / Total Assets). Total Assets = TotalInvestment
-                const TotalAssetsReported = EquityTotal + DebtTotal; // Or use TotalInvestment? User said Total Assets, usually Equity+Debt
+                // 7. Statement of Financial Position (Calculated early for Diagnosis)
+                const bsAnalysis = [];
+                let cumulativeEquity = 0;
+                let cumulativeRE = 0;
+                let cumulativeDebt = 0;
+                let totalInvestPrice = sumInvestBudget(data.invest.production) + sumInvestBudget(data.invest.sales);
+                let cumulativeDepr = 0;
+
+                for (let i = 0; i < 3; i++) {
+                    const yearEquity = (data.loan.equity || []).reduce((sum, e) => sum + (e.loanAmtYear?.[i] || 0), 0);
+                    cumulativeEquity += yearEquity;
+                    const yearRE = yearlyPNL[i]?.ord || 0;
+                    cumulativeRE += yearRE;
+                    const yearDebt = (data.loan.debt || []).reduce((sum, d) => sum + (d.loanAmtYear?.[i] || 0), 0);
+                    cumulativeDebt += yearDebt;
+                    const liability = cumulativeDebt;
+                    const totalEquity = cumulativeEquity + cumulativeRE;
+                    const totalAsset = liability + totalEquity;
+
+                    const mfgDepr = (data.expense.production.find(e => e.expenseTitle === '감가상각비')?.expenseAmtYear?.[i]) || 0;
+                    const salesDepr = (data.expense.sales.find(e => e.expenseTitle === '감가상각비')?.expenseAmtYear?.[i]) || 0;
+                    cumulativeDepr += (mfgDepr + salesDepr);
+                    const nonCurrentAsset = Math.max(0, totalInvestPrice - cumulativeDepr);
+                    const currentAsset = totalAsset - nonCurrentAsset;
+
+                    bsAnalysis.push({
+                        totalAsset, currentAsset, nonCurrentAsset, liability, 
+                        totalEquity, capital: cumulativeEquity, retainedEarnings: cumulativeRE
+                    });
+                }
+
+                const AssetTotalBS = bsAnalysis[0]?.totalAsset || 0;
+                const EquityTotalBS = bsAnalysis[0]?.capital || 0;
+                const equityRatioVal = safeDiv(EquityTotalBS, AssetTotalBS) * 100;
+                const equityStd = 50;
 
                 // 8. Diagnosis Item Calculations & Opinions
                 
@@ -3017,9 +3047,7 @@
                 const rentBenchmarks = { '1': 5, '2': 8.8, '3': 11, '4': 16.5, '5': 11 };
                 const rentStd = rentBenchmarks[industryCd] || 11;
 
-                // 12-1-7 Equity Ratio
-                const equityRatioVal = safeDiv(EquityTotal, TotalAssetsReported) * 100;
-                const equityStd = 50;
+                // 12-1-7 Equity Ratio (Calculated above from BS)
 
                 // 12-1-8 BEP Ratio
                 // 7. Yearly BEP Analysis (Section 11) - Calculated first for Diagnosis
@@ -3118,10 +3146,10 @@
                     },
                     { 
                         id: 'equity', label: '자기자금비율', 
-                        value: TotalAssetsReported > 0 ? equityRatioVal.toFixed(1) + '%' : '입력 필요', 
-                        pass: TotalAssetsReported > 0 && equityRatioVal >= equityStd, 
-                        msg: TotalAssetsReported > 0 ? `기준 ${equityStd}% 이상` : '자본/대출 입력 필요',
-                        tooltip: `계산: 자기자본(${formatCurrency(EquityTotal)}) ÷ 총자산(${formatCurrency(TotalAssetsReported)})`
+                        value: AssetTotalBS > 0 ? equityRatioVal.toFixed(1) + '%' : '입력 필요', 
+                        pass: AssetTotalBS > 0 && equityRatioVal >= equityStd, 
+                        msg: AssetTotalBS > 0 ? `기준 ${equityStd}% 이상` : '자본/대출 입력 필요',
+                        tooltip: `계산: 자기자본(${formatCurrency(EquityTotalBS)}) ÷ 총자산(${formatCurrency(AssetTotalBS)})`
                     },
                     { 
                         id: 'bepRatio', label: '손익분기점 비율', 
@@ -3132,67 +3160,7 @@
                     }
                 ];
 
-                // 9. Statement of Financial Position (12. 재무상태표)
-                const bsAnalysis = [];
-                let cumulativeEquity = 0;
-                let cumulativeRE = 0;
-                let cumulativeDebt = 0;
-                
-                // Helper to sum all investPrice in sales part
-                const getInvestSalesPriceSum = () => {
-                    let total = 0;
-                    Object.values(data.invest.sales).forEach(list => {
-                        list.forEach(inv => { total += (inv.investPrice || 0); });
-                    });
-                    return total;
-                };
-                const investSalesInitial = getInvestSalesPriceSum();
-
-                let totalInvestPrice = sumInvestBudget(data.invest.production) + sumInvestBudget(data.invest.sales);
-                let cumulativeDepr = 0;
-
-                for (let i = 0; i < 3; i++) {
-                    // Capital: Cumulative Equity principal
-                    const yearEquity = (data.loan.equity || []).reduce((sum, e) => sum + (e.loanAmtYear?.[i] || 0), 0);
-                    cumulativeEquity += yearEquity;
-
-                    // Retained Earnings: Cumulative Ordinary Profit
-                    const yearRE = yearlyPNL[i]?.ord || 0;
-                    cumulativeRE += yearRE;
-
-                    // Liability: Cumulative Debt principal (loanAmtYear)
-                    const yearDebt = (data.loan.debt || []).reduce((sum, d) => sum + (d.loanAmtYear?.[i] || 0), 0);
-                    cumulativeDebt += yearDebt;
-                    const liability = cumulativeDebt;
-
-                    // Equity Total
-                    const totalEquity = cumulativeEquity + cumulativeRE;
-
-                    // Total Assets = Liabilities + Equity
-                    const totalAsset = liability + totalEquity;
-
-                    // Non-current Assets (Fixed Assets)
-                    // Accumulate depreciation from expenses
-                    const mfgDepr = (data.expense.production.find(e => e.expenseTitle === '감가상각비')?.expenseAmtYear?.[i]) || 0;
-                    const salesDepr = (data.expense.sales.find(e => e.expenseTitle === '감가상각비')?.expenseAmtYear?.[i]) || 0;
-                    cumulativeDepr += (mfgDepr + salesDepr);
-                    
-                    // Book Value = Total Initial Price - Accumulated Depreciation
-                    const nonCurrentAsset = Math.max(0, totalInvestPrice - cumulativeDepr);
-                    
-                    // Current Assets (Liquid Assets)
-                    const currentAsset = totalAsset - nonCurrentAsset;
-
-                    bsAnalysis.push({
-                        totalAsset,
-                        currentAsset,
-                        nonCurrentAsset,
-                        liability,
-                        totalEquity,
-                        capital: cumulativeEquity,
-                        retainedEarnings: cumulativeRE
-                    });
-                }
+                // (bsAnalysis was moved up for diagnosis calculation)
 
                 return { 
                     S_mon, 
@@ -3210,6 +3178,8 @@
                     yearlyPNL,
                     totalFixedCost: Math.round((bepAnalysis[0]?.totalFC || 0) / 12),
                     ordAmtYear: yearlyPNL.map(p => p.ord),
+                    assetAmtYear: bsAnalysis.map(b => b.totalAsset),
+                    equityAmtYear: bsAnalysis.map(b => b.capital),
                     bepAnalysis, // Section 11 data
                     bsAnalysis // Section 12 data
                 };
@@ -3382,6 +3352,8 @@
                     diagnosis: analysis.diagnosis,
                     yearlyPNL: analysis.yearlyPNL,
                     ordAmtYear: analysis.ordAmtYear,
+                    assetAmtYear: analysis.assetAmtYear,
+                    equityAmtYear: analysis.equityAmtYear,
                     bepAnalysis: analysis.bepAnalysis,
                     bsAnalysis: analysis.bsAnalysis,
                     cogsYearly: analysis.cogsYearly
@@ -3727,12 +3699,16 @@
                         totalRevenue: result.totalRevenue || 0,
                         opIncome: result.opIncome || 0,
                         bepRevenue: result.bepRevenue || 0,
-                        ordAmtYear: result.ordAmtYear || []
+                        ordAmtYear: result.ordAmtYear || [],
+                        assetAmtYear: result.assetAmtYear || [],
+                        equityAmtYear: result.equityAmtYear || []
                     } : {
                         totalRevenue: liteResult.value.totalRevenue || 0,
                         opIncome: liteResult.value.opIncome || 0,
                         bepRevenue: 0,
-                        ordAmtYear: []
+                        ordAmtYear: [],
+                        assetAmtYear: [],
+                        equityAmtYear: []
                     },
                     basic: mode.value === 'expert' ? cleanData.basic : liteData.basic,
                     sale: mode.value === 'expert' ? cleanData.sale : liteData.sale,
