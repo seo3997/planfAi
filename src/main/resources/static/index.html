@@ -280,8 +280,8 @@
             <!-- EXPERT MODE -->
             <div v-if="mode === 'expert'" key="expert">
                 <div class="row g-4">
-                    <!-- Left: Input Sections -->
-                    <div class="col-lg-7">
+                    <!-- Left: Input Sections (Hidden in wide report mode) -->
+                    <div class="col-lg-7" v-if="!isReportWide">
                         <div class="accordion" id="expertAccordion">
                             
                             <!-- 1. Basic Info -->
@@ -967,15 +967,23 @@
                          </div> <!-- End Accordion -->
                     </div>
 
-                    <!-- Right: Dashboard -->
-                    <div class="col-lg-5">
+                    <!-- Right: Dashboard (Full width when wide) -->
+                    <div :class="isReportWide ? 'col-12' : 'col-lg-5'">
                         <div class="sticky-top" style="top: 20px; z-index: 900;">
                              <div class="card-expert bg-white shadow-lg border-0" style="border: 2px solid var(--primary-color);">
                                 <div class="expert-header bg-white">
                                     <h5 class="text-primary fw-bold">📈 수익성 분석 리포트</h5>
-                                    <button class="btn btn-premium btn-sm py-1 px-3" @click="saveExpertReport" :disabled="isSaving">
-                                        {{ isSaving ? '저장 중...' : '리포트 저장' }}
-                                    </button>
+                                    <div class="d-flex gap-2">
+                                        <button v-if="!isReportWide" class="btn btn-outline-primary btn-sm py-1 px-3" @click="isReportWide = true">
+                                            상세보기
+                                        </button>
+                                        <button v-else class="btn btn-outline-secondary btn-sm py-1 px-3" @click="isReportWide = false">
+                                            축소하기
+                                        </button>
+                                        <button class="btn btn-premium btn-sm py-1 px-3" @click="saveExpertReport" :disabled="isSaving">
+                                            {{ isSaving ? '저장 중...' : '리포트 저장' }}
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="expert-body">
                                     <!-- Key Metrics -->
@@ -1382,6 +1390,8 @@
                 </table>
             </div>
         </div>
+
+        <!-- (Detailed Report Modal removed as per user request for inline wide view) -->
 
         <!-- Projection Detail Modal (Advanced Layout) -->
     <div v-if="showProjectionModal" class="modal-backdrop fade show"></div>
@@ -2274,6 +2284,7 @@
             const reports = ref([]);
             const currentReportId = ref(null);
             const showProjectionModal = ref(false);
+            const isReportWide = ref(false);
             const showMaterialModal = ref(false);
             const showLaborModal = ref(false);
             const showExpenseDetailModal = ref(false);
@@ -3880,6 +3891,7 @@
                 addMenu, removeMenu, addMenuExpert,
                 addJob, addInvest, addLoan, addExpense,
                 calcMenuMonthlyRevenue,
+                isReportWide,
                 formatCurrency, formatCurrencyCheon, formatDate, parseReport, getReportValues, loadReports, saveLiteReport, saveExpertReport, loadReportToCanvas, deleteReport, formatNumber, sumArrayIdx,
                 showYearlyModal, currentMenu, currentYearly,
                 openYearlyModal, closeYearlyModal, saveYearlyModal, calcYearly, calcYearlyDirect, onYMenuCdChange,
