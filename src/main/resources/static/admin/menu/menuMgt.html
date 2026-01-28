@@ -80,6 +80,7 @@
                                             <i class="bi bi-plus-sm"></i> 하위
                                         </button>
                                         <button class="btn btn-sm btn-outline-primary me-1" @click="editMenu(menu)">수정</button>
+                                        <button class="btn btn-sm btn-outline-danger" @click="deleteMenu(menu.menuId)">삭제</button>
                                     </td>
                                 </tr>
                                 <tr v-if="menuList.length === 0">
@@ -172,6 +173,32 @@
                     modalObj.show();
                 };
 
+                const editMenu = (menu) => {
+                    const fullId = menu.menuId;
+                    modalTitle.value = '메뉴 수정';
+                    form.value = {
+                        parentMenuId: fullId.length > 4 ? fullId.substring(0, fullId.length - 4) : '',
+                        subMenuId: fullId.substring(fullId.length - 4),
+                        menuTyCode: menu.menuTyCode,
+                        menuNm: menu.menuNm,
+                        url: menu.url,
+                        sortOrdr: menu.sortOrdr,
+                        useYn: menu.useYn
+                    };
+                    modalObj.show();
+                };
+
+                const deleteMenu = (menuId) => {
+                    if (confirm('해당 메뉴와 모든 하위 메뉴가 삭제됩니다. 계속하시겠습니까?')) {
+                        axios.delete(`/api/admin/menu/${menuId}`)
+                            .then(() => {
+                                alert('삭제되었습니다.');
+                                fetchMenus();
+                            })
+                            .catch(err => AdminUtil.handleApiError(err, '삭제 실패'));
+                    }
+                };
+
                 const saveMenu = () => {
                     axios.post('/api/admin/menu', form.value)
                         .then(() => {
@@ -186,7 +213,7 @@
                     fetchMenus();
                 });
 
-                return { menuList, form, modalTitle, openModal, saveMenu };
+                return { menuList, form, modalTitle, openModal, editMenu, deleteMenu, saveMenu };
             }
         }).mount('#app');
     </script>
