@@ -116,7 +116,7 @@ div.error2{width:900px; margin:0 auto;}
 .box-top{}
 .box-top,
 .box-top > .col-auto{margin:0 0 5px !important; padding:0 !important;}
-.box-top .searchword-result{display:table-cell;padding-top: 6px; font-size: 14px;color:#999;}
+.box-top .searchword-result{display:table-cell;padding-top: 6px; font-size: 15px;color:#999;}
 .box-top .searchword-result strong{color:#3668af;}
 .box-top .col:nth-of-type(2){}
 .box-top > .col-auto:nth-of-type(2) select{}
@@ -668,33 +668,33 @@ li.dropdown > ul.dropdown-menu > li.user-header > a{display:block;padding: 10px 
 */
 .btn > i{padding-right: 5px;}
 .btn > i.fa-angle-right{padding-right: 0; padding-left: 5px;}
-.btn{font-size: 12px;padding:.47rem .8rem}
+.btn{font-size: 14px;padding:.47rem .8rem; border: 1px solid transparent; transition: all 0.2s;}
 .btn-top-search,
 .btn-top-search:hover{min-width:50px;background-color:#21457f;border:1px solid #21457f;color:#fff;font-size: 16px;padding: .3rem .8rem;}
 .btn-search,
-.btn-search:hover{min-width:90px;background-color:#21457f;border:1px solid #21457f;color:#fff;}
+.btn-search:hover{min-width:90px;background-color:#21457f;color:#fff; border: none !important;}
 .btn-reset,
 .btn-reset:hover,
 .btn-modify,
-.btn-modify:hover{min-width:90px;background-color:#29beb1;border:1px solid #29beb1;color:#fff;}
+.btn-modify:hover{min-width:90px;background-color:#29beb1;color:#fff; border: none !important;}
 .btn-list,
-.btn-list:hover{min-width:90px;background-color:#ffffff;border:1px solid #cccccc;color:#666;}
+.btn-list:hover{min-width:90px;background-color:#ffffff;border:1px solid #ddd !important;color:#666;}
 .btn-write,
-.btn-write:hover{min-width:90px;background-color:#21457f;border:1px solid #21457f;color:#fff;}
+.btn-write:hover{min-width:90px;background-color:#21457f;color:#fff; border: none !important;}
 .btn-delete,
-.btn-delete:hover{min-width:90px;background-color:#ed5f39;border:1px solid #ed5f39;color:#fff;}
+.btn-delete:hover{min-width:90px;background-color:#ed5f39;color:#fff; border: none !important;}
 .btn-save,
-.btn-save:hover{min-width: 90px;background-color:#4f83d2;border:1px solid #4f83d2;color:#fff;}
+.btn-save:hover{min-width: 90px;background-color:#4f83d2;color:#fff; border: none !important;}
 .btn-download,
-.btn-download:hover{min-width: 90px;background-color:#3c95f7;border:1px solid #3c95f7;color:#fff;}
+.btn-download:hover{min-width: 90px;background-color:#3c95f7;color:#fff; border: none !important;}
 
 .btn-calculator,
-.btn-calculator:hover{min-width: 90px;background-color:#3c95f7;border:1px solid #3c95f7;color:#fff;}
+.btn-calculator:hover{min-width: 90px;background-color:#3c95f7;color:#fff; border: none !important;}
 
 .btn-close,
-.btn-close:hover{min-width:90px;background-color:#ffffff;border:1px solid #cccccc;color:#666;}
+.btn-close:hover{min-width:90px;background-color:#ffffff;border:1px solid #ddd !important;color:#666;}
 .btn-disabled,
-.btn-disabled:hover{min-width:90px;background-color: #b3b6b7;border:1px solid  #b3b6b7;color:#333;}
+.btn-disabled:hover{min-width:90px;background-color: #b3b6b7;color:#333; border: none !important;}
 
   
 .btn-td-delete,
@@ -1026,15 +1026,16 @@ select ~ .w-30{width:183px !important;}
 
 body {
     background-color: var(--content-bg);
-    font-family: 'Malgun Gothic', 'Dotum', 'Apple SD Gothic Neo', sans-serif;
-    font-size: 12px;
+    font-family: 'Noto Sans KR', 'Malgun Gothic', 'Dotum', 'Apple SD Gothic Neo', sans-serif;
+    font-size: 14px;
     margin: 0;
     padding: 0;
+    line-height: 1.6;
 }
 
 /* Layout Structure */
 .admin-header {
-    height: 40px;
+    height: 46px;
     background-color: var(--header-bg);
     display: flex;
     align-items: center;
@@ -1063,11 +1064,11 @@ body {
 }
 
 .admin-header .nav-area .nav-item {
-    padding: 0 15px;
-    height: 40px;
-    line-height: 40px;
+    padding: 0 20px;
+    height: 46px;
+    line-height: 46px;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 15px;
     transition: all 0.2s;
     border-bottom: 4px solid transparent;
 }
@@ -1075,12 +1076,12 @@ body {
 .admin-header .nav-area .nav-item:hover,
 .admin-header .nav-area .nav-item.active {
     background-color: rgba(255, 255, 255, 0.1);
-    border-bottom: 4px solid var(--logo-bg);
+    border-bottom: 3px solid var(--logo-bg);
 }
 
 .admin-header .user-info {
     padding-right: 20px;
-    font-size: 12px;
+    font-size: 16px;
 }
 
 .admin-header .user-info a {
@@ -1092,8 +1093,8 @@ body {
 /* Sidebar & Content Wrapper */
 .main-container {
     display: flex;
-    margin-top: 40px;
-    min-height: calc(100vh - 40px);
+    margin-top: 46px;
+    min-height: calc(100vh - 46px);
 }
 
 .sidebar {
@@ -1108,15 +1109,15 @@ body {
 
 .sidebar .nav-link {
     display: block;
-    padding: 6px 20px 6px 30px;
+    padding: 8px 20px 8px 30px;
     color: #999;
     text-decoration: none;
-    font-size: 12px;
+    font-size: 14px;
     position: relative;
 }
 
 .sidebar .nav-link.category {
-    padding: 15px 10px 5px 20px;
+    padding: 18px 10px 8px 20px;
     color: var(--primary-blue);
     font-size: 18px;
     font-weight: bold;
@@ -1159,14 +1160,14 @@ body {
 }
 
 .page-title {
-    font-size: 18px;
+    font-size: 24px;
     font-weight: bold;
     color: #222;
     margin: 0;
 }
 
 .breadcrumb-area {
-    font-size: 11px;
+    font-size: 13px;
     color: #999;
 }
 
@@ -1203,6 +1204,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 18px;
 }
 
 /* Action Buttons Area */
@@ -1214,24 +1216,85 @@ body {
 }
 
 .btn-action {
-    border: none;
-    padding: 6px 15px;
+    border: none !important;
+    padding: 8px 18px;
     color: white;
-    font-size: 12px;
+    font-size: 14px;
     border-radius: 4px;
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 5px;
+    box-shadow: none;
 }
 
-.btn-delete { background-color: var(--delete-red); }
-.btn-register { background-color: var(--register-blue); }
+.btn-delete { background-color: var(--delete-red) !important; color: white !important; }
+.btn-register { background-color: var(--register-blue) !important; color: white !important; }
+
+/* Inline Table Action Buttons */
+.btn-table-edit {
+    color: #4f83d2 !important;
+    background: transparent !important;
+    border: 1px solid #4f83d2 !important;
+    padding: 2px 8px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+}
+
+.btn-table-edit:hover {
+    background: #4f83d2 !important;
+    color: white !important;
+}
+
+.btn-table-del {
+    color: #ed5f39 !important;
+    background: transparent !important;
+    border: 1px solid #ed5f39 !important;
+    padding: 2px 8px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+}
+
+.btn-table-del:hover {
+    background: #ed5f39 !important;
+    color: white !important;
+}
+
+.btn-table-sub {
+    color: #666 !important;
+    background: transparent !important;
+    border: 1px solid #ddd !important;
+    padding: 2px 8px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+}
+
+.btn-table-sub:hover {
+    background: #f4f4f4 !important;
+    color: #333 !important;
+}
+
+/* Status Badges */
+.badge-use {
+    background-color: #0c8a39 !important;
+    color: white !important;
+    padding: 4px 8px !important;
+    font-weight: 500 !important;
+    border-radius: 2px !important;
+}
+
+.badge-nuse {
+    background-color: #888 !important;
+    color: white !important;
+    padding: 4px 8px !important;
+    font-weight: 500 !important;
+    border-radius: 2px !important;
+}
 
 /* Data Table */
 .data-table-wrapper {
     background: white;
-    border-top: 2px solid #ddd;
+    border-top: 1px solid #ddd;
 }
 
 .data-table {
@@ -1242,16 +1305,18 @@ body {
 .data-table th {
     background-color: var(--table-header);
     border: 1px solid #ddd;
-    padding: 10px;
-    font-size: 12px;
+    padding: 12px;
+    font-size: 14px;
     color: #333;
     text-align: center;
+    font-weight: bold;
 }
 
 .data-table td {
     border: 1px solid #ddd;
-    padding: 8px 10px;
+    padding: 10px 12px;
     text-align: center;
+    font-size: 14px;
 }
 
 .data-table tr:hover {
@@ -1275,8 +1340,8 @@ body {
 .form-control {
     display: block;
     width: 100%;
-    padding: .375rem .75rem;
-    font-size: 12px;
+    padding: .5rem .75rem;
+    font-size: 14px;
     line-height: 1.5;
     color: #495057;
     background-color: #fff;
@@ -1286,8 +1351,8 @@ body {
 
 .badge {
     display: inline-block;
-    padding: .25em .4em;
-    font-size: 11px;
+    padding: .35em .6em;
+    font-size: 12px;
     font-weight: 700;
     border-radius: .25rem;
 }
@@ -1327,10 +1392,10 @@ body {
 }
 
 .dash-title {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: bold;
     color: #333;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     display: flex;
     justify-content: space-between;
     align-items: center;

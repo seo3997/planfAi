@@ -59,16 +59,14 @@
                                 <td>{{ menu.url }}</td>
                                 <td>{{ menu.sortOrdr }}</td>
                                 <td>
-                                    <span class="badge" :class="menu.useYn === 'Y' ? 'bg-success' : 'bg-secondary'">
+                                    <span class="badge" :class="menu.useYn === 'Y' ? 'badge-use' : 'badge-nuse'">
                                         {{ menu.useYn === 'Y' ? '사용' : '미사용' }}
                                     </span>
                                 </td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-secondary me-1" @click="openModal(menu.menuId)">
-                                        <i class="bi bi-plus-sm"></i> 하위
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-primary me-1" @click="editMenu(menu)">수정</button>
-                                    <button v-if="menu.menuLevel > 1" class="btn btn-sm btn-outline-danger" @click="deleteMenu(menu.menuId)">삭제</button>
+                                    <button class="btn btn-sm btn-table-sub me-1" @click="openModal(menu.menuId)">하위</button>
+                                    <button class="btn btn-sm btn-table-edit me-1" @click="editMenu(menu)">수정</button>
+                                    <button v-if="menu.menuLevel > 1" class="btn btn-sm btn-table-del" @click="deleteMenu(menu.menuId)">삭제</button>
                                 </td>
                             </tr>
                             <tr v-if="menuList.length === 0">

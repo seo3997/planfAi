@@ -58,8 +58,8 @@
                                 <td>{{ author.registerNm }}</td>
                                 <td>{{ author.registYmd }}</td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-primary me-1" @click="editAuthor(author)">수정</button>
-                                    <button class="btn btn-sm btn-outline-danger" @click="deleteAuthor(author.authorId)">삭제</button>
+                                    <button class="btn btn-sm btn-table-edit me-1" @click="editAuthor(author)">수정</button>
+                                    <button class="btn btn-sm btn-table-del" @click="deleteAuthor(author.authorId)">삭제</button>
                                 </td>
                             </tr>
                             <tr v-if="authorList.length === 0">
@@ -121,18 +121,21 @@
                 const authorList = ref([]);
                 const totCnt = ref(0);
                 const schAuthNm = ref('');
+                const loading = ref(true);
                 const form = ref({ authorId: '', authorNm: '', rm: '' });
                 const modalTitle = ref('권한 등록');
                 const isEdit = ref(false);
                 let modalObj = null;
 
                 const fetchAuthors = () => {
+                    loading.value = true;
                     axios.get('/api/admin/author', { params: { schAuthNm: schAuthNm.value } })
                         .then(res => {
                             authorList.value = res.data.list;
                             totCnt.value = res.data.totCnt;
                         })
-                        .catch(err => alert('권한 조회 실패'));
+                        .catch(err => alert('권한 조회 실패'))
+                        .finally(() => loading.value = false);
                 };
 
                 const openModal = () => {
@@ -186,7 +189,7 @@
                     fetchAuthors();
                 });
 
-                return { authorList, totCnt, schAuthNm, form, modalTitle, isEdit, openModal, editAuthor, saveAuthor, deleteAuthor, fetchAuthors };
+                return { authorList, totCnt, schAuthNm, loading, form, modalTitle, isEdit, openModal, editAuthor, saveAuthor, deleteAuthor, fetchAuthors };
             }
         });
         AdminLayout.register(app);

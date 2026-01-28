@@ -64,13 +64,21 @@
                 <div class="row">
                     <!-- Left: Menu Tree -->
                     <div class="col-lg-6">
-                        <div class="tree-container">
-                            <tree-node 
-                                v-for="node in menuTree" 
-                                :key="node.menuId" 
-                                :node="node"
-                                @toggle-check="handleCheck"
-                            ></tree-node>
+                        <div class="tree-container position-relative">
+                            <!-- No Data Message -->
+                            <div v-if="menuTree.length === 0" class="d-flex justify-content-center align-items-center h-100 text-muted">
+                                등록된 메뉴가 없습니다.
+                            </div>
+
+                            <!-- Tree Content -->
+                            <ul v-else class="ps-0">
+                                <tree-node 
+                                    v-for="node in menuTree" 
+                                    :key="node.menuId" 
+                                    :node="node"
+                                    @toggle-check="handleCheck"
+                                ></tree-node>
+                            </ul>
                         </div>
                     </div>
 
@@ -142,20 +150,28 @@
                 const authorNm = ref('');
                 const menuTree = ref([]);
                 const flatMenuList = ref([]);
+                const loading = ref(true);
 
-                const fetchAuthorInfo = () => {
-                    axios.get('/api/admin/author/' + authorId)
-                        .then(res => authorNm.value = res.data.authorNm)
-                        .catch(() => alert('권한 정보 로드 실패'));
+                const fetchAuthorInfo = async () => {
+                    try {
+                        const res = await axios.get('/api/admin/author/' + authorId);
+                        authorNm.value = res.data.authorNm;
+                    } catch (err) {
+                        alert('권한 정보 로드 실패');
+                    }
                 };
 
-                const fetchAuthMenus = () => {
-                    axios.get(`/api/admin/authmenu/menus/${authorId}`)
-                        .then(res => {
-                            flatMenuList.value = res.data;
-                            menuTree.value = buildTree(res.data);
-                        })
-                        .catch(() => alert('메뉴 정보 로드 실패'));
+                const fetchAuthMenus = async () => {
+                    loading.value = true;
+                    try {
+                        const res = await axios.get(`/api/admin/authmenu/menus/${authorId}`);
+                        flatMenuList.value = res.data;
+                        menuTree.value = buildTree(res.data);
+                    } catch (err) {
+                        alert('메뉴 정보 로드 실패');
+                    } finally {
+                        loading.value = false;
+                    }
                 };
 
                 const buildTree = (list) => {
@@ -216,7 +232,7 @@
                     }
                 });
 
-                return { authorNm, menuTree, handleCheck, saveMapping, goBack };
+                return { authorNm, menuTree, loading, handleCheck, saveMapping, goBack };
             }
         });
         AdminLayout.register(app);
