@@ -25,31 +25,37 @@ public class MenuService {
 
     @Transactional
     public void saveMenu(MenuVo menuVo) {
+        if (menuVo.getParentMenuId() == null || menuVo.getParentMenuId().isEmpty()) {
+            throw new IllegalArgumentException("하위 메뉴만 등록 가능합니다. 부모 메뉴를 선택해 주세요.");
+        }
+
         // 1. 메뉴 ID 생성 및 레벨 설정
-        String parentId = (menuVo.getParentMenuId() == null || menuVo.getParentMenuId().isEmpty()) ? ""
-                : menuVo.getParentMenuId();
         String subId = menuVo.getSubMenuId(); // 사용자가 입력한 4자리
 
         if (subId == null || subId.length() != 4 || !subId.matches("\\d{4}")) {
             throw new IllegalArgumentException("메뉴 ID 하위 4자리는 반드시 숫자 4자리여야 합니다.");
         }
 
-        String fullMenuId = parentId + subId;
+        // 전체 MENU_ID 생성 (부모ID + 입력한 4자리)
+        String fullMenuId = menuVo.getParentMenuId() + subId;
         menuVo.setMenuId(fullMenuId);
         menuVo.setMenuLevel(fullMenuId.length() / 4);
 
         // 2. 정렬 로직 (Denormalized Sort)
-        if (!parentId.isEmpty()) {
-            MenuVo parent = menuMapper.selectParentMenuInfo(parentId);
-            if (parent != null) {
-                // 부모의 정렬 순서 상속
-                menuVo.setSortOrdr1(parent.getSortOrdr1());
-                menuVo.setSortOrdr2(parent.getSortOrdr2());
-                menuVo.setSortOrdr3(parent.getSortOrdr3());
-                menuVo.setSortOrdr4(parent.getSortOrdr4());
-                menuVo.setSortOrdr5(parent.getSortOrdr5());
-                menuVo.setSortOrdr6(parent.getSortOrdr6());
-            }
+        MenuVo parent = menuMapper.selectParentMenuInfo(menuVo.getParentMenuId());
+        if (parent != null) {
+            // 부모의 정렬 순서 상속
+            menuVo.setSortOrdr1(parent.getSortOrdr1());
+            menuVo.setSortOrdr2(parent.getSortOrdr2());
+            menuVo.setSortOrdr3(parent.getSortOrdr3());
+            menuVo.setSortOrdr4(parent.getSortOrdr4());
+            menuVo.setSortOrdr5(parent.getSortOrdr5());
+            menuVo.setSortOrdr6(parent.getSortOrdr6());
+        }
+
+        // 기본 타입 설정 (메뉴: 20)
+        if (menuVo.getMenuTyCode() == null || menuVo.getMenuTyCode().isEmpty()) {
+            menuVo.setMenuTyCode("20");
         }
 
         // 현재 레벨에 자신의 정렬 순번 저장

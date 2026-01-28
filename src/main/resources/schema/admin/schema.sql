@@ -164,3 +164,7 @@ INSERT INTO `op_user` (
   '정상', 
   NOW()
 );
+
+-- 최상위 메뉴 추가
+INSERT INTO op_menu (MENU_ID, MENU_TY_CODE, MENU_LEVEL, MENU_NM, SORT_ORDR, USE_YN, SORT_ORDR_1, REGIST_DT) 
+VALUES ('1000', '10', 1, 'Home', 1, 'Y', 1, NOW());
