@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="admin.author">
+<mapper namespace="com.whomade.planfAi.admin.author.mapper.AuthorMapper">
 
-	<select id="selectTotCntAuthor" parameterType="dataMap" resultType="int">
-	/* admin.author.selectTotCntAuthor */
-	<![CDATA[
+	<select id="selectTotCntAuthor" parameterType="com.whomade.planfAi.admin.author.vo.AuthorVo" resultType="int">
+	/* com.whomade.planfAi.admin.author.mapper.AuthorMapper.selectTotCntAuthor */
 	SELECT COUNT(1) TOT_CNT
 	FROM op_author A
 	WHERE 1 = 1
-	]]>
-	<if test="sch_auth_nm != null and sch_auth_nm != ''">
-	AND A.AUTHOR_NM LIKE '%'||#{sch_auth_nm}|| '%'
+	<if test="schAuthNm != null and schAuthNm != ''">
+	AND A.AUTHOR_NM LIKE CONCAT('%', #{schAuthNm}, '%')
 	</if>
 	</select>
 
-	<select id="selectPageListAuthor" parameterType="dataMap" resultType="dataMap">
-	/* admin.author.selectPageListAuthor */
+	<select id="selectPageListAuthor" parameterType="com.whomade.planfAi.admin.author.vo.AuthorVo" resultType="com.whomade.planfAi.admin.author.vo.AuthorVo">
+	/* com.whomade.planfAi.admin.author.mapper.AuthorMapper.selectPageListAuthor */
 	SELECT A.AUTHOR_ID
 		, A.AUTHOR_NM
 		, A.RM
@@ -27,33 +25,31 @@
 	LEFT OUTER JOIN op_user B
 	ON A.REGISTER_NO = B.USER_NO
 	WHERE 1 = 1
-	<if test="sch_auth_nm != null and sch_auth_nm != ''">
-		AND A.AUTHOR_NM LIKE '%'|| #{sch_auth_nm}|| '%'
+	<if test="schAuthNm != null and schAuthNm != ''">
+		AND A.AUTHOR_NM LIKE CONCAT('%', #{schAuthNm}, '%')
 	</if>
 	ORDER BY A.AUTHOR_NM
 	</select>
 
-	<insert id="insertAuthor" parameterType="dataMap">
-	/* admin.author.insertAuthor */
-	<![CDATA[
+	<insert id="insertAuthor" parameterType="com.whomade.planfAi.admin.author.vo.AuthorVo">
+	/* com.whomade.planfAi.admin.author.mapper.AuthorMapper.insertAuthor */
 	INSERT INTO op_author (
 		AUTHOR_ID
 		, AUTHOR_NM
 		, RM
 		, REGISTER_NO
 		, REGIST_DT
-	)
-	SELECT #{author_id}
-		, #{author_nm}
+	) VALUES (
+		#{authorId}
+		, #{authorNm}
 		, #{rm}
-		, #{ss_user_no}
+		, #{registerNo}
 		, CURRENT_TIMESTAMP
-	FROM dual
-	]]>
+	)
 	</insert>
 
-	<select id="selectAuthor" parameterType="dataMap" resultType="dataMap">
-	/* admin.author.selectAuthor */
+	<select id="selectAuthor" parameterType="string" resultType="com.whomade.planfAi.admin.author.vo.AuthorVo">
+	/* com.whomade.planfAi.admin.author.mapper.AuthorMapper.selectAuthor */
 	SELECT 
 		AUTHOR_ID
 		, A.AUTHOR_NM
@@ -61,35 +57,30 @@
 		, DATE_FORMAT(A.REGIST_DT, '%Y.%m.%d') 	AS REGIST_YMD 
 		, DATE_FORMAT(A.UPDT_DT, '%Y.%m.%d') 	AS UPDT_YMD 
 	FROM op_author A
-	WHERE A.AUTHOR_ID = #{author_id}
+	WHERE A.AUTHOR_ID = #{authorId}
 	</select>
 
-	<update id="updateAuthor" parameterType="dataMap">
-	/* admin.author.updateAuthor */
+	<update id="updateAuthor" parameterType="com.whomade.planfAi.admin.author.vo.AuthorVo">
+	/* com.whomade.planfAi.admin.author.mapper.AuthorMapper.updateAuthor */
 	UPDATE op_author
-	SET AUTHOR_NM = #{author_nm}
+	SET AUTHOR_NM = #{authorNm}
 		, RM = #{rm}
-		, UPDUSR_NO = #{ss_user_no}
+		, UPDUSR_NO = #{updusrNo}
 		, UPDT_DT = CURRENT_TIMESTAMP
-	WHERE AUTHOR_ID = #{author_id}
+	WHERE AUTHOR_ID = #{authorId}
 	</update>
 
-	<delete id="deleteAuthor" parameterType="dataMap">
-	/* admin.author.deleteAuthor */
-	<![CDATA[
+	<delete id="deleteAuthor" parameterType="string">
+	/* com.whomade.planfAi.admin.author.mapper.AuthorMapper.deleteAuthor */
 	DELETE FROM op_author
-	WHERE AUTHOR_ID = #{author_id}
-	]]>
+	WHERE AUTHOR_ID = #{authorId}
 	</delete>
 
-
-	<select id="selectExistYnAuthor" parameterType="dataMap" resultType="string">
-	/* admin.author.selectExistYnAuthor */
-	<![CDATA[
+	<select id="selectExistYnAuthor" parameterType="string" resultType="string">
+	/* com.whomade.planfAi.admin.author.mapper.AuthorMapper.selectExistYnAuthor */
 	SELECT CASE WHEN COUNT(*) > 0 THEN 'Y' ELSE 'N' END EXIST_YN
 	FROM op_author
-	WHERE AUTHOR_ID = #{author_id}
-	]]>
+	WHERE AUTHOR_ID = #{authorId}
 	</select>
 
 </mapper>

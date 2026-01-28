@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>권한 관리 - PlanfAi 관리자</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link href="/admin/css/admin_style.css" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <!-- Top Header -->
+        <header class="admin-header">
+            <div class="logo-area">planF</div>
+            <nav class="nav-area">
+                <div class="nav-item active">시스템</div>
+                <div class="nav-item">기본정보</div>
+                <div class="nav-item">포인트 관리</div>
+                <div class="nav-item">게시판</div>
+            </nav>
+            <div class="user-info">
+                <i class="bi bi-person-fill"></i> admin
+                <a href="/admin/logout.do" class="ms-3"><i class="bi bi-unlock-fill"></i> Logout</a>
+            </div>
+        </header>
+
+        <div class="main-container">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <a class="nav-link" href="/admin/main.do">대시보드</a>
+                <a class="nav-link" href="/admin/menu/selectListMenuMgt.do">메뉴 관리</a>
+                <a class="nav-link active" href="/admin/author/selectPageListAuthorMgt.do">권한 관리</a>
+                <a class="nav-link" href="#">사용자 관리</a>
+                <a class="nav-link" href="#">코드 관리</a>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="content">
+                <div class="page-title-box">
+                    <h2 class="page-title">권한관리</h2>
+                    <div class="breadcrumb-area">
+                        <i class="bi bi-house-door"></i> > 시스템 > <span class="text-dark fw-bold">권한관리</span>
+                    </div>
+                </div>
+
+                <!-- Search Area -->
+                <div class="search-box-wrapper">
+                    <input type="text" v-model="schAuthNm" @keyup.enter="fetchAuthors" class="search-input" placeholder="권한명">
+                    <button class="btn-search-icon" @click="fetchAuthors"><i class="bi bi-search"></i></button>
+                </div>
+
+                <!-- Action Button -->
+                <div class="actions-area">
+                    <button class="btn-action btn-register" @click="openModal()"><i class="bi bi-pencil-square"></i> 등록</button>
+                </div>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 80px;">No</th>
+                                <th>권한명</th>
+                                <th style="width: 150px;">등록자</th>
+                                <th style="width: 150px;">등록일</th>
+                                <th style="width: 150px;">액션</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(author, index) in authorList" :key="author.authorId">
+                                <td>{{ totCnt - index }}</td>
+                                <td class="text-start px-4">{{ author.authorNm }}</td>
+                                <td>{{ author.registerNm }}</td>
+                                <td>{{ author.registYmd }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary me-1" @click="editAuthor(author)">수정</button>
+                                    <button class="btn btn-sm btn-outline-danger" @click="deleteAuthor(author.authorId)">삭제</button>
+                                </td>
+                            </tr>
+                            <tr v-if="authorList.length === 0">
+                                <td colspan="5" class="text-center py-5 text-muted">등록된 권한이 없습니다.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Simple Pagination (Placeholder) -->
+                <div class="d-flex justify-content-center mt-4">
+                    <nav>
+                        <ul class="pagination pagination-sm">
+                            <li class="page-item disabled"><a class="page-link" href="#"><i class="bi bi-chevron-left"></i></a></li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item disabled"><a class="page-link" href="#"><i class="bi bi-chevron-right"></i></a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </main>
+        </div>
+
+        <!-- Author Modal -->
+        <div class="modal fade" id="authorModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{ modalTitle }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">권한 ID</label>
+                            <input type="text" v-model="form.authorId" class="form-control" :readonly="isEdit" placeholder="예: ROLE_ADMIN">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">권한명</label>
+                            <input type="text" v-model="form.authorNm" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">비고</label>
+                            <textarea v-model="form.rm" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                        <button type="button" class="btn btn-primary" @click="saveAuthor">저장</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const { createApp, ref, onMounted } = Vue;
+        createApp({
+            setup() {
+                const authorList = ref([]);
+                const totCnt = ref(0);
+                const schAuthNm = ref('');
+                const form = ref({ authorId: '', authorNm: '', rm: '' });
+                const modalTitle = ref('권한 등록');
+                const isEdit = ref(false);
+                let modalObj = null;
+
+                const fetchAuthors = () => {
+                    axios.get('/api/admin/author', { params: { schAuthNm: schAuthNm.value } })
+                        .then(res => {
+                            authorList.value = res.data.list;
+                            totCnt.value = res.data.totCnt;
+                        })
+                        .catch(err => alert('권한 조회 실패'));
+                };
+
+                const openModal = () => {
+                    isEdit.value = false;
+                    form.value = { authorId: '', authorNm: '', rm: '' };
+                    modalTitle.value = '권한 등록';
+                    modalObj.show();
+                };
+
+                const editAuthor = (author) => {
+                    isEdit.value = true;
+                    form.value = { ...author };
+                    modalTitle.value = '권한 수정';
+                    modalObj.show();
+                };
+
+                const saveAuthor = () => {
+                    if (isEdit.value) {
+                        axios.put('/api/admin/author', form.value)
+                            .then(res => {
+                                alert(res.data);
+                                modalObj.hide();
+                                fetchAuthors();
+                            })
+                            .catch(err => alert(err.response.data));
+                    } else {
+                        axios.post('/api/admin/author', form.value)
+                            .then(res => {
+                                alert(res.data);
+                                modalObj.hide();
+                                fetchAuthors();
+                            })
+                            .catch(err => alert(err.response.data));
+                    }
+                };
+
+                const deleteAuthor = (authorId) => {
+                    if (confirm('삭제하시겠습니까?')) {
+                        axios.delete(`/api/admin/author/${authorId}`)
+                            .then(res => {
+                                alert(res.data);
+                                fetchAuthors();
+                            })
+                            .catch(err => alert('삭제 실패'));
+                    }
+                };
+
+                onMounted(() => {
+                    modalObj = new bootstrap.Modal(document.getElementById('authorModal'));
+                    fetchAuthors();
+                });
+
+                return { authorList, totCnt, schAuthNm, form, modalTitle, isEdit, openModal, editAuthor, saveAuthor, deleteAuthor, fetchAuthors };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
