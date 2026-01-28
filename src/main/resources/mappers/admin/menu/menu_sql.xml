@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin.menu">
+
+	<select id="selectTotCntMenu" parameterType="dataMap" resultType="int">
+	/* admin.menu.selectTotCntMenu */
+	<![CDATA[
+	SELECT COUNT(1) TOT_CNT
+	FROM op_menu
+	]]>
+	</select>
+
+	<select id="selectListMenu" parameterType="dataMap" resultType="dataMap">
+	/* admin.menu.selectListMenu */
+	<![CDATA[
+		select 
+			MENU_ID,
+			MENU_TY_CODE,
+			MENU_LEVEL,
+			MENU_NM,
+			URL,
+			SORT_ORDR,
+			USE_YN,
+			SORT_ORDR_1,
+			SORT_ORDR_2,
+			SORT_ORDR_3,
+			SORT_ORDR_4,
+			SORT_ORDR_5,
+			SORT_ORDR_6,
+			REGISTER_NO,
+			REGIST_DT,
+			UPDUSR_NO,
+			UPDT_DT
+		from op_menu 
+		order by SORT_ORDR_1 asc ,SORT_ORDR_2 asc ,SORT_ORDR_3 asc ,SORT_ORDR_4 asc ,SORT_ORDR_5 asc,SORT_ORDR_6 asc 
+	]]>
+	</select>
+
+	<select id="selectMenu" parameterType="dataMap" resultType="dataMap">
+	/* admin.menu.selectMenu */
+	<![CDATA[
+	SELECT 
+		A.MENU_ID
+		, A.MENU_TY_CODE
+		, A.MENU_LEVEL
+		, A.MENU_NM
+		, A.URL
+		, A.SORT_ORDR
+		, A.USE_YN
+		, A.SORT_ORDR_1
+		, A.SORT_ORDR_2
+		, A.SORT_ORDR_3
+		, A.SORT_ORDR_4
+		, A.SORT_ORDR_5
+		, A.SORT_ORDR_6
+		, A.REGISTER_NO
+		, DATE_FORMAT(A.REGIST_DT, '%Y.%m.%d') AS REGIST_DT 
+		, A.UPDUSR_NO
+		, DATE_FORMAT(A.UPDT_DT, '%Y.%m.%d') AS UPDT_DT 
+		, (SELECT MENU_NM FROM op_menu WHERE MENU_ID = SUBSTR( A.MENU_ID,  1,LENGTH(A.MENU_ID) - 4 )  ) AS UP_MENU_NM
+		, (SELECT MENU_ID FROM op_menu WHERE MENU_ID = SUBSTR( A.MENU_ID,  1,LENGTH(A.MENU_ID) - 4 )  ) AS UP_MENU_ID
+		
+	FROM op_menu A
+	WHERE A.MENU_ID = #{menu_id}
+	]]>
+	</select>
+
+	<select id="selectExistYnMenu" parameterType="dataMap" resultType="dataMap">
+	/* admin.menu.selectExistYnMenu */
+	<![CDATA[
+	SELECT CASE WHEN COUNT(1) = 0 THEN 'N' ELSE 'Y' END AS EXIST_YN
+	FROM op_menu A
+	WHERE A.MENU_ID = #{new_menu_id}
+	]]>
+	</select>
+
+	<select id="selectExistYnSubMenu" parameterType="dataMap" resultType="dataMap">
+	/* admin.menu.selectExistYnSubMenu */
+	<![CDATA[
+	SELECT CASE WHEN COUNT(1) = 0 THEN 'N' ELSE 'Y' END AS EXIST_SUB_YN
+	FROM op_menu A
+	WHERE A.UP_MENU_ID = #{menu_id}
+	]]>
+	</select>
+
+	<insert id="insertMenu" parameterType="dataMap">
+	/* admin.menu.insertMenu */
+	<![CDATA[
+		INSERT INTO op_menu
+	(
+			MENU_ID
+			, MENU_TY_CODE
+			, MENU_LEVEL
+			, MENU_NM
+			, URL
+			, SORT_ORDR
+			, USE_YN
+			, SORT_ORDR_1
+			, SORT_ORDR_2
+			, SORT_ORDR_3
+			, SORT_ORDR_4
+			, SORT_ORDR_5
+			, SORT_ORDR_6
+			, REGISTER_NO
+			, REGIST_DT
+	)
+	VALUES
+	(
+			#{new_menu_id}
+			, #{new_menu_type_code}
+			, #{new_menu_lv}
+			, #{new_menu_nm}
+			, #{new_url}
+			, #{new_srt_ord}
+			, #{new_disp_yn}
+			, #{sort_ordr_1}
+			, #{sort_ordr_2}
+			, #{sort_ordr_3}
+			, #{sort_ordr_4}
+			, #{sort_ordr_5}
+			, #{sort_ordr_6}
+			, #{ss_user_id}
+			, CURRENT_TIMESTAMP
+	)
+	]]>
+	</insert>
+	<update id="updateMenu" parameterType="dataMap">
+	/* admin.menu.updateMenu */
+	UPDATE op_menu
+	SET MENU_TY_CODE = #{menu_type_code}
+		, MENU_NM = #{menu_nm}
+		, URL = #{url}
+		, SORT_ORDR = #{srt_ord}
+		, SORT_ORDR_1 = #{sort_ordr_1}
+		, SORT_ORDR_2 = #{sort_ordr_2}
+		, SORT_ORDR_3 = #{sort_ordr_3}
+		, SORT_ORDR_4 = #{sort_ordr_4}
+		, SORT_ORDR_5 = #{sort_ordr_5}
+		, SORT_ORDR_6 = #{sort_ordr_6}
+		, USE_YN = #{disp_yn}
+		, UPDUSR_NO = #{ss_user_no}
+		, UPDT_DT = CURRENT_TIMESTAMP
+	WHERE MENU_ID = #{menu_id}
+	</update>
+	
+	<update id="updateMenuSub" parameterType="dataMap">
+	/* admin.menu.updateMenuSub */
+	UPDATE op_menu
+	SET UPDUSR_NO = #{ss_user_no}
+		, UPDT_DT = CURRENT_TIMESTAMP
+	<choose>
+		<when test="sortDepth == 1">
+		, SORT_ORDR_1 = #{srt_ord}
+		</when>
+		<when test="sortDepth == 2">
+		, SORT_ORDR_2 = #{srt_ord}
+		</when>
+		<when test="sortDepth == 3">
+		, SORT_ORDR_3 = #{srt_ord}
+		</when>
+		<when test="sortDepth == 4">
+		, SORT_ORDR_4 = #{srt_ord}
+		</when>
+		<when test="sortDepth == 5">
+		, SORT_ORDR_5 = #{srt_ord}
+		</when>
+		<when test="sortDepth == 6">
+		, SORT_ORDR_6 = #{srt_ord}
+		</when>
+	</choose>
+	WHERE MENU_ID LIKE CONCAT(#{menu_id},'%')
+	</update>
+
+	<delete id="deleteAuthMenu" parameterType="dataMap">
+	/* admin.menu.deleteAuthMenu */
+	DELETE
+	FROM op_author_menu
+	WHERE MENU_ID LIKE CONCAT(#{menu_id},'%')  
+	</delete>
+
+	<delete id="deleteMenu" parameterType="dataMap">
+	/* admin.menu.deleteMenu */ 
+	DELETE
+	FROM op_menu
+	WHERE MENU_ID LIKE CONCAT(#{menu_id},'%')
+	</delete>
+	
+	<select id="selectExistSortSubMenu" parameterType="dataMap" resultType="dataMap">
+	/* admin.menu.selectExistSortSubMenu */
+	<![CDATA[
+	SELECT CASE WHEN COUNT(1) = 0 THEN 'N' ELSE 'Y' END AS EXIST_SORT_YN
+	FROM op_menu A
+	WHERE
+	A.MENU_ID LIKE CONCAT(#{up_menu_id},'%')
+	AND A.MENU_LEVEL 	= #{menuLevel}
+	AND A.SORT_ORDR = #{srt_ord}
+	AND A.MENU_ID != #{menu_id}
+	]]>
+	</select>
+	
+	
+</mapper>

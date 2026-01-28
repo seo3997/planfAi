@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="admin.authmenu">
+
+	<select id="selectTotCntAuthMenu" parameterType="dataMap" resultType="int">
+	/* admin.authmenu.selectTotCntAuthMenu */
+	<![CDATA[
+	SELECT COUNT(1) TOT_CNT
+	FROM op_author A
+	LEFT OUTER JOIN op_user B
+		ON A.REGISTER_NO = B.USER_NO
+	WHERE 1 = 1
+	]]>
+	<if test="sch_auth_nm != null and sch_auth_nm != ''">
+	AND   A.AUTHOR_NM LIKE '%'||#{sch_auth_nm}||'%'
+	</if>
+	</select>
+
+	<select id="admin.authmenu.selectPageListAuthMenu" parameterType="dataMap" resultType="dataMap">
+	/* admin.authmenu.selectPageListAuthMenu */
+	SELECT AUTHOR_ID
+		, A.AUTHOR_NM
+		, A.RM
+		, A.REGISTER_NO
+		, DATE_FORMAT(A.REGIST_DT, '%Y.%m.%d') AS REGIST_YMD
+		, B.USER_NM
+		, A.REGIST_DT
+	FROM op_author A
+	LEFT OUTER JOIN op_user B
+	ON A.REGISTER_NO = B.USER_NO
+	WHERE 1 = 1
+	<if test="sch_auth_nm != null and sch_auth_nm != ''">
+		AND A.AUTHOR_NM LIKE '%'|| #{sch_auth_nm}||'%'
+	</if>
+	ORDER BY REGIST_DT DESC
+	</select>
+
+	<select id="admin.authmenu.selectInfoAuthMenu" parameterType="dataMap" resultType="dataMap">
+	/* admin.authmenu.selectInfoAuthMenu */
+	<![CDATA[
+	SELECT A.AUTHOR_NM
+	FROM op_author A
+	WHERE A.AUTHOR_ID = #{author_id}
+	]]>
+	</select>
+
+	<select id="admin.authmenu.selectListAuthMenu" parameterType="dataMap" resultType="dataMap">
+	/* admin.authmenu.selectListAuthMenu */
+	<![CDATA[
+	select
+		  A.MENU_ID,
+          A.MENU_TY_CODE,
+          A.MENU_LEVEL,
+          A.MENU_NM,
+          A.URL,
+          A.SORT_ORDR,
+          A.USE_YN,
+          A.SORT_ORDR_1,
+          A.SORT_ORDR_2,
+          A.SORT_ORDR_3,
+          A.SORT_ORDR_4,
+          A.SORT_ORDR_5,
+          A.REGISTER_NO,
+          A.REGIST_DT,
+          A.UPDUSR_NO,
+          A.UPDT_DT
+          ,CASE WHEN IFNULL(B.MENU_ID,' ') = ' ' THEN 'N' ELSE 'Y' END AUTH_YN
+		from op_menu A
+        	LEFT OUTER JOIN op_author_menu B
+            ON A.MENU_ID = B.MENU_ID
+            AND B.AUTHOR_ID = #{author_id}
+            order by A.MENU_ID asc
+	]]>
+
+	</select>
+
+	<insert id="admin.authmenu.insertAuthMenu" parameterType="dataMap">
+	/* admin.authmenu.insertAuthMenu */
+	INSERT INTO op_author_menu(AUTHOR_ID
+		, MENU_ID
+		, REGISTER_NO
+		, REGIST_DT
+	) VALUES (
+		#{author_id}
+		, #{menu_id}
+		, #{ss_user_no}
+		, CURRENT_TIMESTAMP
+	)
+	</insert>
+
+	<delete id="admin.authmenu.deleteAuthMenu" parameterType="dataMap">
+	/* admin.authmenu.deleteAuthMenu */
+	DELETE
+	FROM op_author_menu
+	WHERE AUTHOR_ID = #{author_id}
+	</delete>
+
+</mapper>

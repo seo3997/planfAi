@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin.user">
+
+	<select id="selectTotCntUser" parameterType="dataMap" resultType="int">
+		/* admin.user.selectTotCntUser */
+		SELECT COUNT(1) TOT_CNT
+		FROM op_user A
+		WHERE 1 = 1
+		<include refid="whereParam" />
+	</select>
+	
+	<select id="selectPageListUser" parameterType="dataMap" resultType="dataMap">
+		/* admin.user.selectPageListUser */
+		<if test="limitStart != null">
+			<![CDATA[
+					SELECT AA.*
+					FROM(
+			]]>	
+		</if>			
+		<include refid="selectParam" />
+		<include refid="whereParam" />
+		<if test=" limitStart != null">
+			<![CDATA[
+   						ORDER BY A.USER_NM ASC
+					) AA
+				LIMIT #{limitStart},#{limitEnd}
+			]]>
+		</if>
+	</select>
+
+	<sql id="selectParam">
+		SELECT A.USER_NO
+			, A.USER_NM
+			, A.USER_ID
+			, B.USER_NM AS REGISTER_NM
+		 	, DATE_FORMAT(A.REGIST_DT, '%Y.%m.%d') AS REGIST_YMD 
+			, A.AREA_CODE
+			, A.AREA_SE_CODE_S
+			, A.AREA_SE_CODE_D
+			, D.CODE_NM AS AREA_NM
+			, A.CTTPC_SE_CODE
+			, A.CTTPC
+			, A.EMAIL
+			, A.USER_STTUS_CODE
+			, C.CODE_NM AS USER_STTUS_NM
+		    , A.MEMBER_CODE AS AUTHOR_ID
+		    , (SELECT AUTHOR_NM FROM op_author WHERE AUTHOR_ID = A.MEMBER_CODE) AS AUTHOR_NM
+		FROM op_user A
+		LEFT OUTER JOIN op_user B ON A.REGISTER_NO = B.USER_NO
+		LEFT OUTER JOIN op_code C ON A.USER_STTUS_CODE = C.CODE AND C.GROUP_ID = 'R010050'
+		LEFT OUTER JOIN op_code D ON A.AREA_CODE = D.CODE AND D.GROUP_ID = 'R010070'
+		WHERE 1 = 1
+	</sql>
+
+
+	<sql id="whereParam">
+		<if test="sch_text != null and sch_text != ''">
+			<choose>
+				<when test="sch_type == 'user_id'">
+			AND A.USER_ID LIKE '%'|| #{sch_text}|| '%'
+				</when>
+				<when test="sch_type == 'user_nm'">
+			AND A.USER_NM LIKE '%'|| #{sch_text}|| '%'
+				</when>
+				<when test="sch_type == 'email'">
+			AND A.EMAIL LIKE '%'|| #{sch_text}|| '%'
+				</when>
+				<when test="sch_type == 'cttpc'">
+			AND A.CTTPC LIKE '%'|| #{sch_text}|| '%'
+				</when>
+			</choose>
+		</if>
+		<if test="sch_user_sttus_code != null and sch_user_sttus_code != ''">
+			AND A.USER_STTUS_CODE =#{sch_user_sttus_code}
+		</if>
+		<if test="sch_user_author != null and sch_user_author != ''">
+			AND A.MEMBER_CODE =#{sch_user_author}
+		</if>
+	</sql>
+
+
+	<select id="selecMaxUserNo"  resultType="int">
+		SELECT IFNULL(MAX(USER_NO),0)+1 AS userNO 
+		FROM  op_user
+	</select>
+
+	<insert id="insertUser" parameterType="dataMap">
+	/* admin.user.insertUser */
+	<![CDATA[
+	INSERT INTO op_user (
+		USER_NO
+		, USER_ID
+		, PASSWORD
+		, AREA_CODE
+		, AREA_SE_CODE_S
+		, AREA_SE_CODE_D
+		, USER_NM
+		, CTTPC_SE_CODE
+		, CTTPC
+		, EMAIL
+		, USER_STTUS_CODE
+		, MEMBER_CODE
+		, REGISTER_NO
+		, REGIST_DT
+	) VALUES (
+		  #{user_no}
+		, #{user_id}
+		, #{enPwd}
+		, #{area_se_code_m}
+		, #{area_se_code_s}
+		, #{area_se_code_d}
+		, #{user_nm}
+		, #{cttpc_se_code}
+		, #{cttpc}
+		, #{email}
+		, #{user_sttus_code}
+		, #{author_id}
+		, #{ss_user_no}
+		, CURRENT_TIMESTAMP
+	)
+	]]>
+	</insert>
+
+	<insert id="insertUserFront" parameterType="dataMap">
+	INSERT INTO op_user (
+		USER_NO
+		, USER_ID
+		, PASSWORD
+		, AREA_CODE
+		, AREA_SE_CODE_S
+		, AREA_SE_CODE_D
+		, USER_NM
+		, CTTPC_SE_CODE
+		, CTTPC
+		, EMAIL
+		, USER_STTUS_CODE
+		, TMPR_PASSWORD_ISSU_YN
+		, REGISTER_NO
+		, REGIST_DT
+	) VALUES (
+		(select * from (select ifnull(max(USER_NO),0)+1 from op_user) next)
+		, #{user_id}
+		, #{enPwd}
+		, #{area_se_code_m}
+		, #{area_se_code_s}
+		, #{area_se_code_d}
+		, #{user_nm}
+		, #{cttpc_se_code}
+		, #{cttpc}
+		, #{email}
+		, #{user_sttus_code}
+		, 'N'
+		, #{user_no}
+		, CURRENT_TIMESTAMP
+	)
+	</insert>
+
+	<insert id="insertUserChgHst" parameterType="dataMap">
+	/* admin.user.insertUserChgHst */
+	<![CDATA[
+		INSERT INTO op_user_chghst(
+				 USER_CHGHST_SEQ
+				,USER_NO
+				,USER_CHANGE_CODE_L
+				,USER_CHANGE_CODE_M
+				,CHANGE_CN
+				,REGISTER_NO
+				,REGIST_DT
+				,UPDUSR_NO
+				,UPDT_DT
+		)VALUES(
+				(select * from (select ifnull(max(USER_CHGHST_SEQ),0)+1 from op_user_chghst) next)
+				,#{user_no}
+				,'R010280'
+		        ,#{user_change_code_m}
+				,#{change_cn}
+				, #{ss_user_no}
+				, CURRENT_TIMESTAMP
+				, #{ss_user_no}
+				, CURRENT_TIMESTAMP
+		)
+	]]>
+	</insert>
+
+
+	<select id="selectUser" parameterType="dataMap" resultType="dataMap">
+	/* admin.user.selectUser */
+	SELECT A.USER_NO
+		, A.USER_ID
+		, A.PASSWORD
+		, A.AREA_CODE
+		, A.AREA_SE_CODE_S
+		, A.AREA_SE_CODE_D
+		, D.CODE_NM AS AREA_NM
+	    , (SELECT SCLAS_NM FROM op_sclas_code WHERE GROUP_ID='R010070' AND CODE = A.AREA_CODE AND SCLAS_CODE = A.AREA_SE_CODE_S) AS AREA_SE_CODE_S_NM
+		, A.USER_NM
+		, A.CTTPC_SE_CODE
+		, C.CODE_NM AS CTTPC_SE_NM
+		, A.CTTPC
+		, A.EMAIL
+		, A.USER_STTUS_CODE
+		, B.CODE_NM AS USER_STTUS_NM
+		, A.REGISTER_NO
+		, DATE_FORMAT(A.REGIST_DT, '%Y.%m.%d') AS REGIST_YMD 
+		, '' AS FRMHS_SEQ
+		, '' AS HSMP_SEQ
+		, '' AS APC_SEQ
+		, '' AS XPTCP_SEQ
+		,'' 	AS FRMHS_NM
+		,''   	AS HSMP_NM
+		,'' 	AS APC_NM
+		,'' 	AS XPTCP_NM
+	FROM op_user A
+	LEFT OUTER JOIN op_code B ON A.USER_STTUS_CODE 	= B.CODE AND B.GROUP_ID = 'R010050'
+	LEFT OUTER JOIN op_code C ON A.CTTPC_SE_CODE	= C.CODE AND C.GROUP_ID = 'R010040'
+	LEFT OUTER JOIN op_code D ON A.AREA_CODE = D.CODE AND D.GROUP_ID = 'R010070'
+	WHERE A.USER_NO = #{user_no}
+	</select>
+
+	<update id="updateUser" parameterType="dataMap">
+	/* admin.user.updateUser */
+	UPDATE op_user
+	SET USER_NM = #{user_nm}
+		, USER_STTUS_CODE = #{user_sttus_code}
+		, CTTPC_SE_CODE = #{cttpc_se_code}
+		, CTTPC = #{cttpc}
+		, EMAIL = #{email}
+		, AREA_CODE = #{area_se_code_m}
+		, AREA_SE_CODE_S = #{area_se_code_s}
+		, AREA_SE_CODE_D = #{area_se_code_d}
+		<if test="enPwd != null and enPwd != ''">
+		, PASSWORD = #{enPwd}
+		</if>
+	    , MEMBER_CODE   = #{author_id}
+		, UPDUSR_NO 	= #{ss_user_no}
+		, UPDT_DT 		= CURRENT_TIMESTAMP
+	WHERE USER_NO = #{user_no}
+	</update>
+
+	<update id="updateUserPsssword" parameterType="dataMap">
+	/* admin.user.updateUserPsssword */
+	UPDATE op_user
+	SET	  PASSWORD 	= #{enPwd}
+			, UPDUSR_NO 	= #{user_no}
+			, UPDT_DT 		= CURRENT_TIMESTAMP
+	WHERE USER_NO 		= #{user_no}
+	</update>
+	
+	<update id="updateUserInfo" parameterType="dataMap">
+	/* admin.user.updateUserInfo */
+	UPDATE op_user
+	SET UPDUSR_NO = #{ss_user_no}
+	<if test ="modal_user_nm != null and modal_user_nm !=''">
+		, USER_NM = #{modal_user_nm} 
+	</if>
+	<if test ="modal_cttpc_se_code != null and modal_cttpc_se_code !=''">
+		, CTTPC_SE_CODE = #{modal_cttpc_se_code}
+	</if>
+	<if test ="modal_cttpc != null and modal_cttpc !=''">
+		, CTTPC = #{modal_cttpc}
+	</if>
+	<if test ="modal_email != null and modal_email !=''">
+		, EMAIL = #{modal_email}
+	</if>
+	<if test="enPwd != null and enPwd != ''">
+		, PASSWORD = #{enPwd}
+	</if>
+		, UPDT_DT = CURRENT_TIMESTAMP
+	WHERE USER_NO = #{modal_user_no}
+	</update>
+	
+	
+	
+
+	<delete id="deleteUser" parameterType="dataMap">
+	/* admin.user.deleteUser */
+	<![CDATA[
+	UPDATE op_user
+	SET USER_STTUS_CODE = #{user_sttus_code_stop}
+		, UPDT_DT = CURRENT_TIMESTAMP
+	WHERE USER_NO = #{user_no}
+	]]>
+	</delete>
+
+	<select id="selectIdExistYn" parameterType="dataMap" resultType="string">
+	/* admin.user.selectIdExistYn */
+	SELECT
+		CASE WHEN COUNT(*) <![CDATA[ > ]]> 0
+			THEN 'Y'
+			ELSE 'N'
+		END EXIST_YN
+	FROM op_user A
+	WHERE A.USER_ID = #{user_id}
+	</select>
+
+	<select id="selectFindIdbyName" parameterType="dataMap" resultType="dataMap">
+	/* admin.user.selectFindIdbyName */
+	SELECT A.USER_ID
+	       ,A.USER_NM
+	       ,DATE_FORMAT(A.REGIST_DT, '%Y.%m.%d') AS REGIST_DT 
+	FROM op_user A
+	WHERE A.USER_NM	=#{user_nm}
+	AND   A.CTTPC			=#{cttpc}
+	</select>
+
+	<select id="selectFindIdbyId" parameterType="dataMap" resultType="dataMap">
+	/* admin.user.selectFindIdbyId */
+	SELECT	 A.USER_ID
+	       	,A.USER_NM
+	       	,A.USER_NO
+	        ,DATE_FORMAT(A.REGIST_DT, '%Y.%m.%d') AS REGIST_DT 
+	FROM op_user A
+	WHERE A.USER_ID	=#{user_id}
+	</select>
+
+	
+	<select id="selectListAuthor" parameterType="dataMap" resultType="dataMap">
+	/* admin.user.selectListAuthor */
+	SELECT A.AUTHOR_ID
+		, A.AUTHOR_NM
+	FROM op_author A
+	</select>
+	
+
+	<select id="selectListAuthorUser" parameterType="dataMap" resultType="dataMap">
+	/* admin.user.selectListAuthorUser */
+	 SELECT A.MEMBER_CODE AS AUTHOR_ID
+		, A.USER_NO 
+		, B.AUTHOR_NM
+	FROM op_user A
+	LEFT OUTER JOIN op_author B
+		ON A.MEMBER_CODE = B.AUTHOR_ID
+	WHERE A.USER_NO = #{user_no}
+	</select>
+	
+	<select id="selectPageListAllUser" parameterType="dataMap" resultType="dataMap">
+	/* admin.user.selectPageListAllBbs */
+	SELECT A.USER_NO
+		 , A.NCNM
+		 , A.USER_ID
+		 , B.NCNM AS REGISTER_NM	
+		 , DATE_FORMAT(A.REGIST_DT, '%Y.%m.%d') AS REGIST_YMD 
+		 , A.SEX_CODE
+		 , A.CTTPC_SE_CODE
+		 , A.USER_STTUS_CODE
+		 , A.CTTPC
+		 , A.EMAIL
+		 , C.CODE_NM AS USER_STTUS_NM
+		 , A.ORGNZT_CODE
+		 , D.CODE_NM AS ORGNZT_NM
+	FROM op_user A
+	LEFT OUTER JOIN op_user B ON A.REGISTER_NO = B.USER_NO
+	LEFT OUTER JOIN op_code C ON A.USER_STTUS_CODE = C.CODE AND C.GROUP_ID = #{group_id}
+	LEFT OUTER JOIN op_code D ON A.ORGNZT_CODE = D.CODE AND D.GROUP_ID = 'R010070'
+	WHERE 1 = 1
+	<if test="sch_text != null and sch_text != ''">
+		<choose>
+			<when test="sch_type == 'user_id'">
+		AND A.USER_ID LIKE '%'|| #{sch_text}|| '%'
+			</when>
+			<when test="sch_type == 'ncnm'">
+		AND A.NCNM LIKE '%'|| #{sch_text}|| '%'
+			</when>
+			<when test="sch_type == 'email'">
+		AND A.EMAIL LIKE '%'|| #{sch_text}|| '%'
+			</when>
+			<when test="sch_type == 'cttpc'">
+		AND A.CTTPC LIKE '%'|| #{sch_text}|| '%'
+			</when>
+		</choose>
+	</if>
+	ORDER BY A.REGIST_DT DESC 
+	</select>
+</mapper>

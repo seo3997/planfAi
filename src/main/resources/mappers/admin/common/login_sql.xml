@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="login">
+			
+	<resultMap id="userInfoVo" type="com.whomade.kycarrots.admin.common.vo.UserInfoVo">
+		<result property="id"						column="USER_ID"/>
+		<result property="userNo"					column="USER_NO"/>
+		<result property="userNm"					column="USER_NM"/>
+		<result property="email"					column="EMAIL"/>
+		<result property="areaCode"					column="AREA_CODE"/>
+		<result property="authorId"					column="AUTHOR_ID"/>
+		<result property="userSttusCode"			column="USER_STTUS_CODE"/>
+		<result property="password"					column="PASSWORD"/>
+		<result property="areaCodeL"				column="AREA_SE_CODE_L"/>
+		<result property="areaCodeS"				column="AREA_SE_CODE_S"/>
+		<result property="areaCodeD"				column="AREA_SE_CODE_D"/>
+		
+		
+		
+		
+	</resultMap>
+
+	<select id="selectUserInfo" parameterType="dataMap" resultMap="userInfoVo">
+	/* login.selectUserInfo : 사용자 로그인 정보 조회*/
+	SELECT A.USER_ID AS USER_ID
+		, A.USER_NO
+		, A.USER_NM
+		, A.EMAIL
+		, A.AREA_CODE
+		, USER_STTUS_CODE
+		, PASSWORD
+		,'R010070' AS AREA_SE_CODE_L
+		,IFNULL(AREA_SE_CODE_S ,'') AS AREA_SE_CODE_S
+		,IFNULL(AREA_SE_CODE_D ,'') AS AREA_SE_CODE_D
+        ,MEMBER_CODE AS  AUTHOR_ID
+	FROM op_user A
+	WHERE A.USER_ID = #{id}
+	</select>
+
+	<select id="selectUserAreaName" parameterType="dataMap" resultType="String">
+	SELECT CONCAT(C.CODE_NM,' ',D.SCLAS_NM,' ',A.SDCLAS_NM) AREA_NAME
+	FROM op_sdclas_code A 
+	LEFT JOIN op_code C ON A.GROUP_ID=C.GROUP_ID AND A.CODE = C.CODE
+	LEFT JOIN op_sclas_code D ON A.GROUP_ID=D.GROUP_ID AND A.CODE = D.CODE AND A.SCLAS_CODE=D.SCLAS_CODE
+	WHERE A.GROUP_ID 		= 'R010070'
+	AND   A.CODE     		= #{area_code_m}
+	AND   A.SCLAS_CODE      = #{area_code_s}
+	AND   A.SDCLAS_CODE     = #{area_code_d}
+	</select>
+
+	<select id="selectListAuthor" parameterType="String" resultType="dataMap">
+		/* login.selectListAuthor */
+		SELECT 	MEMBER_CODE AS AUTHOR_ID
+		FROM 	op_user
+		WHERE 	USER_NO=#{userNo}
+	</select>
+
+	<update id="updateUserLoginDt" parameterType="String">
+	/* login.updateUserLoginDt */
+	UPDATE op_user
+	SET LOGIN_DT = CURRENT_TIMESTAMP
+		, UPDUSR_NO 	= #{user_no}
+		, UPDT_DT 		= CURRENT_TIMESTAMP
+	WHERE 	USER_NO = #{user_no}
+	</update>
+
+
+</mapper>

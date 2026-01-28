@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="admin.code">
+
+	<select id="selectListCombo" parameterType="dataMap" resultType="dataMap">
+	/* admin.code.selectListCombo */
+	<![CDATA[
+	SELECT 
+		DTL_CODE
+		,DTL_CODE_NM
+		,ATTR1
+		,ATTR2
+		,ATTR3
+		,DTL_CODE_NM_EN 
+	FROM tb_code_dtl
+	WHERE GRP_CODE = #{grp_code}
+	AND   DISP_YN = 'Y'
+	ORDER BY A.SRT_ORD
+	]]>
+	</select>
+
+	<select id="selectTotCntGroupCode" parameterType="dataMap" resultType="int">
+	/* admin.code.selectTotCntGroupCode */
+	SELECT 
+	COUNT(1) TOT_CNT
+	FROM op_code_group A
+	WHERE 1 = 1
+	<include refid="whereParam" />
+	</select>
+
+
+	<select id="selectPageListGroupCode" parameterType="dataMap" resultType="dataMap">
+		<if test="limitStart != null">
+			<![CDATA[
+ 				SELECT AA.*
+				FROM (
+			]]>	
+		</if>			
+		<include refid="selectParam" />
+		<include refid="whereParam" />
+		<if test=" limitStart != null">
+			<![CDATA[
+						ORDER BY A.GROUP_ID DESC
+				) AA
+				LIMIT #{limitStart},#{limitEnd}
+			]]>
+		</if>
+	</select>
+
+
+	<sql id="selectParam">
+		SELECT 
+			A.GROUP_ID
+			, A.GROUP_NM
+			, A.GROUP_NM_ENG
+			, A.RM
+			, B.USER_NM AS REGISTER_NM
+			, DATE_FORMAT(A.REGIST_DT, '%Y.%m.%d') AS REGIST_YMD 
+		FROM op_code_group A 
+		LEFT OUTER JOIN op_user B
+		ON A.REGISTER_NO = B.USER_NO
+		WHERE 1 = 1
+	</sql>
+
+	<sql id="whereParam">
+		<if test="sch_grp_code_nm != null and sch_grp_code_nm != ''">
+			AND A.GROUP_NM LIKE '%'||#{sch_grp_code_nm}||'%'
+		</if>
+	</sql>
+
+	<select id="selectGroupCode" parameterType="dataMap" resultType="dataMap">
+	/* admin.code.selectGroupCode */	
+	SELECT 
+		GROUP_ID
+		,GROUP_NM
+		,GROUP_NM_ENG
+		,RM
+	FROM 
+		op_code_group
+	WHERE GROUP_ID = #{group_id}
+	</select>
+
+	<select id="selectListCode" parameterType="dataMap" resultType="dataMap">
+	/* admin.code.selectListCode */	
+	SELECT 
+		GROUP_ID
+		,CODE
+		,CODE_NM
+		,CODE_NM_ENG
+		,ATTRB_1
+		,ATTRB_2      
+		,ATTRB_3
+		,USE_YN
+		,SORT_ORDR
+	FROM op_code
+	WHERE GROUP_ID = #{group_id}
+	ORDER BY SORT_ORDR
+	</select>
+
+	<delete id="deleteGroupCode" parameterType="dataMap">
+	/* admin.code.deleteGroupCode */	
+	DELETE FROM op_code_group
+	WHERE GROUP_ID = #{group_id}
+	</delete>
+
+	<delete id="deleteCode" parameterType="dataMap">
+	/* admin.code.deleteCode */	
+	DELETE FROM op_code
+	WHERE GROUP_ID = #{group_id}
+	</delete>
+
+	<select id="selectExistYnGroupCode" parameterType="dataMap" resultType="dataMap">
+	/* admin.code.selectExistYnGroupCode */	
+	SELECT 
+		CASE WHEN COUNT(*) > 0 THEN 'Y' ELSE 'N' END EXIST_YN
+	FROM op_code_group
+	WHERE GROUP_ID = #{group_id}
+	</select>
+
+	<insert id="insertGroupCode" parameterType="dataMap">
+	/* admin.code.insertGroupCode */	
+	INSERT INTO op_code_group (
+		GROUP_ID
+		, GROUP_NM
+		, GROUP_NM_ENG
+		, RM
+		, REGISTER_NO
+		, REGIST_DT
+	) VALUES (
+		#{group_id}
+		, #{group_nm}
+		, #{group_nm_eng}
+		, #{rm}
+		, #{ss_user_no}
+		, CURRENT_TIMESTAMP
+	)
+	</insert>
+
+	<update id="updateGroupCode" parameterType="dataMap">
+	/* admin.code.updateGroupCode */	
+	UPDATE op_code_group 
+	SET GROUP_NM = #{group_nm}
+		, GROUP_NM_ENG = #{group_nm_eng}
+		, RM = #{rm}
+		, UPDUSR_NO = #{ss_user_no}
+		, UPDT_DT = CURRENT_TIMESTAMP
+	WHERE GROUP_ID = #{group_id}
+	</update>
+
+	<insert id="insertCode" parameterType="dataMap">
+	/* admin.code.insertCode */	
+	INSERT INTO op_code(
+		GROUP_ID
+		, CODE
+		, CODE_NM
+		, CODE_NM_ENG
+		, ATTRB_1
+		, ATTRB_2
+		, ATTRB_3
+		, SORT_ORDR
+		, USE_YN
+		, REGISTER_NO
+		, REGIST_DT
+	) VALUES (
+		#{group_id}
+		, #{code}
+		, #{code_nm}
+		, #{code_nm_eng}
+		, #{attrb_1}
+		, #{attrb_2}
+		, #{attrb_3}
+		, #{sort_ordr}
+		, #{use_yn}
+		, #{ss_user_no}
+		, CURRENT_TIMESTAMP
+	)
+	</insert>
+
+</mapper>
