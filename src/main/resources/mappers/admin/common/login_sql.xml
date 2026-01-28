@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="login">
+<mapper namespace="com.whomade.planfAi.admin.login.mapper.LoginMapper">
 			
-	<resultMap id="userInfoVo" type="com.whomade.kycarrots.admin.common.vo.UserInfoVo">
+	<resultMap id="userInfoVo" type="com.whomade.planfAi.admin.common.vo.UserInfoVo">
 		<result property="id"						column="USER_ID"/>
 		<result property="userNo"					column="USER_NO"/>
 		<result property="userNm"					column="USER_NM"/>
@@ -12,8 +12,8 @@
 		<result property="userSttusCode"			column="USER_STTUS_CODE"/>
 		<result property="password"					column="PASSWORD"/>
 		<result property="areaCodeL"				column="AREA_SE_CODE_L"/>
-		<result property="areaCodeS"				column="AREA_SE_CODE_S"/>
-		<result property="areaCodeD"				column="AREA_SE_CODE_D"/>
+		<result property="areaSeCodeS"				column="AREA_SE_CODE_S"/>
+		<result property="areaSeCodeD"				column="AREA_SE_CODE_D"/>
 		
 		
 		
@@ -32,7 +32,7 @@
 		,'R010070' AS AREA_SE_CODE_L
 		,IFNULL(AREA_SE_CODE_S ,'') AS AREA_SE_CODE_S
 		,IFNULL(AREA_SE_CODE_D ,'') AS AREA_SE_CODE_D
-        ,MEMBER_CODE AS  AUTHOR_ID
+        ,AUTHOR_ID AS  AUTHOR_ID
 	FROM op_user A
 	WHERE A.USER_ID = #{id}
 	</select>
@@ -50,7 +50,7 @@
 
 	<select id="selectListAuthor" parameterType="String" resultType="dataMap">
 		/* login.selectListAuthor */
-		SELECT 	MEMBER_CODE AS AUTHOR_ID
+		SELECT 	AUTHOR_ID AS AUTHOR_ID
 		FROM 	op_user
 		WHERE 	USER_NO=#{userNo}
 	</select>

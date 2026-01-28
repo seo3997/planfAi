@@ -14,6 +14,7 @@
 - **Framework**: Spring Boot 3.4.1
 - **Database**: MySQL 8.x
 - **Persistence**: MyBatis (XML Mapper 방식)
+- **Utilities**: Lombok (Getter/Setter 자동화)
 - **JDK 버전**: 21
 - **Configuration**: `application-dev.yml` (또는 `application.yml`)
 

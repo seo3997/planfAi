@@ -72,3 +72,24 @@ Level 2: 10001000 (부모 1000 + 사용자 입력 1000)
 상태: USER_STTUS_CODE가 '정상'인 사용자만 로그인을 허용한다.
 
 물리 참조: admin.user 패키지 및 schema/admin/op_user.sql 참조.
+
+6. 시스템 공통 유틸리티 (Common Utilities)
+   - 암호화: BCryptPasswordEncoder를 Config에 등록하여 모든 도메인에서 공유한다.
+   - 응답 구조: 가급적 ResponseEntity를 사용하여 HTTP 상태 코드와 메시지를 통일한다.
+
+7. 보안 및 필터링 (Security & Filtering)
+   - Spring Security: 모든 /admin/\*\* 경로에 대해 인증 여부를 검사한다.
+   - CSRF: API 중심 개발을 위해 CSRF는 비활성화하며, 필요 시 JWT 또는 Session 기반 인증을 병행한다.
+
+8. 시스템 가동 시나리오 (Operation Scenario)
+   8.1 관리자 인증
+   - 접속 URL: /admin/login.do
+   - 기능: 사용자 ID/PW 검증 및 세션 생성. 성공 시 메뉴 관리 페이지로 리다이렉트한다.
+
+     8.2 메뉴 체계 구축
+
+   - 접속 URL: /admin/menu/selectListMenuMgt.do
+   - 시나리오:
+     1. 시스템 기동 후 최상위 카테고리(예: 시스템관리, 1000)를 먼저 등록한다.
+     2. 생성된 카테고리 하위에 실제 업무 메뉴(예: 메뉴관리, 10001000)를 등록한다.
+     3. 각 메뉴 등록 시 SORT_ORDR 값을 지정하여 정렬 순서를 확정한다.

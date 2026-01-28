@@ -45,8 +45,8 @@
 			, A.EMAIL
 			, A.USER_STTUS_CODE
 			, C.CODE_NM AS USER_STTUS_NM
-		    , A.MEMBER_CODE AS AUTHOR_ID
-		    , (SELECT AUTHOR_NM FROM op_author WHERE AUTHOR_ID = A.MEMBER_CODE) AS AUTHOR_NM
+		    , A.AUTHOR_ID AS AUTHOR_ID
+		    , (SELECT AUTHOR_NM FROM op_author WHERE AUTHOR_ID = A.AUTHOR_ID) AS AUTHOR_NM
 		FROM op_user A
 		LEFT OUTER JOIN op_user B ON A.REGISTER_NO = B.USER_NO
 		LEFT OUTER JOIN op_code C ON A.USER_STTUS_CODE = C.CODE AND C.GROUP_ID = 'R010050'
@@ -76,7 +76,7 @@
 			AND A.USER_STTUS_CODE =#{sch_user_sttus_code}
 		</if>
 		<if test="sch_user_author != null and sch_user_author != ''">
-			AND A.MEMBER_CODE =#{sch_user_author}
+			AND A.AUTHOR_ID =#{sch_user_author}
 		</if>
 	</sql>
 
@@ -101,7 +101,7 @@
 		, CTTPC
 		, EMAIL
 		, USER_STTUS_CODE
-		, MEMBER_CODE
+		, AUTHOR_ID
 		, REGISTER_NO
 		, REGIST_DT
 	) VALUES (
@@ -233,7 +233,7 @@
 		<if test="enPwd != null and enPwd != ''">
 		, PASSWORD = #{enPwd}
 		</if>
-	    , MEMBER_CODE   = #{author_id}
+	    , AUTHOR_ID   = #{author_id}
 		, UPDUSR_NO 	= #{ss_user_no}
 		, UPDT_DT 		= CURRENT_TIMESTAMP
 	WHERE USER_NO = #{user_no}
@@ -326,12 +326,12 @@
 
 	<select id="selectListAuthorUser" parameterType="dataMap" resultType="dataMap">
 	/* admin.user.selectListAuthorUser */
-	 SELECT A.MEMBER_CODE AS AUTHOR_ID
+	 SELECT A.AUTHOR_ID AS AUTHOR_ID
 		, A.USER_NO 
 		, B.AUTHOR_NM
 	FROM op_user A
 	LEFT OUTER JOIN op_author B
-		ON A.MEMBER_CODE = B.AUTHOR_ID
+		ON A.AUTHOR_ID = B.AUTHOR_ID
 	WHERE A.USER_NO = #{user_no}
 	</select>
 	
