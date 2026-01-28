@@ -1,24 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="admin.authmenu">
+<mapper namespace="com.whomade.planfAi.admin.authmenu.mapper.AuthMenuMapper">
 
-	<select id="selectTotCntAuthMenu" parameterType="dataMap" resultType="int">
-	/* admin.authmenu.selectTotCntAuthMenu */
-	<![CDATA[
+	<select id="selectTotCntAuthor" parameterType="dataMap" resultType="int">
+	/* com.whomade.planfAi.admin.authmenu.mapper.AuthMenuMapper.selectTotCntAuthor */
 	SELECT COUNT(1) TOT_CNT
 	FROM op_author A
-	LEFT OUTER JOIN op_user B
-		ON A.REGISTER_NO = B.USER_NO
 	WHERE 1 = 1
-	]]>
-	<if test="sch_auth_nm != null and sch_auth_nm != ''">
-	AND   A.AUTHOR_NM LIKE CONCAT('%', #{sch_auth_nm}, '%')
+	<if test="schAuthNm != null and schAuthNm != ''">
+	AND   A.AUTHOR_NM LIKE CONCAT('%', #{schAuthNm}, '%')
 	</if>
 	</select>
 
-	<select id="admin.authmenu.selectPageListAuthMenu" parameterType="dataMap" resultType="dataMap">
-	/* admin.authmenu.selectPageListAuthMenu */
-	SELECT AUTHOR_ID
+	<select id="selectPageListAuthor" parameterType="dataMap" resultType="dataMap">
+	/* com.whomade.planfAi.admin.authmenu.mapper.AuthMenuMapper.selectPageListAuthor */
+	SELECT A.AUTHOR_ID
 		, A.AUTHOR_NM
 		, A.RM
 		, A.REGISTER_NO
@@ -29,25 +25,22 @@
 	LEFT OUTER JOIN op_user B
 	ON A.REGISTER_NO = B.USER_NO
 	WHERE 1 = 1
-	<if test="sch_auth_nm != null and sch_auth_nm != ''">
-		AND A.AUTHOR_NM LIKE CONCAT('%', #{sch_auth_nm}, '%')
+	<if test="schAuthNm != null and schAuthNm != ''">
+		AND A.AUTHOR_NM LIKE CONCAT('%', #{schAuthNm}, '%')
 	</if>
-	ORDER BY REGIST_DT DESC
+	ORDER BY A.AUTHOR_NM ASC
 	</select>
 
-	<select id="admin.authmenu.selectInfoAuthMenu" parameterType="dataMap" resultType="dataMap">
-	/* admin.authmenu.selectInfoAuthMenu */
-	<![CDATA[
-	SELECT A.AUTHOR_NM
-	FROM op_author A
-	WHERE A.AUTHOR_ID = #{author_id}
-	]]>
+	<select id="selectAuthorInfo" parameterType="string" resultType="dataMap">
+	/* com.whomade.planfAi.admin.authmenu.mapper.AuthMenuMapper.selectAuthorInfo */
+	SELECT AUTHOR_ID, AUTHOR_NM
+	FROM op_author
+	WHERE AUTHOR_ID = #{authorId}
 	</select>
 
-	<select id="admin.authmenu.selectListAuthMenu" parameterType="dataMap" resultType="dataMap">
-	/* admin.authmenu.selectListAuthMenu */
-	<![CDATA[
-	select
+	<select id="selectListAuthMenu" parameterType="string" resultType="com.whomade.planfAi.admin.authmenu.vo.AuthMenuVo">
+	/* com.whomade.planfAi.admin.authmenu.mapper.AuthMenuMapper.selectListAuthMenu */
+	SELECT
 		  A.MENU_ID,
           A.MENU_TY_CODE,
           A.MENU_LEVEL,
@@ -60,39 +53,34 @@
           A.SORT_ORDR_3,
           A.SORT_ORDR_4,
           A.SORT_ORDR_5,
-          A.REGISTER_NO,
-          A.REGIST_DT,
-          A.UPDUSR_NO,
-          A.UPDT_DT
-          ,CASE WHEN IFNULL(B.MENU_ID,' ') = ' ' THEN 'N' ELSE 'Y' END AUTH_YN
-		from op_menu A
-        	LEFT OUTER JOIN op_author_menu B
+          A.SORT_ORDR_6
+          ,CASE WHEN IFNULL(B.MENU_ID,'') = '' THEN 'N' ELSE 'Y' END AUTH_YN
+		FROM op_menu A
+        LEFT OUTER JOIN op_author_menu B
             ON A.MENU_ID = B.MENU_ID
-            AND B.AUTHOR_ID = #{author_id}
-            order by A.MENU_ID asc
-	]]>
-
+            AND B.AUTHOR_ID = #{authorId}
+        ORDER BY A.MENU_ID ASC
 	</select>
 
-	<insert id="admin.authmenu.insertAuthMenu" parameterType="dataMap">
-	/* admin.authmenu.insertAuthMenu */
+	<insert id="insertAuthMenu" parameterType="com.whomade.planfAi.admin.authmenu.vo.AuthMenuVo">
+	/* com.whomade.planfAi.admin.authmenu.mapper.AuthMenuMapper.insertAuthMenu */
 	INSERT INTO op_author_menu(AUTHOR_ID
 		, MENU_ID
 		, REGISTER_NO
 		, REGIST_DT
 	) VALUES (
-		#{author_id}
-		, #{menu_id}
-		, #{ss_user_no}
+		#{authorId}
+		, #{menuId}
+		, #{registerNo}
 		, CURRENT_TIMESTAMP
 	)
 	</insert>
 
-	<delete id="admin.authmenu.deleteAuthMenu" parameterType="dataMap">
-	/* admin.authmenu.deleteAuthMenu */
+	<delete id="deleteAuthMenu" parameterType="string">
+	/* com.whomade.planfAi.admin.authmenu.mapper.AuthMenuMapper.deleteAuthMenu */
 	DELETE
 	FROM op_author_menu
-	WHERE AUTHOR_ID = #{author_id}
+	WHERE AUTHOR_ID = #{authorId}
 	</delete>
 
 </mapper>
