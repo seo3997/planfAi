@@ -42,4 +42,19 @@ public class MenuController {
         menuService.deleteMenu(menuId);
         return ResponseEntity.ok("메뉴가 성공적으로 삭제되었습니다.");
     }
+
+    @GetMapping("/user-menus")
+    public ResponseEntity<java.util.List<MenuVo>> getUserMenus(
+            @RequestParam(required = false) Integer menuLevel,
+            @RequestParam(required = false) String parentMenuId,
+            jakarta.servlet.http.HttpSession session) {
+
+        com.whomade.planfAi.admin.common.vo.UserInfoVo user = (com.whomade.planfAi.admin.common.vo.UserInfoVo) session
+                .getAttribute("adminUser");
+        if (user == null) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED).build();
+        }
+
+        return ResponseEntity.ok(menuService.getUserMenuList(user.getAuthorId(), menuLevel, parentMenuId));
+    }
 }

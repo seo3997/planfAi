@@ -13,43 +13,12 @@
 </head>
 <body>
     <div id="app">
-        <!-- Top Header -->
-        <header class="admin-header">
-            <div class="logo-area">planF</div>
-            <nav class="nav-area">
-                <div class="nav-item active">시스템</div>
-                <div class="nav-item">기본정보</div>
-                <div class="nav-item">포인트 관리</div>
-                <div class="nav-item">게시판</div>
-            </nav>
-            <div class="user-info">
-                <i class="bi bi-person-fill me-1"></i> admin
-                <a href="/admin/logout.do" class="ms-3"><i class="bi bi-unlock-fill me-1"></i> Logout</a>
-            </div>
-        </header>
+        <!-- Common Header Component -->
+        <admin-header></admin-header>
 
         <div class="main-container">
-            <!-- Sidebar -->
-            <aside class="sidebar">
-                <a class="nav-link active" href="/admin/main.do">
-                    대시보드
-                </a>
-                <a class="nav-link" href="/admin/menu/selectListMenuMgt.do">
-                    메뉴 관리
-                </a>
-                <a class="nav-link" href="/admin/author/selectPageListAuthorMgt.do">
-                    권한 관리
-                </a>
-                <a class="nav-link" href="/admin/authmenu/selectPageListAuthMenuMgt.do">
-                    권한별 메뉴관리
-                </a>
-                <a class="nav-link" href="#">
-                    사용자 관리
-                </a>
-                <a class="nav-link" href="#">
-                    코드 관리
-                </a>
-            </aside>
+            <!-- Common Sidebar Component -->
+            <admin-sidebar></admin-sidebar>
 
             <!-- Main Content -->
             <main class="content">
@@ -59,6 +28,7 @@
                         <i class="bi bi-house-door"></i> > 메인 > <span class="text-dark fw-bold">대시보드</span>
                     </div>
                 </div>
+                <!-- ... stats cards and table remain same ... -->
 
                 <!-- Stats Row -->
                 <div class="row g-4 mb-4">
@@ -143,12 +113,17 @@
     </div>
 
     <script>
-        const { createApp } = Vue;
-        createApp({
+        const { createApp, onMounted } = Vue;
+        const app = createApp({
             setup() {
+                onMounted(() => {
+                    AdminMenu.init();
+                });
                 return {};
             }
-        }).mount('#app');
+        });
+        AdminLayout.register(app);
+        app.mount('#app');
     </script>
 </body>
 </html>

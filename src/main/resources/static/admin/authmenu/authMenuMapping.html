@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/admin/js/admin_common.js"></script>
     <link href="/admin/css/admin_style.css" rel="stylesheet">
     <style>
         .tree-container {
@@ -45,34 +46,14 @@
 </head>
 <body>
     <div id="app">
-        <!-- Top Header -->
-        <header class="admin-header">
-            <div class="logo-area">planF</div>
-            <nav class="nav-area">
-                <div class="nav-item active">시스템</div>
-                <div class="nav-item">기본정보</div>
-                <div class="nav-item">포인트 관리</div>
-                <div class="nav-item">게시판</div>
-            </nav>
-            <div class="user-info">
-                <i class="bi bi-person-fill"></i> admin
-                <a href="/admin/logout.do" class="ms-3"><i class="bi bi-unlock-fill"></i> Logout</a>
-            </div>
-        </header>
+        <admin-header></admin-header>
 
         <div class="main-container">
-            <!-- Sidebar -->
-            <aside class="sidebar">
-                <a class="nav-link" href="/admin/main.do">대시보드</a>
-                <a class="nav-link" href="/admin/menu/selectListMenuMgt.do">메뉴 관리</a>
-                <a class="nav-link" href="/admin/author/selectPageListAuthorMgt.do">권한 관리</a>
-                <a class="nav-link active" href="/admin/authmenu/selectPageListAuthMenuMgt.do">권한별 메뉴관리</a>
-                <a class="nav-link" href="#">사용자 관리</a>
-                <a class="nav-link" href="#">코드 관리</a>
-            </aside>
+            <admin-sidebar></admin-sidebar>
 
             <!-- Main Content -->
             <main class="content">
+                <!-- ... page title and mapping content ... -->
                 <div class="page-title-box">
                     <h2 class="page-title">권한별 메뉴리스트</h2>
                     <div class="breadcrumb-area">
@@ -154,7 +135,7 @@
             }
         };
 
-        createApp({
+        const app = createApp({
             components: { TreeNode },
             setup() {
                 const authorId = new URLSearchParams(window.location.search).get('authorId');
@@ -225,6 +206,7 @@
                 };
 
                 onMounted(() => {
+                    AdminMenu.init();
                     if (authorId) {
                         fetchAuthorInfo();
                         fetchAuthMenus();
@@ -236,7 +218,9 @@
 
                 return { authorNm, menuTree, handleCheck, saveMapping, goBack };
             }
-        }).mount('#app');
+        });
+        AdminLayout.register(app);
+        app.mount('#app');
     </script>
 </body>
 </html>

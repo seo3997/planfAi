@@ -94,4 +94,12 @@ public class MenuService {
     public void deleteMenu(String menuId) {
         menuMapper.deleteMenu(menuId);
     }
+
+    public List<MenuVo> getUserMenuList(String authorId, Integer menuLevel, String parentMenuId) {
+        java.util.Map<String, Object> params = new java.util.HashMap<>();
+        params.put("authorId", authorId);
+        params.put("menuLevel", menuLevel);
+        params.put("parentMenuId", parentMenuId);
+        return menuMapper.selectUserMenuList(params);
+    }
 }

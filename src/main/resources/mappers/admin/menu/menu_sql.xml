@@ -82,4 +82,35 @@
         DELETE FROM op_menu WHERE MENU_ID LIKE CONCAT(#{menuId}, '%')
     </delete>
 
+    <select id="selectUserMenuList" parameterType="map" resultType="com.whomade.planfAi.admin.menu.vo.MenuVo">
+        /* com.whomade.planfAi.admin.menu.mapper.MenuMapper.selectUserMenuList */
+        SELECT 
+            M.MENU_ID,
+            M.MENU_TY_CODE,
+            M.MENU_LEVEL,
+            M.MENU_NM,
+            M.URL,
+            M.SORT_ORDR,
+            M.USE_YN,
+            M.SORT_ORDR_1,
+            M.SORT_ORDR_2,
+            M.SORT_ORDR_3,
+            M.SORT_ORDR_4,
+            M.SORT_ORDR_5,
+            M.SORT_ORDR_6
+        FROM op_menu M
+        INNER JOIN op_author_menu AM ON M.MENU_ID = AM.MENU_ID
+        WHERE AM.AUTHOR_ID = #{authorId}
+          AND M.USE_YN = 'Y'
+          AND M.MENU_TY_CODE != '30'
+        <if test="menuLevel != null">
+          AND M.MENU_LEVEL = #{menuLevel}
+        </if>
+        <if test="parentMenuId != null and parentMenuId != ''">
+          AND M.MENU_ID LIKE CONCAT(#{parentMenuId}, '%')
+          AND M.MENU_ID != #{parentMenuId}
+        </if>
+        ORDER BY M.SORT_ORDR_1, M.SORT_ORDR_2, M.SORT_ORDR_3, M.SORT_ORDR_4, M.SORT_ORDR_5, M.SORT_ORDR_6
+    </select>
+
 </mapper>

@@ -18,4 +18,7 @@ public interface MenuMapper {
 
     // 상위 메뉴 정보 조회 (ID 결합 및 정렬 상속용)
     MenuVo selectParentMenuInfo(String parentMenuId);
+
+    // 권한 기반 동적 메뉴 조회
+    List<MenuVo> selectUserMenuList(java.util.Map<String, Object> params);
 }
