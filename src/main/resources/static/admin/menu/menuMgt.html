@@ -12,86 +12,105 @@
     <link href="/admin/css/admin_style.css" rel="stylesheet">
 </head>
 <body>
-    <div id="app" class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <nav class="col-md-2 sidebar d-none d-md-block py-4 shadow">
-                <h5 class="px-3 mb-4 text-primary fw-bold">PlanfAi Admin</h5>
-                <ul class="nav flex-column gap-1">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/admin/main.do">
-                            <i class="bi bi-speedometer2 me-2"></i>대시보드
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/admin/menu/selectListMenuMgt.do">
-                            <i class="bi bi-list-nested me-2"></i>메뉴 관리
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="bi bi-people me-2"></i>사용자 관리
-                        </a>
-                    </li>
-                    <div class="border-top border-secondary my-3 mx-3"></div>
-                    <li class="nav-item">
-                        <a class="nav-link text-danger" href="/admin/logout.do">
-                            <i class="bi bi-box-arrow-right me-2"></i>로그아웃
-                        </a>
-                    </li>
-                </ul>
+    <div id="app">
+        <!-- Top Header -->
+        <header class="admin-header">
+            <div class="logo-area">planF</div>
+            <nav class="nav-area">
+                <div class="nav-item active">시스템</div>
+                <div class="nav-item">기본정보</div>
+                <div class="nav-item">포인트 관리</div>
+                <div class="nav-item">게시판</div>
             </nav>
+            <div class="user-info">
+                <i class="bi bi-person-fill me-1"></i> admin
+                <a href="/admin/logout.do" class="ms-3"><i class="bi bi-unlock-fill me-1"></i> Logout</a>
+            </div>
+        </header>
+
+        <div class="main-container">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <a class="nav-link" href="/admin/main.do">
+                    대시보드
+                </a>
+                <a class="nav-link active" href="/admin/menu/selectListMenuMgt.do">
+                    메뉴 관리
+                </a>
+                <a class="nav-link" href="#">
+                    사용자 관리
+                </a>
+                <a class="nav-link" href="#">
+                    코드 관리
+                </a>
+            </aside>
 
             <!-- Main Content -->
-            <main class="col-md-10 content">
-                <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-                    <h2>메뉴 관리</h2>
+            <main class="content">
+                <div class="page-title-box">
+                    <h2 class="page-title">메뉴 관리</h2>
+                    <div class="breadcrumb-area">
+                        <i class="bi bi-house-door"></i> > 시스템 > <span class="text-dark fw-bold">메뉴 관리</span>
+                    </div>
                 </div>
 
-                <div class="card shadow-sm">
-                    <div class="card-body p-0">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th style="width: 15%;">메뉴 ID</th>
-                                    <th>메뉴명</th>
-                                    <th>URL</th>
-                                    <th style="width: 10%;">정렬</th>
-                                    <th style="width: 10%;">사용여부</th>
-                                    <th style="width: 15%;">액션</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="menu in menuList" :key="menu.menuId" :class="'menu-level-' + menu.menuLevel">
-                                    <td>{{ menu.menuId }}</td>
-                                    <td>
-                                        <span v-if="menu.menuLevel > 1" class="text-muted me-1">└</span>
-                                        {{ menu.menuNm }}
-                                    </td>
-                                    <td>{{ menu.url }}</td>
-                                    <td class="text-center">{{ menu.sortOrdr }}</td>
-                                    <td class="text-center">
-                                        <span class="badge" :class="menu.useYn === 'Y' ? 'bg-success' : 'bg-secondary'">
-                                            {{ menu.useYn === 'Y' ? '사용' : '미사용' }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-secondary me-1" @click="openModal(menu.menuId)">
-                                            <i class="bi bi-plus-sm"></i> 하위
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-primary me-1" @click="editMenu(menu)">수정</button>
-                                        <button class="btn btn-sm btn-outline-danger" @click="deleteMenu(menu.menuId)">삭제</button>
-                                    </td>
-                                </tr>
-                                <tr v-if="menuList.length === 0">
-                                    <td colspan="6" class="text-center py-5 text-muted">등록된 메뉴가 없습니다.</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <!-- Search Area -->
+                <div class="search-box-wrapper">
+                    <input type="text" class="search-input" placeholder="메뉴명 또는 URL">
+                    <button class="btn-search-icon"><i class="bi bi-search"></i></button>
+                </div>
+
+                <!-- Action Buttons Area -->
+                <div class="actions-area">
+                    <!-- Delete button is already in row, but the image shows a bulk delete button often -->
+                    <!-- <button class="btn-action btn-delete"><i class="bi bi-trash"></i> 삭제</button> -->
+                </div>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;"><input type="checkbox"></th>
+                                <th style="width: 15%;">메뉴 ID</th>
+                                <th>메뉴명</th>
+                                <th>URL</th>
+                                <th style="width: 10%;">정렬</th>
+                                <th style="width: 10%;">사용여부</th>
+                                <th style="width: 15%;">액션</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="menu in menuList" :key="menu.menuId" :class="'menu-level-' + menu.menuLevel">
+                                <td><input type="checkbox"></td>
+                                <td>{{ menu.menuId }}</td>
+                                <td class="text-start">
+                                    <span v-if="menu.menuLevel > 1" class="text-muted me-1">└</span>
+                                    {{ menu.menuNm }}
+                                </td>
+                                <td>{{ menu.url }}</td>
+                                <td>{{ menu.sortOrdr }}</td>
+                                <td>
+                                    <span class="badge" :class="menu.useYn === 'Y' ? 'bg-success' : 'bg-secondary'">
+                                        {{ menu.useYn === 'Y' ? '사용' : '미사용' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-secondary me-1" @click="openModal(menu.menuId)">
+                                        <i class="bi bi-plus-sm"></i> 하위
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-primary me-1" @click="editMenu(menu)">수정</button>
+                                    <button class="btn btn-sm btn-outline-danger" @click="deleteMenu(menu.menuId)">삭제</button>
+                                </td>
+                            </tr>
+                            <tr v-if="menuList.length === 0">
+                                <td colspan="7" class="text-center py-5 text-muted">등록된 메뉴가 없습니다.</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </main>
         </div>
+    </div>
 
         <!-- Menu Form Modal (Placeholder) -->
         <div class="modal fade" id="menuModal" tabindex="-1">
