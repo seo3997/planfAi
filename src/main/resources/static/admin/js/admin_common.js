@@ -7,6 +7,11 @@ if (typeof axios !== 'undefined') {
     axios.interceptors.response.use(
         response => response,
         error => {
+            // 로그인 API 요청인 경우 인터셉터에서 처리하지 않고 인터페이스에서 직접 처리
+            if (error.config && error.config.url.includes('/api/admin/login')) {
+                return Promise.reject(error);
+            }
+
             if (error.response && error.response.status === 401) {
                 alert('세션이 만료되었거나 권한이 없습니다. 로그인 페이지로 이동합니다.');
                 location.href = '/admin/login.do';

@@ -37,15 +37,19 @@ public class AdminLoginController {
         String userId = (String) loginData.get("userId");
         String password = (String) loginData.get("password");
 
-        UserInfoVo user = loginService.authenticate(userId, password);
+        try {
+            UserInfoVo user = loginService.authenticate(userId, password);
 
-        if (user != null) {
             // 세션에 정보 저장
             HttpSession session = request.getSession();
             session.setAttribute("adminUser", user);
             return ResponseEntity.ok("success");
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("아이디 또는 비밀번호가 일치하지 않습니다.");
+
+        } catch (IllegalArgumentException e) {
+            // "존재하지 않는 사용자", "비밀번호 불일치" 등 상세 메시지 반환
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
         }
     }
 

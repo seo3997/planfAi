@@ -8,6 +8,8 @@ CREATE TABLE `op_user` (
   `CTTPC` varchar(200) DEFAULT NULL COMMENT '통신사 정보',
   `EMAIL` varchar(50) DEFAULT NULL COMMENT '이메일',
   `AREA_CODE` varchar(10) DEFAULT NULL COMMENT '지역 코드',
+  `AREA_SE_CODE_S` varchar(20) DEFAULT NULL COMMENT '지역 구분 코드 중',
+  `AREA_SE_CODE_D` varchar(20) DEFAULT NULL COMMENT '지역 구분 코드 소',
   `USER_STTUS_CODE` varchar(100) DEFAULT NULL COMMENT '사용자 상태 코드',
   `LOGIN_DT` datetime DEFAULT NULL COMMENT '마지막 로그인 일시',
   `USER_AGE` varchar(255) DEFAULT NULL,
@@ -138,3 +140,27 @@ CREATE TABLE `op_sdclas_code` (
   `UPDT_DT` datetime DEFAULT NULL,
   PRIMARY KEY (`GROUP_ID`,`CODE`,`SCLAS_CODE`,`SDCLAS_CODE`)
 )
+
+-- 기본 생성 Sql문 
+-- 1. 권한 마스터에 관리자 권한 추가 (존재하지 않을 경우 대비)
+INSERT INTO `op_author` (`AUTHOR_ID`, `AUTHOR_NM`, `RM`, `REGIST_DT`)
+VALUES ('ROLE_ADMIN', '시스템 관리자', '전체 관리 권한', NOW());
+
+-- 2. 관리자 계정 생성 (비밀번호 1234 암호화 적용)
+INSERT INTO `op_user` (
+  `USER_ID`, 
+  `PASSWORD`, 
+  `USER_NM`, 
+  `EMAIL`, 
+  `AUTHOR_ID`, 
+  `USER_STTUS_CODE`, 
+  `REGIST_DT`
+) VALUES (
+  'admin', 
+  '$2a$10$vI8tmZH7/SByyS.uU7.E/uzYDRSuxyt8Aa.dPlNV6JpS3mjKu6F9i', -- '1234' BCrypt Hash
+  '관리자', 
+  'seo3997@gmil.com', 
+  'ROLE_ADMIN', 
+  '정상', 
+  NOW()
+);
