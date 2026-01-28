@@ -33,7 +33,6 @@
                 <div class="search-box-wrapper">
                     <input type="text" v-model="schText" @keyup.enter="fetchMenus" class="search-input" placeholder="메뉴명 또는 URL">
                     <button class="btn-search-icon" @click="fetchMenus"><i class="bi bi-search"></i></button>
-                    <button class="btn btn-primary ms-3" @click="openModal()">최상위 메뉴 등록</button>
                 </div>
 
                 <div class="data-table-wrapper">
@@ -69,7 +68,7 @@
                                         <i class="bi bi-plus-sm"></i> 하위
                                     </button>
                                     <button class="btn btn-sm btn-outline-primary me-1" @click="editMenu(menu)">수정</button>
-                                    <button class="btn btn-sm btn-outline-danger" @click="deleteMenu(menu.menuId)">삭제</button>
+                                    <button v-if="menu.menuLevel > 1" class="btn btn-sm btn-outline-danger" @click="deleteMenu(menu.menuId)">삭제</button>
                                 </td>
                             </tr>
                             <tr v-if="menuList.length === 0">
