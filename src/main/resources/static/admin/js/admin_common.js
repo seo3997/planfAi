@@ -30,16 +30,25 @@ const AdminMenu = {
     }),
 
     async init() {
-        await this.fetchTopMenus();
+        const topMenus = await this.fetchTopMenus();
+        if (window.location.pathname.includes('/admin/main.do')) {
+            // Dashboard doesn't show sidebar, but we still need activeTopId for GNB highlights
+            if (!this.state.activeTopId && topMenus.length > 0) {
+                this.state.activeTopId = topMenus[0].menuId;
+            }
+            return;
+        }
+
         if (this.state.activeTopId) {
             await this.fetchLeftMenus(this.state.activeTopId);
-        } else if (this.state.topMenus.length > 0) {
-            await this.fetchLeftMenus(this.state.topMenus[0].menuId);
+        } else if (topMenus.length > 0) {
+            await this.fetchLeftMenus(topMenus[0].menuId);
         }
     },
 
     async fetchTopMenus() {
         try {
+            // As per business spec 9.2, MENU_LEVEL = 3 is used for GNB (Top Menu)
             const res = await axios.get('/api/admin/menu/user-menus', { params: { menuLevel: 3 } });
             this.state.topMenus = res.data;
             return res.data;
@@ -86,7 +95,14 @@ const AdminHeader = {
     `,
     setup() {
         const menuState = AdminMenu.state;
-        const changeTop = (id) => AdminMenu.fetchLeftMenus(id);
+        const changeTop = async (id) => {
+            const leftMenus = await AdminMenu.fetchLeftMenus(id);
+            // After loading left menus, navigate to the first menu item if it exists
+            const firstMenu = leftMenus.find(m => m.menuTyCode === '20');
+            if (firstMenu && firstMenu.url) {
+                location.href = firstMenu.url;
+            }
+        };
         const goHome = () => location.href = '/admin/main.do';
         return { menuState, changeTop, goHome };
     }

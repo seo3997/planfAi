@@ -16,100 +16,66 @@
         <!-- Common Header Component -->
         <admin-header></admin-header>
 
-        <div class="main-container">
-            <!-- Common Sidebar Component -->
-            <admin-sidebar></admin-sidebar>
+        <div class="main-container no-sidebar">
+            <!-- Sidebar Area (Empty white space to match header logo) -->
+            <div class="sidebar" style="background-color: transparent; border-right: none;"></div>
 
             <!-- Main Content -->
-            <main class="content">
-                <div class="page-title-box">
-                    <h2 class="page-title">통계 대시보드</h2>
-                    <div class="breadcrumb-area">
-                        <i class="bi bi-house-door"></i> > 메인 > <span class="text-dark fw-bold">대시보드</span>
-                    </div>
-                </div>
-                <!-- ... stats cards and table remain same ... -->
+            <main class="content" style="background-color: white;">
+                <div class="dash-row">
+                    <!-- Left Section: Voucher Mgmt -->
+                    <div class="dash-section" style="max-width: 400px;">
+                        <div class="dash-title">산학협력 바우처관리</div>
+                        
+                        <div class="dash-card blue">
+                            <div class="card-label">회원사승인 건수</div>
+                            <div class="card-value">
+                                <span class="accrue">1</span>
+                                <span class="accrue-unit">건</span>
+                            </div>
+                        </div>
 
-                <!-- Stats Row -->
-                <div class="row g-4 mb-4">
-                    <div class="col-md-3">
-                        <div class="card card-stat bg-primary text-white shadow-sm">
-                            <div class="card-body">
-                                <h6 class="card-title opacity-75">전체 사용자</h6>
-                                <h3 class="fw-bold mb-0">1,280명</h3>
+                        <div class="dash-card green">
+                            <div class="card-label">포인트승인 건수</div>
+                            <div class="card-value">
+                                <span class="accrue">1</span>
+                                <span class="accrue-unit">건</span>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="card card-stat bg-success text-white shadow-sm">
-                            <div class="card-body">
-                                <h6 class="card-title opacity-75">오늘 생성 리포트</h6>
-                                <h3 class="fw-bold mb-0">45건</h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card card-stat bg-warning text-dark shadow-sm">
-                            <div class="card-body">
-                                <h6 class="card-title opacity-75">문의 대기</h6>
-                                <h3 class="fw-bold mb-0">12건</h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card card-stat bg-info text-white shadow-sm">
-                            <div class="card-body">
-                                <h6 class="card-title opacity-75">시스템 상태</h6>
-                                <h3 class="fw-bold mb-0">Normal</h3>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Recent Activity Table -->
-                <div class="data-table-wrapper">
-                    <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0 fw-bold">최근 리포트 생성 현황</h5>
-                        <div class="actions-area m-0">
-                            <button class="btn-action btn-register"><i class="bi bi-pencil-square"></i> 등록</button>
+                    <!-- Right Section: Board -->
+                    <div class="dash-section">
+                        <div class="dash-title">
+                            게시판
+                            <button class="btn-plus"><i class="bi bi-plus"></i></button>
+                        </div>
+                        
+                        <div class="data-table-wrapper" style="border-top: 2px solid #f0f0f0;">
+                            <table class="data-table">
+                                <thead style="background-color: #f9f9f9;">
+                                    <tr>
+                                        <th style="width: 80px;">No</th>
+                                        <th>제목</th>
+                                        <th style="width: 150px;">등록자</th>
+                                        <th style="width: 150px;">등록일자</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td class="text-start px-3">미리보는 트렌드코리아 22</td>
+                                        <td>soohyun</td>
+                                        <td>2022.12.08</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 50px;"><input type="checkbox"></th>
-                                <th style="width: 60px;">No</th>
-                                <th>사용자</th>
-                                <th>업종</th>
-                                <th>목표 순이익</th>
-                                <th>생성일시</th>
-                                <th style="width: 100px;">액션</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>1</td>
-                                <td>홍길동 (test@user.com)</td>
-                                <td><span class="badge bg-secondary">외식업</span></td>
-                                <td>5,000,000원</td>
-                                <td>2024-01-28 14:20</td>
-                                <td><button class="btn btn-sm btn-outline-primary">보기</button></td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>2</td>
-                                <td>이순신 (lee@user.com)</td>
-                                <td><span class="badge bg-secondary">제조업</span></td>
-                                <td>12,000,000원</td>
-                                <td>2024-01-28 13:05</td>
-                                <td><button class="btn btn-sm btn-outline-primary">보기</button></td>
-                            </tr>
-                        </tbody>
-                    </table>
                 </div>
             </main>
         </div>
+    </div>
     </div>
 
     <script>

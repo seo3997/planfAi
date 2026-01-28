@@ -1014,11 +1014,11 @@ select ~ .w-30{width:183px !important;}
    Base Styles & Layout (Image Based)
    ========================================================================== */
 :root {
-    --header-bg: #1e3a5f;
-    --logo-bg: #4eb6b6;
+    --header-bg: #2b4b8a;
+    --logo-bg: #49A7B0;
     --sidebar-bg: #ffffff;
     --content-bg: #f4f7f6;
-    --primary-blue: #337ab7;
+    --primary-blue: #2b579a;
     --delete-red: #ed5f39;
     --register-blue: #21457f;
     --table-header: #f9f9f9;
@@ -1026,7 +1026,7 @@ select ~ .w-30{width:183px !important;}
 
 body {
     background-color: var(--content-bg);
-    font-family: 'Malgun Gothic', 'Dotum', sans-serif;
+    font-family: 'Malgun Gothic', 'Dotum', 'Apple SD Gothic Neo', sans-serif;
     font-size: 12px;
     margin: 0;
     padding: 0;
@@ -1034,7 +1034,7 @@ body {
 
 /* Layout Structure */
 .admin-header {
-    height: 50px;
+    height: 40px;
     background-color: var(--header-bg);
     display: flex;
     align-items: center;
@@ -1052,28 +1052,30 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: bold;
 }
 
 .admin-header .nav-area {
     flex-grow: 1;
     display: flex;
-    padding-left: 20px;
+    padding-left: 10px;
 }
 
 .admin-header .nav-area .nav-item {
     padding: 0 15px;
-    height: 50px;
-    line-height: 50px;
+    height: 40px;
+    line-height: 40px;
     cursor: pointer;
     font-size: 13px;
-    transition: background 0.2s;
+    transition: all 0.2s;
+    border-bottom: 4px solid transparent;
 }
 
 .admin-header .nav-area .nav-item:hover,
 .admin-header .nav-area .nav-item.active {
     background-color: rgba(255, 255, 255, 0.1);
+    border-bottom: 4px solid var(--logo-bg);
 }
 
 .admin-header .user-info {
@@ -1090,15 +1092,15 @@ body {
 /* Sidebar & Content Wrapper */
 .main-container {
     display: flex;
-    margin-top: 50px;
-    min-height: calc(100vh - 50px);
+    margin-top: 40px;
+    min-height: calc(100vh - 40px);
 }
 
 .sidebar {
     width: 200px;
     background-color: var(--sidebar-bg);
     border-right: 1px solid #ddd;
-    padding-top: 20px;
+    padding-top: 10px;
     position: fixed;
     height: 100%;
     z-index: 900;
@@ -1106,11 +1108,27 @@ body {
 
 .sidebar .nav-link {
     display: block;
-    padding: 10px 20px;
-    color: #666;
+    padding: 6px 20px 6px 30px;
+    color: #999;
     text-decoration: none;
-    border-bottom: 1px solid #f0f0f0;
     font-size: 12px;
+    position: relative;
+}
+
+.sidebar .nav-link.category {
+    padding: 15px 10px 5px 20px;
+    color: var(--primary-blue);
+    font-size: 18px;
+    font-weight: bold;
+    border-bottom: none;
+    cursor: default;
+}
+
+.sidebar a.nav-link::before {
+    content: "•";
+    position: absolute;
+    left: 15px;
+    color: #ccc;
 }
 
 .sidebar .nav-link:hover {
@@ -1120,6 +1138,10 @@ body {
 .sidebar .nav-link.active {
     color: var(--primary-blue);
     font-weight: bold;
+}
+
+.sidebar a.nav-link.active::before {
+    color: var(--primary-blue);
 }
 
 .content {
@@ -1139,7 +1161,7 @@ body {
 .page-title {
     font-size: 18px;
     font-weight: bold;
-    color: #000;
+    color: #222;
     margin: 0;
 }
 
@@ -1155,25 +1177,32 @@ body {
 /* Search Area */
 .search-box-wrapper {
     background: #fff;
-    border: 1px solid var(--header-bg);
-    padding: 15px 15px;
+    border: 2px solid #3668af;
+    padding: 15px 20px;
     margin-bottom: 20px;
     display: flex;
-    gap: 10px;
+    gap: 15px;
+    align-items: center;
 }
 
 .search-input {
     width: 300px;
+    height: 34px;
     padding: 5px 10px;
     border: 1px solid #ddd;
+    box-sizing: border-box;
 }
 
 .btn-search-icon {
-    background-color: var(--header-bg);
+    background-color: #21457f;
     color: white;
     border: none;
-    padding: 5px 15px;
+    height: 34px;
+    padding: 0 15px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Action Buttons Area */
@@ -1281,4 +1310,83 @@ body {
     padding: 40px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     border-radius: 8px;
+}
+/* Dashboard Specific Styles */
+.no-sidebar .content {
+    margin-left: 0;
+}
+
+.dash-row {
+    display: flex;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.dash-section {
+    flex: 1;
+}
+
+.dash-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dash-card {
+    border-radius: 12px;
+    padding: 25px;
+    color: white;
+    margin-bottom: 20px;
+    position: relative;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    min-height: 140px;
+}
+
+.dash-card.blue { background-color: #4f83d2; }
+.dash-card.green { background-color: #8ccc48; }
+
+.dash-card .card-label {
+    font-size: 18px;
+    font-weight: 500;
+    font-style: italic;
+    opacity: 0.9;
+    margin-bottom: 10px;
+}
+
+.dash-card .card-value {
+    position: absolute;
+    bottom: 20px;
+    right: 25px;
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+}
+
+.dash-card .accrue {
+    font-size: 60px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.dash-card .accrue-unit {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.btn-plus {
+    width: 24px;
+    height: 24px;
+    background-color: #d8dee3;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: 14px;
+    border: none;
 }
