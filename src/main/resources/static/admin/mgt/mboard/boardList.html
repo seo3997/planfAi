@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>게시판 관리 - planF</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/admin/js/admin_common.js"></script>
+    <link href="/admin/css/admin_style.css" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <admin-header></admin-header>
+
+        <div class="main-container">
+            <admin-sidebar></admin-sidebar>
+
+            <main class="content">
+                <div class="page-header d-flex justify-content-between align-items-center">
+                    <h2>게시판</h2>
+                    <div class="breadcrumb">
+                        <i class="bi bi-house-door-fill"></i> > 게시판 > <strong>게시판</strong>
+                    </div>
+                </div>
+
+                <!-- 검색 영역 -->
+                <div class="search-section-new mb-4" style="border: 2px solid #3668af; padding: 15px; background: #fff;">
+                    <div class="d-flex gap-2">
+                        <select class="form-select" style="width: 150px;" v-model="searchDto.sch_bbs_se_code">
+                            <option value="">전체</option>
+                            <option v-for="item in categoryCodes" :key="item.CODE" :value="item.CODE">
+                                {{ item.CODE_NM }}
+                            </option>
+                        </select>
+                        <div class="input-group">
+                            <input type="text" class="form-control" v-model="searchDto.sch_text" placeholder="검색어를 입력하세요" @keyup.enter="fetchBoardList">
+                            <button class="btn" style="background-color: #21457f; color: #fff;" @click="fetchBoardList">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 리스트 영역 -->
+                <div class="list-section">
+                    <div class="d-flex justify-content-end mb-3">
+                        <button class="btn btn-primary" style="background-color: #21457f; border: none;" @click="goForm">
+                            <i class="bi bi-plus-lg"></i> 게시물 등록
+                        </button>
+                    </div>
+
+                    <table class="table table-bordered text-center align-middle" style="border-top: 2px solid #3668af;">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 100px; background-color: #f8f9fa;">No</th>
+                                <th style="background-color: #f8f9fa;">자료제목</th>
+                                <th style="width: 180px; background-color: #f8f9fa;">작성자</th>
+                                <th style="width: 180px; background-color: #f8f9fa;">작성일</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(item, index) in boardList" :key="item.BBS_SEQ" @click="goDetail(item.BBS_SEQ)" class="clickable">
+                                <td>{{ totalCount - ((currentPage - 1) * pageSize) - index }}</td>
+                                <td class="text-start ps-3">{{ item.SJ }}</td>
+                                <td>{{ item.REGISTER_NM }}</td>
+                                <td>{{ item.REGIST_DT }}</td>
+                            </tr>
+                            <tr v-if="boardList.length === 0">
+                                <td colspan="4" class="py-5 text-muted">등록된 게시글이 없습니다.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- 페이징 -->
+                    <div class="pagination-area mt-4 d-flex justify-content-center">
+                        <nav>
+                            <ul class="pagination">
+                                <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                                    <a class="page-link" href="#" @click.prevent="changePage(currentPage - 1)">&laquo;</a>
+                                </li>
+                                <li v-for="p in totalPages" :key="p" class="page-item" :class="{ active: p === currentPage }">
+                                    <a class="page-link" href="#" @click.prevent="changePage(p)"
+                                       :style="p === currentPage ? 'background-color: #29beb1; border-color: #29beb1;' : ''">
+                                        {{ p }}
+                                    </a>
+                                </li>
+                                <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+                                    <a class="page-link" href="#" @click.prevent="changePage(currentPage + 1)">&raquo;</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+
+                <admin-footer></admin-footer>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, onMounted, computed } = Vue;
+
+        const app = createApp({
+            setup() {
+                const boardList = ref([]);
+                const totalCount = ref(0);
+                const currentPage = ref(1);
+                const pageSize = 10;
+                const categoryCodes = ref([]);
+
+                const searchDto = ref({
+                    sch_bbs_se_code: '',
+                    sch_text: ''
+                });
+
+                const fetchCategories = async () => {
+                    categoryCodes.value = await AdminCode.getCodes('R010170');
+                };
+
+                const fetchBoardList = () => {
+                    axios.get('/api/admin/mgt/board/list', {
+                        params: { ...searchDto.value, page: currentPage.value, size: pageSize }
+                    }).then(res => {
+                        boardList.value = res.data.list;
+                        totalCount.value = res.data.totalCount;
+                    });
+                };
+
+                const totalPages = computed(() => Math.ceil(totalCount.value / pageSize) || 1);
+
+                const changePage = (p) => {
+                    if (p < 1 || p > totalPages.value) return;
+                    currentPage.value = p;
+                    fetchBoardList();
+                };
+
+                const goDetail = (seq) => {
+                    location.href = `/admin/mgt/mboard/selectBoard.do?bbs_seq=${seq}`;
+                };
+
+                const goForm = () => {
+                    location.href = '/admin/mgt/mboard/insertFormBoard.do';
+                };
+
+                onMounted(() => {
+                    AdminMenu.init();
+                    fetchCategories();
+                    fetchBoardList();
+                });
+
+                return {
+                    boardList, totalCount, currentPage, totalPages,
+                    searchDto, categoryCodes,
+                    fetchBoardList, changePage, goDetail, goForm
+                };
+            }
+        });
+        AdminLayout.register(app);
+        app.mount('#app');
+    </script>
+</body>
+</html>

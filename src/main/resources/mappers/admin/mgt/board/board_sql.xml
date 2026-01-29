@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.whomade.planfAi.admin.mgt.board.mapper.BoardMapper">	
+	
+	
+	<select id="selectTotCntBoard" parameterType="dataMap" resultType="int">
+	/* mgt.mboard.selectTotCntBoard */
+	SELECT COUNT(1) AS TOT_CNT
+	FROM tb_board A
+	WHERE A.DELETE_YN = 'N'
+	<include refid="whereParam" />
+	</select>
+
+
+	<select id="selectPageListBoard" parameterType="dataMap" resultType="dataMap">
+		<if test="limitStart != null">
+			<![CDATA[
+			   SELECT AA.*
+			   FROM(
+			]]>	
+		</if>			
+		<include refid="selectParam" />
+		<include refid="whereParam" />
+		<if test=" limitStart != null">
+			<![CDATA[
+	    			ORDER BY A.UPDT_DT DESC
+				) AA
+				LIMIT #{limitStart},#{limitEnd}
+			]]>
+		</if>
+	</select>
+
+	<select id="selectListBoard" parameterType="dataMap" resultType="dataMap">
+		SELECT A.BBS_SEQ
+			, A.BBS_SE_CODE_L
+			, A.BBS_SE_CODE_M
+			, C.CODE_NM AS BBS_SE_NM
+			, A.SJ
+			, A.CN
+			, A.ATCH_DOC_ID
+		    , A.ATCH_YN
+			, A.REGISTER_NO
+			, B.USER_NM AS REGISTER_NM
+			, B.USER_ID AS REGISTER_ID
+			,DATE_FORMAT(A.REGIST_DT, '%Y.%m.%d') AS REGIST_DT 
+		FROM tb_board A
+		INNER JOIN op_user B
+		ON A.REGISTER_NO = B.USER_NO
+		LEFT  JOIN op_code C  	ON A.BBS_SE_CODE_L=C.GROUP_ID 	AND A.BBS_SE_CODE_M = C.CODE 
+		WHERE A.DELETE_YN = 'N'
+		<if test="sch_bbs_se_code != null and sch_bbs_se_code != ''">
+			AND A.BBS_SE_CODE_M  = #{sch_bbs_se_code}
+		</if>
+ 		ORDER BY A.UPDT_DT DESC
+		LIMIT 0,5
+	</select>
+
+
+	<sql id="selectParam">
+			SELECT A.BBS_SEQ
+				, A.BBS_SE_CODE_L
+				, A.BBS_SE_CODE_M
+				, C.CODE_NM AS BBS_SE_NM
+				, A.SJ
+				, A.ATCH_DOC_ID
+				, A.ATCH_YN
+				, A.REGISTER_NO
+				, B.USER_NM AS REGISTER_NM
+				, B.USER_ID AS REGISTER_ID
+				,DATE_FORMAT(A.REGIST_DT, '%Y.%m.%d') AS REGIST_DT 
+			FROM tb_board A
+			INNER JOIN op_user B
+			ON A.REGISTER_NO = B.USER_NO
+			LEFT  JOIN op_code C  	ON A.BBS_SE_CODE_L=C.GROUP_ID 	AND A.BBS_SE_CODE_M = C.CODE 
+			WHERE A.DELETE_YN = 'N'
+	</sql>
+
+	<sql id="whereParam">
+		   <if test="sch_bbs_se_code != null and sch_bbs_se_code != ''">
+		       AND A.BBS_SE_CODE_M  = #{sch_bbs_se_code}
+		   </if>
+			<if test="(front_yn == '1' or front_yn == 1)
+				  and sch_bbs_se_code_m == '20'
+				  and ss_user_no != null and ss_user_no != ''">
+				AND A.REGISTER_NO = #{ss_user_no}
+			</if>
+		<if test="sch_text != null and sch_text != ''">
+			AND CONCAT(A.SJ, A.CN) LIKE CONCAT('%',#{sch_text},'%')
+		</if>
+	</sql>
+	
+	<select id="selectBoard" parameterType="dataMap" resultType="dataMap">
+	/* mgt.mboard.selectBoard */
+	SELECT A.BBS_SEQ
+		, A.BBS_SE_CODE_L
+		, A.BBS_SE_CODE_M
+		, C.CODE_NM AS BBS_SE_NM
+		, A.SJ
+		, A.CN
+		, A.ATCH_DOC_ID
+		, A.ATCH_YN
+		, A.HIT_CNT
+		, A.DELETE_YN
+		, A.REGISTER_NO
+        , DATE_FORMAT(A.REGIST_DT, '%Y.%m.%d') AS REGIST_DT 
+		, B.USER_NM AS REGISTER_NM
+		, B.USER_ID AS REGISTER_ID
+	FROM tb_board A 	INNER JOIN op_user B	ON A.REGISTER_NO = B.USER_NO
+	LEFT  JOIN op_code C  	ON A.BBS_SE_CODE_L=C.GROUP_ID 	AND A.BBS_SE_CODE_M = C.CODE 
+	WHERE 	A.BBS_SEQ = #{bbs_seq}
+	AND 		A.DELETE_YN = 'N'
+	</select>
+		
+	<insert id="insertBoard" parameterType="dataMap">
+	/*  mgt.mboard.insertBoard */
+	INSERT INTO tb_board (
+	    BBS_SEQ
+		,BBS_SE_CODE_L
+		,BBS_SE_CODE_M
+		, SJ
+		, CN
+		, ATCH_DOC_ID
+		, ATCH_YN
+		, HIT_CNT
+		, DELETE_YN
+		, REGISTER_NO
+		, REGIST_DT
+		, UPDUSR_NO
+		, UPDT_DT
+	) values (
+		(select * from (select ifnull(max(bbs_seq),0)+1 from tb_board) next)
+		,#{bbs_se_code_l}
+		,#{bbs_se_code_m}
+		,#{sj}
+		,#{cn}
+		,#{atch_doc_id}
+		<choose>
+			<when test="atch_yn != null and atch_yn != ''">
+				,#{atch_yn}
+			</when>
+			<otherwise>
+				,'Y'
+			</otherwise>
+		</choose>
+		, 0
+		,'N'
+		,#{ss_user_no}
+		, CURRENT_TIMESTAMP
+		,#{ss_user_no}
+		, CURRENT_TIMESTAMP
+	)
+	</insert>
+
+	<update id="updateBoard" parameterType="dataMap">
+	/*  mgt.mboard.updateBoard */
+	UPDATE tb_board
+	SET SJ = #{sj}
+		, CN = #{cn}
+		<if test="atch_doc_id != null and atch_doc_id != ''">
+			, ATCH_DOC_ID = #{atch_doc_id}
+			<if test="atch_yn != null and atch_yn != ''">
+				, ATCH_YN = #{atch_yn}
+			</if>
+		</if>
+		, UPDUSR_NO = #{ss_user_no}
+		, UPDT_DT = CURRENT_TIMESTAMP
+	WHERE BBS_SEQ = #{bbs_seq}
+	</update>
+	
+	<update id="deleteBoard" parameterType="dataMap">
+	/* mgt.mboard.deleteBoard */
+	UPDATE tb_board
+	SET DELETE_YN = 'Y'
+	WHERE BBS_SEQ = #{bbs_seq}
+	</update>
+
+	<insert id="insertFile" parameterType="com.whomade.planfAi.common.util.file.vo.CoFileVO">
+	/* admin.mgt.board.insertFile */
+	INSERT INTO tb_file (
+		DOC_ID, FILE_ID, FILE_NM, FILE_EXTSN_NM, FILE_SIZE, 
+		FILE_PARTN_COURS, FILE_ABSLT_COURS, CNTNTS_TY, SORT_ORDR, 
+		REGISTER_NO, REGIST_DT
+	) VALUES (
+		#{doc_id}, #{file_id}, #{file_nm}, #{file_ext_nm}, #{file_size},
+		#{file_rltv_path}, #{file_aslt_path}, #{content_type}, 0,
+		#{ss_user_id}, CURRENT_TIMESTAMP
+	)
+	</insert>
+
+	<select id="selectFileList" parameterType="dataMap" resultType="dataMap">
+	/* admin.mgt.board.selectFileList */
+	SELECT FILE_SEQ, DOC_ID, FILE_ID, FILE_NM, FILE_EXTSN_NM, 
+	       FILE_SIZE, FILE_PARTN_COURS, CNTNTS_TY, SORT_ORDR
+	FROM tb_file
+	WHERE DOC_ID = #{atch_doc_id}
+	ORDER BY SORT_ORDR ASC
+	</select>
+
+	<update id="deleteFile" parameterType="dataMap">
+	/* admin.mgt.board.deleteFile */
+	DELETE FROM tb_file WHERE FILE_SEQ = #{file_seq}
+	</update>
+
+</mapper>
