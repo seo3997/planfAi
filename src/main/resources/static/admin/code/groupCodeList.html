@@ -85,7 +85,7 @@
                             <tr v-for="(item, index) in groupList" :key="item.groupId" @click="goDetail(item.groupId)" style="cursor: pointer;">
                                 <td @click.stop><input type="checkbox" v-model="selectedIds" :value="item.groupId"></td>
                                 <td>{{ totCnt - ((page - 1) * size) - index }}</td>
-                                <td class="fw-medium text-primary">{{ item.groupId }}</td>
+                                <td class="fw-medium text-dark">{{ item.groupId }}</td>
                                 <td class="text-start px-3 text-dark">{{ item.groupNm }}</td>
                                 <td class="text-start px-3 text-muted">{{ item.groupNmEng }}</td>
                                 <td>{{ item.registerNm }}</td>
