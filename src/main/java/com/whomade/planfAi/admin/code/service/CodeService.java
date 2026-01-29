@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -123,5 +125,44 @@ public class CodeService {
 
     public void deleteSdclasCode(String groupId, String code, String sclasCode, String sdclasCode) {
         codeMapper.deleteSdclasCode(groupId, code, sclasCode, sdclasCode);
+    }
+
+    @Transactional
+    public void saveAllSclas(List<SclasCodeDto> dtoList, Long userNo) {
+        for (SclasCodeDto dto : dtoList) {
+            if (dto.getSclasCode() == null || dto.getSclasCode().isEmpty())
+                continue;
+
+            // Simple logic: if version/isNew flag not available, we could check DB or just
+            // try to insert/update.
+            // But usually in these UIs, we know if it's new. Let's assume we just try to
+            // update and if it fails or we want to be safe:
+            // For now, let's use the pattern from the controller: check if it's a new entry
+            // (this might need frontend support)
+            // Actually, I'll just use the mapper's insert/update.
+            // If the user wants "server to handle it", usually it means "upsert" or
+            // handleList.
+            dto.setUpdusrNo(userNo);
+            int updated = codeMapper.updateSclasCode(dto);
+            if (updated == 0) {
+                dto.setRegisterNo(userNo);
+                codeMapper.insertSclasCode(dto);
+            }
+        }
+    }
+
+    @Transactional
+    public void saveAllSdclas(List<SdclasCodeDto> dtoList, Long userNo) {
+        for (SdclasCodeDto dto : dtoList) {
+            if (dto.getSdclasCode() == null || dto.getSdclasCode().isEmpty())
+                continue;
+
+            dto.setUpdusrNo(userNo);
+            int updated = codeMapper.updateSdclasCode(dto);
+            if (updated == 0) {
+                dto.setRegisterNo(userNo);
+                codeMapper.insertSdclasCode(dto);
+            }
+        }
     }
 }

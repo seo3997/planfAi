@@ -116,6 +116,13 @@ public class CodeRestController {
         return ResponseEntity.ok("삭제되었습니다.");
     }
 
+    @PostMapping("/sclas/all")
+    public ResponseEntity<?> saveAllSclas(@RequestBody List<SclasCodeDto> dtoList, HttpSession session) {
+        UserInfoVo user = (UserInfoVo) session.getAttribute("adminUser");
+        codeService.saveAllSclas(dtoList, user.getUserNo());
+        return ResponseEntity.ok("저장되었습니다.");
+    }
+
     // Sub Classification (Sdclas)
     @GetMapping("/sdclas/{groupId}/{code}/{sclasCode}")
     public ResponseEntity<?> getSdclasCodes(@PathVariable String groupId, @PathVariable String code,
@@ -145,5 +152,12 @@ public class CodeRestController {
             @PathVariable String sclasCode, @PathVariable String sdclasCode) {
         codeService.deleteSdclasCode(groupId, code, sclasCode, sdclasCode);
         return ResponseEntity.ok("삭제되었습니다.");
+    }
+
+    @PostMapping("/sdclas/all")
+    public ResponseEntity<?> saveAllSdclas(@RequestBody List<SdclasCodeDto> dtoList, HttpSession session) {
+        UserInfoVo user = (UserInfoVo) session.getAttribute("adminUser");
+        codeService.saveAllSdclas(dtoList, user.getUserNo());
+        return ResponseEntity.ok("저장되었습니다.");
     }
 }

@@ -169,7 +169,6 @@
                                                     <button v-if="!sc.isNew" class="btn btn-sm btn-primary px-3 py-1" style="font-size: 12px;" @click="openSdclasModal(sc)">관리</button>
                                                 </td>
                                                 <td class="text-center">
-                                                    <button class="btn btn-sm btn-primary py-0 px-2 me-1" @click="saveSclas(sc)">저장</button>
                                                     <button class="btn btn-sm btn-danger py-0 px-2" @click="deleteSclas(sc, sidx)"><i class="bi bi-trash"></i></button>
                                                 </td>
                                             </tr>
@@ -179,7 +178,8 @@
                                         </tbody>
                                     </table>
                                 </div>
-                                <div class="text-center mt-3">
+                                <div class="text-center mt-3 gap-2 d-flex justify-content-center">
+                                    <button class="btn btn-sm btn-primary px-4" @click="saveSclas"><i class="bi bi-check-lg"></i> 소분류 저장</button>
                                     <button class="btn btn-sm btn-success px-4" @click="addSclasRow"><i class="bi bi-plus-lg"></i> 소분류 추가</button>
                                 </div>
                             </div>
@@ -225,7 +225,6 @@
                                                     </select>
                                                 </td>
                                                 <td class="text-center">
-                                                    <button class="btn btn-sm btn-primary py-0 px-2 me-1" @click="saveSdclas(sd)">저장</button>
                                                     <button class="btn btn-sm btn-danger py-0 px-2" @click="deleteSdclas(sd, sdidx)"><i class="bi bi-trash"></i></button>
                                                 </td>
                                             </tr>
@@ -235,7 +234,8 @@
                                         </tbody>
                                     </table>
                                 </div>
-                                <div class="text-center mt-3">
+                                <div class="text-center mt-3 gap-2 d-flex justify-content-center">
+                                    <button class="btn btn-sm btn-primary px-4" @click="saveSdclas"><i class="bi bi-check-lg"></i> 세분류 저장</button>
                                     <button class="btn btn-sm btn-success px-4" @click="addSdclasRow"><i class="bi bi-plus-lg"></i> 세분류 추가</button>
                                 </div>
                             </div>
@@ -358,11 +358,9 @@
                     });
                 };
 
-                const saveSclas = async (sc) => {
-                    if(!sc.sclasCode || !sc.sclasNm) return alert('코드와 명칭을 입력해주세요.');
+                const saveSclas = async () => {
                     try {
-                        if(sc.isNew) await axios.post('/api/admin/code/sclas', sc);
-                        else await axios.put('/api/admin/code/sclas', sc);
+                        await axios.post('/api/admin/code/sclas/all', sclasCodes.value);
                         alert('저장되었습니다.');
                         fetchSclasCodes(selectedCode.value.code);
                     } catch (err) { alert('저장 실패'); }
@@ -407,11 +405,9 @@
                     });
                 };
 
-                const saveSdclas = async (sd) => {
-                    if(!sd.sdclasCode || !sd.sdclasNm) return alert('코드와 명칭을 입력해주세요.');
+                const saveSdclas = async () => {
                     try {
-                        if(sd.isNew) await axios.post('/api/admin/code/sdclas', sd);
-                        else await axios.put('/api/admin/code/sdclas', sd);
+                        await axios.post('/api/admin/code/sdclas/all', sdclasCodes.value);
                         alert('저장되었습니다.');
                         fetchSdclasCodes(selectedSclas.value.code, selectedSclas.value.sclasCode);
                     } catch (err) { alert('저장 실패'); }
