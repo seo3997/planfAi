@@ -166,10 +166,19 @@ const AdminSidebar = {
     }
 };
 
+const AdminFooter = {
+    template: `
+        <footer class="admin-footer">
+            Copyright 2026. <strong>planF</strong>. All rights reserved.
+        </footer>
+    `
+};
+
 const AdminLayout = {
     register(app) {
         app.component('admin-header', AdminHeader);
         app.component('admin-sidebar', AdminSidebar);
+        app.component('admin-footer', AdminFooter);
     }
 };
 

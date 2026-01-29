@@ -51,10 +51,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="(item, index) in groupList" :key="item.groupId">
-                                <td><input type="checkbox" v-model="selectedIds" :value="item.groupId"></td>
+                            <tr v-for="(item, index) in groupList" :key="item.groupId" @click="goDetail(item.groupId)" style="cursor: pointer;">
+                                <td @click.stop><input type="checkbox" v-model="selectedIds" :value="item.groupId"></td>
                                 <td>{{ totCnt - ((page - 1) * size) - index }}</td>
-                                <td><a href="#" @click.prevent="goDetail(item.groupId)" class="text-primary text-decoration-none">{{ item.groupId }}</a></td>
+                                <td class="fw-bold">{{ item.groupId }}</td>
                                 <td class="text-start px-3">{{ item.groupNm }}</td>
                                 <td class="text-start px-3">{{ item.groupNmEng }}</td>
                                 <td>{{ item.registerNm }}</td>
@@ -83,6 +83,7 @@
                         </ul>
                     </nav>
                 </div>
+                <admin-footer></admin-footer>
             </main>
         </div>
     </div>
