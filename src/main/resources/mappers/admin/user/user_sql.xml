@@ -90,6 +90,7 @@
         SELECT 
             u.*,
             (SELECT a.AUTHOR_NM FROM op_author a WHERE a.AUTHOR_ID = u.AUTHOR_ID) as AUTHOR_NM,
+            (SELECT c.CODE_NM FROM op_code c WHERE c.GROUP_ID = 'R010050' AND c.CODE = u.USER_STTUS_CODE) as USER_STTUS_NM,
             (SELECT c1.CODE_NM FROM op_code c1 WHERE c1.GROUP_ID = 'R010070' AND c1.CODE = u.AREA_CODE) as AREA_NM,
             (SELECT c2.SCLAS_NM FROM op_sclas_code c2 
              WHERE c2.GROUP_ID = 'R010070' 

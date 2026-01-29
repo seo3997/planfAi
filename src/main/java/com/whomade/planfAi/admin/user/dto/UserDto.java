@@ -23,6 +23,8 @@ public class UserDto {
     private Integer gender;
     private String authorId;
     private String authorNm; // Join with op_author
+    private String areaNm;
+    private String areaSeNm;
     private Integer citizenshipType;
     private String referrerId;
     private String deviceType;
