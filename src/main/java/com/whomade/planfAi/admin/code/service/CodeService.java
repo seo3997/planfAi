@@ -2,6 +2,8 @@ package com.whomade.planfAi.admin.code.service;
 
 import com.whomade.planfAi.admin.code.dto.CodeDto;
 import com.whomade.planfAi.admin.code.dto.CodeGroupDto;
+import com.whomade.planfAi.admin.code.dto.SclasCodeDto;
+import com.whomade.planfAi.admin.code.dto.SdclasCodeDto;
 import com.whomade.planfAi.admin.code.mapper.CodeMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -87,5 +89,39 @@ public class CodeService {
 
     public void deleteCode(String groupId, String code) {
         codeMapper.deleteCode(groupId, code);
+    }
+
+    // Small Classification (Sclas)
+    public List<SclasCodeDto> getSclasCodeList(String groupId, String code) {
+        return codeMapper.selectSclasCodeList(groupId, code);
+    }
+
+    public void insertSclasCode(SclasCodeDto dto) {
+        codeMapper.insertSclasCode(dto);
+    }
+
+    public void updateSclasCode(SclasCodeDto dto) {
+        codeMapper.updateSclasCode(dto);
+    }
+
+    public void deleteSclasCode(String groupId, String code, String sclasCode) {
+        codeMapper.deleteSclasCode(groupId, code, sclasCode);
+    }
+
+    // Sub Classification (Sdclas)
+    public List<SdclasCodeDto> getSdclasCodeList(String groupId, String code, String sclasCode) {
+        return codeMapper.selectSdclasCodeList(groupId, code, sclasCode);
+    }
+
+    public void insertSdclasCode(SdclasCodeDto dto) {
+        codeMapper.insertSdclasCode(dto);
+    }
+
+    public void updateSdclasCode(SdclasCodeDto dto) {
+        codeMapper.updateSdclasCode(dto);
+    }
+
+    public void deleteSdclasCode(String groupId, String code, String sclasCode, String sdclasCode) {
+        codeMapper.deleteSdclasCode(groupId, code, sclasCode, sdclasCode);
     }
 }

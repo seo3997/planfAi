@@ -2,6 +2,8 @@ package com.whomade.planfAi.admin.code.controller;
 
 import com.whomade.planfAi.admin.code.dto.CodeDto;
 import com.whomade.planfAi.admin.code.dto.CodeGroupDto;
+import com.whomade.planfAi.admin.code.dto.SclasCodeDto;
+import com.whomade.planfAi.admin.code.dto.SdclasCodeDto;
 import com.whomade.planfAi.admin.code.service.CodeService;
 import com.whomade.planfAi.admin.common.vo.UserInfoVo;
 import lombok.RequiredArgsConstructor;
@@ -81,6 +83,67 @@ public class CodeRestController {
     @DeleteMapping("/sub/{groupId}/{code}")
     public ResponseEntity<?> deleteCode(@PathVariable String groupId, @PathVariable String code) {
         codeService.deleteCode(groupId, code);
+        return ResponseEntity.ok("삭제되었습니다.");
+    }
+
+    // Small Classification (Sclas)
+    @GetMapping("/sclas/{groupId}/{code}")
+    public ResponseEntity<?> getSclasCodes(@PathVariable String groupId, @PathVariable String code) {
+        List<SclasCodeDto> result = codeService.getSclasCodeList(groupId, code);
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/sclas")
+    public ResponseEntity<?> createSclasCode(@RequestBody SclasCodeDto dto, HttpSession session) {
+        UserInfoVo user = (UserInfoVo) session.getAttribute("adminUser");
+        dto.setRegisterNo(user.getUserNo());
+        codeService.insertSclasCode(dto);
+        return ResponseEntity.ok("등록되었습니다.");
+    }
+
+    @PutMapping("/sclas")
+    public ResponseEntity<?> updateSclasCode(@RequestBody SclasCodeDto dto, HttpSession session) {
+        UserInfoVo user = (UserInfoVo) session.getAttribute("adminUser");
+        dto.setUpdusrNo(user.getUserNo());
+        codeService.updateSclasCode(dto);
+        return ResponseEntity.ok("수정되었습니다.");
+    }
+
+    @DeleteMapping("/sclas/{groupId}/{code}/{sclasCode}")
+    public ResponseEntity<?> deleteSclasCode(@PathVariable String groupId, @PathVariable String code,
+            @PathVariable String sclasCode) {
+        codeService.deleteSclasCode(groupId, code, sclasCode);
+        return ResponseEntity.ok("삭제되었습니다.");
+    }
+
+    // Sub Classification (Sdclas)
+    @GetMapping("/sdclas/{groupId}/{code}/{sclasCode}")
+    public ResponseEntity<?> getSdclasCodes(@PathVariable String groupId, @PathVariable String code,
+            @PathVariable String sclasCode) {
+        List<SdclasCodeDto> result = codeService.getSdclasCodeList(groupId, code, sclasCode);
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/sdclas")
+    public ResponseEntity<?> createSdclasCode(@RequestBody SdclasCodeDto dto, HttpSession session) {
+        UserInfoVo user = (UserInfoVo) session.getAttribute("adminUser");
+        dto.setRegisterNo(user.getUserNo());
+        codeService.insertSdclasCode(dto);
+        return ResponseEntity.ok("등록되었습니다.");
+    }
+
+    @PutMapping("/sdclas")
+    public ResponseEntity<?> updateSdclasCode(@RequestBody SdclasCodeDto dto, HttpSession session) {
+        UserInfoVo user = (UserInfoVo) session.getAttribute("adminUser");
+        dto.setUpdusrNo(user.getUserNo());
+        codeService.updateSdclasCode(dto);
+        return ResponseEntity.ok("수정되었습니다.");
+    }
+
+    @DeleteMapping("/sdclas/{groupId}/{code}/{sclasCode}/{sdclasCode}")
+    public ResponseEntity<?> deleteSdclasCode(@PathVariable String groupId, @PathVariable String code,
+            @PathVariable String sclasCode, @PathVariable String sdclasCode) {
+        codeService.deleteSdclasCode(groupId, code, sclasCode, sdclasCode);
         return ResponseEntity.ok("삭제되었습니다.");
     }
 }

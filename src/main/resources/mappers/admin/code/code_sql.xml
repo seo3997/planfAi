@@ -95,4 +95,71 @@
         DELETE FROM op_code WHERE GROUP_ID = #{groupId}
     </delete>
 
+    <!-- Small Classification (Sclas) -->
+    <select id="selectSclasCodeList" resultType="com.whomade.planfAi.admin.code.dto.SclasCodeDto">
+        SELECT * FROM op_sclas_code
+        WHERE GROUP_ID = #{groupId} AND CODE = #{code}
+        ORDER BY SORT_ORDR ASC
+    </select>
+
+    <insert id="insertSclasCode" parameterType="com.whomade.planfAi.admin.code.dto.SclasCodeDto">
+        INSERT INTO op_sclas_code (
+            GROUP_ID, CODE, SCLAS_CODE, SCLAS_NM, ATTRB_1, ATTRB_2, ATTRB_3, ATTRB_4, SORT_ORDR, USE_YN, REGISTER_NO, REGIST_DT
+        ) VALUES (
+            #{groupId}, #{code}, #{sclasCode}, #{sclasNm}, #{attrb1}, #{attrb2}, #{attrb3}, #{attrb4}, #{sortOrdr}, #{useYn}, #{registerNo}, NOW()
+        )
+    </insert>
+
+    <update id="updateSclasCode" parameterType="com.whomade.planfAi.admin.code.dto.SclasCodeDto">
+        UPDATE op_sclas_code SET
+            SCLAS_NM = #{sclasNm},
+            ATTRB_1 = #{attrb1},
+            ATTRB_2 = #{attrb2},
+            ATTRB_3 = #{attrb3},
+            ATTRB_4 = #{attrb4},
+            SORT_ORDR = #{sortOrdr},
+            USE_YN = #{useYn},
+            UPDUSR_NO = #{updusrNo},
+            UPDT_DT = NOW()
+        WHERE GROUP_ID = #{groupId} AND CODE = #{code} AND SCLAS_CODE = #{sclasCode}
+    </update>
+
+    <delete id="deleteSclasCode">
+        DELETE FROM op_sclas_code 
+        WHERE GROUP_ID = #{groupId} AND CODE = #{code} AND SCLAS_CODE = #{sclasCode}
+    </delete>
+
+    <!-- Sub Classification (Sdclas) -->
+    <select id="selectSdclasCodeList" resultType="com.whomade.planfAi.admin.code.dto.SdclasCodeDto">
+        SELECT * FROM op_sdclas_code
+        WHERE GROUP_ID = #{groupId} AND CODE = #{code} AND SCLAS_CODE = #{sclasCode}
+        ORDER BY SORT_ORDR ASC
+    </select>
+
+    <insert id="insertSdclasCode" parameterType="com.whomade.planfAi.admin.code.dto.SdclasCodeDto">
+        INSERT INTO op_sdclas_code (
+            GROUP_ID, CODE, SCLAS_CODE, SDCLAS_CODE, SDCLAS_NM, ATTRB_1, ATTRB_2, ATTRB_3, SORT_ORDR, USE_YN, REGISTER_NO, REGIST_DT
+        ) VALUES (
+            #{groupId}, #{code}, #{sclasCode}, #{sdclasCode}, #{sdclasNm}, #{attrb1}, #{attrb2}, #{attrb3}, #{sortOrdr}, #{useYn}, #{registerNo}, NOW()
+        )
+    </insert>
+
+    <update id="updateSdclasCode" parameterType="com.whomade.planfAi.admin.code.dto.SdclasCodeDto">
+        UPDATE op_sdclas_code SET
+            SDCLAS_NM = #{sdclasNm},
+            ATTRB_1 = #{attrb1},
+            ATTRB_2 = #{attrb2},
+            ATTRB_3 = #{attrb3},
+            SORT_ORDR = #{sortOrdr},
+            USE_YN = #{useYn},
+            UPDUSR_NO = #{updusrNo},
+            UPDT_DT = NOW()
+        WHERE GROUP_ID = #{groupId} AND CODE = #{code} AND SCLAS_CODE = #{sclasCode} AND SDCLAS_CODE = #{sdclasCode}
+    </update>
+
+    <delete id="deleteSdclasCode">
+        DELETE FROM op_sdclas_code 
+        WHERE GROUP_ID = #{groupId} AND CODE = #{code} AND SCLAS_CODE = #{sclasCode} AND SDCLAS_CODE = #{sdclasCode}
+    </delete>
+
 </mapper>
