@@ -22,4 +22,6 @@ public interface UserMapper {
     List<Map<String, Object>> selectAuthorList();
 
     List<Map<String, Object>> selectCommonCodes(String groupId);
+
+    List<Map<String, Object>> selectSclasCodes(String areaCode);
 }

@@ -62,4 +62,8 @@ public class UserService {
     public List<Map<String, Object>> selectCommonCodes(String groupId) {
         return userMapper.selectCommonCodes(groupId);
     }
+
+    public List<Map<String, Object>> selectSclasCodes(String areaCode) {
+        return userMapper.selectSclasCodes(areaCode);
+    }
 }

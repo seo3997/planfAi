@@ -62,9 +62,4 @@ public class UserRestController {
         return ResponseEntity.ok(authors);
     }
 
-    @GetMapping("/status-codes")
-    public ResponseEntity<?> getStatusCodes() {
-        List<Map<String, Object>> codes = userService.selectCommonCodes("R010050");
-        return ResponseEntity.ok(codes);
-    }
 }

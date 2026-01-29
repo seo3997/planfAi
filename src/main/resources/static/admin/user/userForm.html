@@ -73,11 +73,26 @@
                             <td>
                                 <input type="email" class="form-control" v-model="user.email" placeholder="이메일" style="width: 350px;">
                             </td>
-                            <th>사용자 상태 코드</th>
+                            <th>사용자 상태</th>
                             <td>
                                 <select class="form-select" v-model="user.userSttusCode" style="width: 350px;">
                                     <option v-for="st in statusCodes" :key="st.CODE" :value="st.CODE">{{ st.CODE_NM }}</option>
                                 </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>지역</th>
+                            <td colspan="3">
+                                <div class="d-flex gap-2">
+                                    <select class="form-select" v-model="user.areaCode" @change="onAreaChange" style="width: 200px;">
+                                        <option value="">중분류 선택</option>
+                                        <option v-for="area in areaCodes" :key="area.CODE" :value="area.CODE">{{ area.CODE_NM }}</option>
+                                    </select>
+                                    <select class="form-select" v-model="user.areaSeCodeS" style="width: 200px;">
+                                        <option value="">소분류 선택</option>
+                                        <option v-for="sub in subAreaCodes" :key="sub.CODE" :value="sub.CODE">{{ sub.CODE_NM }}</option>
+                                    </select>
+                                </div>
                             </td>
                         </tr>
                     </table>
@@ -112,13 +127,17 @@
             setup() {
                 const authors = ref([]);
                 const statusCodes = ref([]);
+                const areaCodes = ref([]);
+                const subAreaCodes = ref([]);
                 const user = ref({
                     userId: '',
                     password: '',
                     userNm: '',
                     email: '',
                     userSttusCode: '',
-                    authorId: ''
+                    authorId: '',
+                    areaCode: '',
+                    areaSeCodeS: ''
                 });
                 
                 const contact = ref({ part1: '', part2: '', part3: '' });
@@ -133,14 +152,23 @@
                         });
                 };
 
-                const fetchStatusCodes = () => {
-                    axios.get('/api/admin/user/status-codes')
-                        .then(res => {
-                            statusCodes.value = res.data;
-                            if (statusCodes.value.length > 0) {
-                                user.value.userSttusCode = statusCodes.value[0].CODE;
-                            }
-                        });
+                const fetchStatusCodes = async () => {
+                    statusCodes.value = await AdminCode.getCodes('R010050');
+                    if (statusCodes.value.length > 0) {
+                        user.value.userSttusCode = statusCodes.value[0].CODE;
+                    }
+                };
+
+                const fetchAreas = async () => {
+                    areaCodes.value = await AdminCode.getCodes('R010070');
+                };
+
+                const onAreaChange = async () => {
+                    user.value.areaSeCodeS = '';
+                    subAreaCodes.value = [];
+                    if (user.value.areaCode) {
+                        subAreaCodes.value = await AdminCode.getSclasCodes('R010070', user.value.areaCode);
+                    }
                 };
 
                 const saveUser = () => {
@@ -168,9 +196,10 @@
                     AdminMenu.init();
                     fetchAuthors();
                     fetchStatusCodes();
+                    fetchAreas();
                 });
 
-                return { authors, statusCodes, user, contact, saveUser, goList };
+                return { authors, statusCodes, areaCodes, subAreaCodes, user, contact, onAreaChange, saveUser, goList };
             }
         });
         AdminLayout.register(app);

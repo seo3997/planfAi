@@ -84,14 +84,13 @@
                             <th>지역</th>
                             <td colspan="3">
                                 <div class="d-flex gap-2">
-                                    <select class="form-select" v-model="user.areaCode" style="width: 200px;">
-                                        <option value="">서울특별시</option>
+                                    <select class="form-select" v-model="user.areaCode" @change="onAreaChange" style="width: 200px;">
+                                        <option value="">중분류 선택</option>
+                                        <option v-for="area in areaCodes" :key="area.CODE" :value="area.CODE">{{ area.CODE_NM }}</option>
                                     </select>
                                     <select class="form-select" v-model="user.areaSeCodeS" style="width: 200px;">
-                                        <option value="">선택하세요</option>
-                                    </select>
-                                    <select class="form-select" v-model="user.areaSeCodeD" style="width: 200px;">
-                                        <option value="">선택하세요</option>
+                                        <option value="">소분류 선택</option>
+                                        <option v-for="sub in subAreaCodes" :key="sub.CODE" :value="sub.CODE">{{ sub.CODE_NM }}</option>
                                     </select>
                                 </div>
                             </td>
@@ -133,6 +132,8 @@
             setup() {
                 const authors = ref([]);
                 const statusCodes = ref([]);
+                const areaCodes = ref([]);
+                const subAreaCodes = ref([]);
                 const user = ref({});
                 const contact = ref({ part1: '', part2: '', part3: '' });
                 const userNo = new URLSearchParams(window.location.search).get('userNo');
@@ -142,15 +143,25 @@
                         .then(res => authors.value = res.data);
                 };
 
-                const fetchStatusCodes = () => {
-                    axios.get('/api/admin/user/status-codes')
-                        .then(res => statusCodes.value = res.data);
+                const fetchStatusCodes = async () => {
+                    statusCodes.value = await AdminCode.getCodes('R010050');
+                };
+
+                const fetchAreas = async () => {
+                    areaCodes.value = await AdminCode.getCodes('R010070');
+                };
+
+                const onAreaChange = async () => {
+                    subAreaCodes.value = [];
+                    if (user.value.areaCode) {
+                        subAreaCodes.value = await AdminCode.getSclasCodes('R010070', user.value.areaCode);
+                    }
                 };
 
                 const fetchUserDetail = () => {
                     if(!userNo) return;
                     axios.get(`/api/admin/user/${userNo}`)
-                        .then(res => {
+                        .then(async res => {
                             user.value = res.data;
                             user.value.password = ''; // Don't show hash
                             if (user.value.cttpc) {
@@ -158,6 +169,11 @@
                                 contact.value.part1 = parts[0] || '';
                                 contact.value.part2 = parts[1] || '';
                                 contact.value.part3 = parts[2] || '';
+                            }
+                            if (user.value.areaCode) {
+                                await onAreaChange();
+                                // Ensure the sub-area value is restored after the list is fetched
+                                user.value.areaSeCodeS = res.data.areaSeCodeS;
                             }
                         });
                 };
@@ -184,10 +200,11 @@
                     AdminMenu.init();
                     fetchAuthors();
                     fetchStatusCodes();
+                    fetchAreas();
                     fetchUserDetail();
                 });
 
-                return { authors, statusCodes, user, contact, saveUser, goBack };
+                return { authors, statusCodes, areaCodes, subAreaCodes, user, contact, onAreaChange, saveUser, goBack };
             }
         });
         AdminLayout.register(app);

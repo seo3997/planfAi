@@ -174,6 +174,35 @@ const AdminFooter = {
     `
 };
 
+const AdminCode = {
+    // 중분류 코드 조회 (groupId 기준)
+    async getCodes(groupId) {
+        try {
+            const res = await axios.get(`/api/admin/code/sub/${groupId}`);
+            return res.data.map(item => ({
+                CODE: item.code,
+                CODE_NM: item.codeNm
+            }));
+        } catch (err) {
+            console.error('AdminCode.getCodes error:', err);
+            return [];
+        }
+    },
+    // 소분류 코드 조회 (groupId, 중분류 code 기준)
+    async getSclasCodes(groupId, code) {
+        try {
+            const res = await axios.get(`/api/admin/code/sclas/${groupId}/${code}`);
+            return res.data.map(item => ({
+                CODE: item.sclasCode,
+                CODE_NM: item.sclasNm
+            }));
+        } catch (err) {
+            console.error('AdminCode.getSclasCodes error:', err);
+            return [];
+        }
+    }
+};
+
 const AdminLayout = {
     register(app) {
         app.component('admin-header', AdminHeader);
