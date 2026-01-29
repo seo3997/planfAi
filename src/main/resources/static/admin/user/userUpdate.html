@@ -163,6 +163,12 @@
                 };
 
                 const saveUser = () => {
+                    // Remove spaces
+                    if (user.value.userId) user.value.userId = user.value.userId.replace(/\s/g, '');
+                    if (user.value.password) user.value.password = user.value.password.replace(/\s/g, '');
+                    if (user.value.userNm) user.value.userNm = user.value.userNm.replace(/\s/g, '');
+                    if (user.value.email) user.value.email = user.value.email.replace(/\s/g, '');
+
                     user.value.cttpc = `${contact.value.part1}-${contact.value.part2}-${contact.value.part3}`;
                     
                     axios.put('/api/admin/user', user.value)

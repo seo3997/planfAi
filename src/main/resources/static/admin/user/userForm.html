@@ -144,6 +144,12 @@
                 };
 
                 const saveUser = () => {
+                    // Remove spaces
+                    if (user.value.userId) user.value.userId = user.value.userId.replace(/\s/g, '');
+                    if (user.value.password) user.value.password = user.value.password.replace(/\s/g, '');
+                    if (user.value.userNm) user.value.userNm = user.value.userNm.replace(/\s/g, '');
+                    if (user.value.email) user.value.email = user.value.email.replace(/\s/g, '');
+
                     if (!user.value.userId) return alert('아이디를 입력해주세요.');
                     if (!user.value.password) return alert('비밀번호를 입력해주세요.');
                     
