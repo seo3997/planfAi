@@ -2,11 +2,27 @@
  * Admin Portal Common JavaScript
  */
 
-// Axios Global Interceptor for Session handling
+// Axios Global Interceptor for Session handling and Loading Mask
 if (typeof axios !== 'undefined') {
-    axios.interceptors.response.use(
-        response => response,
+    axios.interceptors.request.use(
+        config => {
+            // 로그인 요청 등 특정 요청에서는 로딩바 제외하고 싶을 경우 조건 추가 가능
+            wrapLoadingMask('show');
+            return config;
+        },
         error => {
+            wrapLoadingMask('hide');
+            return Promise.reject(error);
+        }
+    );
+
+    axios.interceptors.response.use(
+        response => {
+            wrapLoadingMask('hide');
+            return response;
+        },
+        error => {
+            wrapLoadingMask('hide');
             // 로그인 API 요청인 경우 인터셉터에서 처리하지 않고 인터페이스에서 직접 처리
             if (error.config && error.config.url.includes('/api/admin/login')) {
                 return Promise.reject(error);
@@ -167,4 +183,52 @@ const AdminUtil = {
         alert(msg);
         console.error('API Error:', err);
     }
+};
+
+/**
+ * 전역 로딩 마스크 제어 함수
+ */
+function wrapLoadingMask(stat) {
+    let dimmed = document.querySelector('.dimmed');
+    
+    // 마스크 엘리먼트가 없으면 생성하여 body에 추가
+    if (!dimmed) {
+        const loadingWrap = `
+            <div class="dimmed">
+                <div class="loading-bar">
+                    <div class="lds-default">
+                        <div></div><div></div><div></div><div></div>
+                        <div></div><div></div><div></div><div></div>
+                        <div></div><div></div><div></div><div></div>
+                    </div>
+                </div>
+            </div>`;
+        document.body.insertAdjacentHTML('beforeend', loadingWrap);
+        dimmed = document.querySelector('.dimmed');
+    }
+
+    if (stat === 'show') {
+        document.body.style.overflow = 'hidden';
+        dimmed.style.display = 'flex';
+    } else {
+        document.body.style.overflow = '';
+        dimmed.style.display = 'none';
+    }
+}
+
+// 페이지 표시/숨김 이벤트 처리 (BFCache 대응)
+window.addEventListener('pageshow', function (e) {
+    wrapLoadingMask('hide');
+    if (e.persisted) console.log('[BFCache] restored');
+});
+
+window.addEventListener('pagehide', function () {
+    wrapLoadingMask('hide');
+});
+
+// 페이지 이동 전 로딩바 표시
+window.onbeforeunload = function(e) {
+    // 특정 예외 처리 (예: 파일 다운로드 등)가 필요한 경우 여기에 논리 추가
+    // 브라우저에 따라 onbeforeunload에서 무거운 작업을 하면 차단될 수 있으므로 주의
+    wrapLoadingMask('show');
 };
