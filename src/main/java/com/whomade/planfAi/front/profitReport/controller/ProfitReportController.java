@@ -1,9 +1,9 @@
-package com.whomade.planfAi.profitReport.controller;
+package com.whomade.planfAi.front.profitReport.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.whomade.planfAi.profitReport.service.ProfitReportService;
-import com.whomade.planfAi.profitReport.vo.ProfitVo;
+import com.whomade.planfAi.front.profitReport.service.ProfitReportService;
+import com.whomade.planfAi.front.profitReport.vo.ProfitVo;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

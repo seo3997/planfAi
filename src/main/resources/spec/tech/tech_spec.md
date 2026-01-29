@@ -32,31 +32,34 @@
 ```text
 src/main/java/com/whomade/planfAi/
 ├── PlanfAiApplication.java
-├── profitReport/                  # 기존 도메인 (Controller, Service, Mapper, VO)
-└── admin/                         # 신규 관리자 프레임워크
-    ├── user/                      # 사용자 관리 (op_user)
-    ├── author/                    # 권한 관리 (op_author)
-    ├── authmenu/                  # 권한별 메뉴 매핑 (op_author_menu)
-    ├── menu/                      # 4자리 확장형 메뉴 관리 (op_menu)
-    ├── code/                      # 대/중분류 코드 (op_code_group, op_code)
-    ├── sccode/                    # 소분류 코드 (op_sclas_code)
-    └── sdcode/                    # 세분류 코드 (op_sdclas_code)
+├── front/                         # [이동] 사용자 서비스 도메인
+│   └── profitReport/              # 수익 리포트 관련 업무
+└── admin/                         # 관리자 프레임워크 (System + Ops)
+    ├── user/ | author/ | authmenu/ | menu/ | code/ ... (시스템 관리)
+    └── mgt/                       # [신규] 운영 관리 업무 영역
+        └── board/                 # 게시판 관리 (Target)
+            ├── controller/
+            ├── service/
+            └── vo/
 
 src/main/resources/
 ├── mappers/
-│   ├── profitReport/              # ProfitReportMapper.xml
-│   └── admin/                     # 관리자 전용 매퍼 (도메인별 폴더 분리)
-│       ├── user/ | author/ | authmenu/ | menu/ | code/ | sccode/ | sdcode/
+│   ├── front/                     # [이동] 사용자 서비스 매퍼
+│   │   └── profitReport/
+│   └── admin/                     # 관리자 전용 매퍼
+│       ├── user/ | code/ ...
+│       └── mgt/
+│           └── board/             # board_sql.xml (MyBatis SQL)
 ├── static/
-│   ├── common/                    # [Front 전용] common.css, common.js
-│   ├── admin/                     # [Admin 전용] admin_style.css, admin_common.js
-│   └── index.html                 # Vue 3 + Bootstrap 5 Main
-├── schema/                        # SQL DDL 관리 (AI 참조용)
-│   ├── admin/                     # op_user.sql, op_menu.sql 등
-│   └── profitReport/              # 기존 도메인 SQL
-├── schema.sql                     # 공통 테이블 DDL
-├── application-dev.yml            # DB 및 MyBatis 설정
-└── pom.xml                        # 프로젝트 의존성 관리
+│   ├── common/                    # 공통 에셋
+│   ├── admin/                     # 관리자 전용 에셋
+│   └── index.html
+├── schema/                        # SQL DDL (AI 참조용)
+│   ├── front/
+│   ├── admin/
+│   └── mgt/                       # tb_board.sql, tb_file.sql
+├── application-dev.yml            # 설정 정보 (아래 2.1 참고)
+└── pom.xml                        # 의존성 관리 (아래 2.2 참고)
 ```
 
 ## 4. 상세 요구사항

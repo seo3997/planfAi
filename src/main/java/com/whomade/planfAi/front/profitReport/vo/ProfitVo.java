@@ -1,4 +1,4 @@
-package com.whomade.planfAi.profitReport.vo;
+package com.whomade.planfAi.front.profitReport.vo;
 
 import java.time.LocalDateTime;
 

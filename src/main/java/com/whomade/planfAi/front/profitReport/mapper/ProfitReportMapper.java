@@ -1,6 +1,6 @@
-package com.whomade.planfAi.profitReport.mapper;
+package com.whomade.planfAi.front.profitReport.mapper;
 
-import com.whomade.planfAi.profitReport.vo.ProfitVo;
+import com.whomade.planfAi.front.profitReport.vo.ProfitVo;
 import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 

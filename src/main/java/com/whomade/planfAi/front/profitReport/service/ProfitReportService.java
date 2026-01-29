@@ -1,7 +1,7 @@
-package com.whomade.planfAi.profitReport.service;
+package com.whomade.planfAi.front.profitReport.service;
 
-import com.whomade.planfAi.profitReport.mapper.ProfitReportMapper;
-import com.whomade.planfAi.profitReport.vo.ProfitVo;
+import com.whomade.planfAi.front.profitReport.mapper.ProfitReportMapper;
+import com.whomade.planfAi.front.profitReport.vo.ProfitVo;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
