@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.whomade.planfAi.common.util.RequestUtil;
+
 @RestController
 @RequestMapping("/api/admin/authmenu")
 @RequiredArgsConstructor
@@ -19,10 +21,8 @@ public class AuthMenuRestController {
     private final AuthMenuService authMenuService;
 
     @GetMapping("/authors")
-    public ResponseEntity<Map<String, Object>> authorList(
-            @RequestParam(required = false) String schAuthNm) {
-        DataMap searchMap = new DataMap();
-        searchMap.put("schAuthNm", schAuthNm);
+    public ResponseEntity<Map<String, Object>> authorList(jakarta.servlet.http.HttpServletRequest request) {
+        DataMap searchMap = RequestUtil.getDataMap(request);
 
         Map<String, Object> result = new HashMap<>();
         result.put("list", authMenuService.getAuthorPageList(searchMap));

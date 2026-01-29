@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.whomade.planfAi.common.util.RequestUtil;
+import com.whomade.planfAi.common.vo.DataMap;
+
 @RestController
 @RequestMapping("/api/admin/author")
 @RequiredArgsConstructor
@@ -18,7 +21,11 @@ public class AuthorRestController {
     private final AuthorService authorService;
 
     @GetMapping
-    public ResponseEntity<Map<String, Object>> list(AuthorVo authorVo) {
+    public ResponseEntity<Map<String, Object>> list(jakarta.servlet.http.HttpServletRequest request) {
+        DataMap paramMap = RequestUtil.getDataMap(request);
+        AuthorVo authorVo = new AuthorVo();
+        authorVo.setSchAuthNm(paramMap.getString("schAuthNm"));
+
         Map<String, Object> result = new HashMap<>();
         result.put("list", authorService.getPageListAuthor(authorVo));
         result.put("totCnt", authorService.getTotCntAuthor(authorVo));
