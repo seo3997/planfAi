@@ -10,6 +10,8 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="/admin/js/admin_common.js"></script>
     <link href="/admin/css/admin_style.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuedraggable@4.1.0/dist/vuedraggable.umd.min.js"></script>
     <style>
         .menu-mgmt-container { display: flex; gap: 20px; align-items: flex-start; }
         
@@ -22,17 +24,21 @@
             padding: 15px;
             min-height: 800px;
         }
-        .tree-header { margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; display: flex; gap: 5px; }
+        .tree-header { margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; display: flex; gap: 5px; align-items: center;}
         .btn-tree-ctrl { font-size: 13px; padding: 4px 10px; background: #f5f5f5; border: 1px solid #ccc; border-radius: 3px; }
+        .btn-save-order { font-size: 13px; padding: 4px 12px; background: #2b579a; color: #fff; border: none; border-radius: 3px; font-weight: bold; margin-left: auto;}
         
-        .tree-list { list-style: none; padding-left: 0; margin: 0; }
+        .tree-list { list-style: none; padding-left: 0; margin: 0; min-height: 5px;}
         .tree-node { list-style: none; padding-left: 20px; margin-top: 5px; position: relative; }
         .tree-label-row { display: flex; align-items: center; cursor: pointer; padding: 4px 8px; border-radius: 3px; transition: background 0.2s; }
         .tree-label-row:hover { background: #f0f7ff; }
         .tree-label-row.selected { background: #d7ebff; font-weight: bold; color: #2b579a; }
         .tree-toggle { color: #888; margin-right: 5px; cursor: pointer; display: inline-block; width: 14px; text-align: center; }
-        .tree-label { font-size: 14px; color: #333; }
+        .tree-label { font-size: 14px; color: #333; flex: 1; pointer-events: auto;}
         .selected .tree-label { color: #2b579a; }
+
+        .ghost { opacity: 0.5; background: #c8ebfb; }
+        .drag-handle { cursor: grab; margin-right: 8px; color: #ccc; }
 
         /* Right: Form Section */
         .form-section { flex: 1; display: flex; flex-direction: column; gap: 20px; }
@@ -94,7 +100,8 @@
                                 :selected-id="selectedId" 
                                 :expanded-ids="expandedIds"
                                 @select="selectMenu"
-                                @toggle="toggleNode">
+                                @toggle="toggleNode"
+                                @reorder="saveAllOrders">
                             </tree-item>
                         </ul>
                     </div>
@@ -222,7 +229,10 @@
         const TreeItem = {
             name: 'TreeItem',
             props: ['node', 'selectedId', 'expandedIds'],
-            emits: ['select', 'toggle'],
+            emits: ['select', 'toggle', 'reorder'],
+            components: {
+                draggable: window.vuedraggable
+            },
             template: `
                 <li class="tree-node">
                     <div class="tree-label-row" 
@@ -235,17 +245,28 @@
                         </span>
                         <span class="tree-label">{{ node.menuNm }}</span>
                     </div>
-                    <ul v-if="node.children && node.children.length > 0 && expandedIds.has(node.menuId)" class="tree-list">
-                        <tree-item 
-                            v-for="child in node.children" 
-                            :key="child.menuId" 
-                            :node="child" 
-                            :selected-id="selectedId"
-                            :expanded-ids="expandedIds"
-                            @select="$emit('select', $event)"
-                            @toggle="$emit('toggle', $event)">
-                        </tree-item>
-                    </ul>
+                    
+                    <draggable 
+                        v-if="node.children && node.children.length > 0 && expandedIds.has(node.menuId)"
+                        v-model="node.children"
+                        tag="ul"
+                        class="tree-list"
+                        item-key="menuId"
+                        ghost-class="ghost"
+                        handle=".tree-label"
+                        @end="$emit('reorder')"
+                    >
+                        <template #item="{element}">
+                           <tree-item 
+                                :node="element" 
+                                :selected-id="selectedId" 
+                                :expanded-ids="expandedIds"
+                                @select="$emit('select', $event)"
+                                @toggle="$emit('toggle', $event)"
+                                @reorder="$emit('reorder')">
+                            </tree-item>
+                        </template>
+                    </draggable>
                 </li>
             `
         };
@@ -255,14 +276,16 @@
         const { createApp, ref, reactive, onMounted, computed, watch } = Vue;
 
         const app = createApp({
-            components: { TreeItem },
+            components: { 
+                TreeItem,
+                draggable: window.vuedraggable
+            },
             setup() {
                 const flatMenus = ref([]);
+                const menuTree = ref([]);
                 const selectedId = ref('');
                 const expandedIds = ref(new Set());
                 const isNewFormVisible = ref(false);
-                const isIdChecked = ref(false);
-
                 const editForm = reactive({
                     parentMenuId: '', parentMenuNm: '', menuId: '', menuLevel: '',
                     menuNm: '', menuTyCode: '20', sortOrdr: 1, useYn: 'Y', url: ''
@@ -273,9 +296,11 @@
                     menuNm: '', menuTyCode: '20', sortOrdr: 1, useYn: 'Y', url: ''
                 });
 
-                // Compute hierarchical structure from flat list
-                const menuTree = computed(() => {
-                    const list = JSON.parse(JSON.stringify(flatMenus.value));
+                const isIdChecked = ref(false);
+
+                // Helper to build tree from flat list
+                const buildTree = (data) => {
+                    const list = JSON.parse(JSON.stringify(data));
                     const map = {};
                     const roots = [];
 
@@ -292,15 +317,15 @@
                             roots.push(m);
                         }
                     });
-
                     return roots;
-                });
+                };
 
                 const fetchMenus = () => {
                     axios.get('/api/admin/menu')
                         .then(res => {
                             flatMenus.value = res.data;
-                            toggleAll(true); // Auto-expand all on initial load
+                            menuTree.value = buildTree(res.data);
+                            toggleAll(true);
                         })
                         .catch(err => alert('메뉴 조회 실패'));
                 };
@@ -309,7 +334,6 @@
                     selectedId.value = node.menuId;
                     isNewFormVisible.value = false;
                     
-                    // Fill edit form
                     const pid = node.menuId.length > 4 ? node.menuId.substring(0, node.menuId.length - 4) : '';
                     const parent = flatMenus.value.find(m => m.menuId === pid);
                     
@@ -422,6 +446,63 @@
                     }
                 };
 
+                // Logic to save all sorts
+                const saveAllOrders = () => {
+                    selectedId.value = '';
+                    isNewFormVisible.value = false;
+                    
+                    const updateList = [];
+                    const traverse = (nodes, parentSorts = [0,0,0,0,0,0]) => {
+                        nodes.forEach((node, index) => {
+                            const newSort = (index + 1) * 10;
+                            node.sortOrdr = newSort;
+                            
+                            // Inherit parent sorts and set own level's sort
+                            const currentSorts = [...parentSorts];
+                            const lvl = node.menuLevel;
+                            currentSorts[lvl - 1] = newSort;
+                            
+                            node.sortOrdr1 = currentSorts[0];
+                            node.sortOrdr2 = currentSorts[1];
+                            node.sortOrdr3 = currentSorts[2];
+                            node.sortOrdr4 = currentSorts[3];
+                            node.sortOrdr5 = currentSorts[4];
+                            node.sortOrdr6 = currentSorts[5];
+                            
+                            updateList.push({
+                                menuId: node.menuId,
+                                menuLevel: node.menuLevel,
+                                sortOrdr: node.sortOrdr,
+                                sortOrdr1: node.sortOrdr1,
+                                sortOrdr2: node.sortOrdr2,
+                                sortOrdr3: node.sortOrdr3,
+                                sortOrdr4: node.sortOrdr4,
+                                sortOrdr5: node.sortOrdr5,
+                                sortOrdr6: node.sortOrdr6
+                            });
+                            
+                            if (node.children && node.children.length > 0) {
+                                traverse(node.children, currentSorts);
+                            }
+                        });
+                    };
+
+                    traverse(menuTree.value);
+
+                    axios.post('/api/admin/menu/order', updateList)
+                        .then(() => {
+                            // Clear all menu caches to reflect changes in Top/Left menus
+                            sessionStorage.removeItem('topMenus');
+                            Object.keys(sessionStorage).forEach(key => {
+                                if (key.startsWith('leftMenus_')) {
+                                    sessionStorage.removeItem(key);
+                                }
+                            });
+                            fetchMenus();
+                        })
+                        .catch(err => AdminUtil.handleApiError(err));
+                };
+
                 onMounted(() => {
                     AdminMenu.init();
                     fetchMenus();
@@ -429,7 +510,7 @@
 
                 return { 
                     flatMenus, menuTree, selectedId, expandedIds, editForm, newForm, isNewFormVisible, isIdChecked,
-                    selectMenu, toggleNode, toggleAll, showNewForm, checkIdDuplicate, saveEdit, registerMenu, deleteMenu 
+                    selectMenu, toggleNode, toggleAll, showNewForm, checkIdDuplicate, saveEdit, registerMenu, deleteMenu, saveAllOrders
                 };
             }
         });

@@ -57,4 +57,14 @@ public class MenuController {
 
         return ResponseEntity.ok(menuService.getUserMenuList(user.getAuthorId(), menuLevel, parentMenuId));
     }
+
+    @PostMapping("/order")
+    public ResponseEntity<String> saveOrder(@RequestBody List<MenuVo> menuList) {
+        try {
+            menuService.saveMenuOrder(menuList);
+            return ResponseEntity.ok("메뉴 순서가 성공적으로 저장되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("메뉴 순서 저장 중 오류가 발생했습니다.");
+        }
+    }
 }

@@ -21,4 +21,8 @@ public interface MenuMapper {
 
     // 권한 기반 동적 메뉴 조회
     List<MenuVo> selectUserMenuList(java.util.Map<String, Object> params);
+
+    void updateMenuSortOrder(MenuVo menuVo);
+
+    void updateChildrenSortOrder(java.util.Map<String, Object> params);
 }

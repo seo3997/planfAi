@@ -102,4 +102,20 @@ public class MenuService {
         params.put("parentMenuId", parentMenuId);
         return menuMapper.selectUserMenuList(params);
     }
+
+    @Transactional
+    public void saveMenuOrder(List<MenuVo> menuList) {
+        if (menuList == null || menuList.isEmpty())
+            return;
+
+        for (MenuVo menu : menuList) {
+            menuMapper.updateMenuSortOrder(menu);
+
+            java.util.Map<String, Object> params = new java.util.HashMap<>();
+            params.put("menuId", menu.getMenuId());
+            params.put("level", menu.getMenuLevel());
+            params.put("newSort", menu.getSortOrdr());
+            menuMapper.updateChildrenSortOrder(params);
+        }
+    }
 }

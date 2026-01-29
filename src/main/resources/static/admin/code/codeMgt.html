@@ -175,7 +175,7 @@
                             }
                         }
                         alert('저장되었습니다.');
-                        fetchCodes();
+                        location.href = '/admin/code/selectPageListGroupCodeMgt.do';
                     } catch (err) {
                         alert('저장 중 오류 발생: ' + (err.response?.data || ''));
                     }

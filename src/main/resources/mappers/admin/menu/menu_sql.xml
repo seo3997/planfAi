@@ -113,4 +113,30 @@
         ORDER BY M.SORT_ORDR_1, M.SORT_ORDR_2, M.SORT_ORDR_3, M.SORT_ORDR_4, M.SORT_ORDR_5, M.SORT_ORDR_6
     </select>
 
+    <update id="updateMenuSortOrder" parameterType="com.whomade.planfAi.admin.menu.vo.MenuVo">
+        UPDATE op_menu SET
+            SORT_ORDR = #{sortOrdr},
+            SORT_ORDR_1 = #{sortOrdr1},
+            SORT_ORDR_2 = #{sortOrdr2},
+            SORT_ORDR_3 = #{sortOrdr3},
+            SORT_ORDR_4 = #{sortOrdr4},
+            SORT_ORDR_5 = #{sortOrdr5},
+            SORT_ORDR_6 = #{sortOrdr6}
+        WHERE MENU_ID = #{menuId}
+    </update>
+
+    <update id="updateChildrenSortOrder" parameterType="map">
+        UPDATE op_menu SET
+            <choose>
+                <when test="level == 1">SORT_ORDR_1 = #{newSort}</when>
+                <when test="level == 2">SORT_ORDR_2 = #{newSort}</when>
+                <when test="level == 3">SORT_ORDR_3 = #{newSort}</when>
+                <when test="level == 4">SORT_ORDR_4 = #{newSort}</when>
+                <when test="level == 5">SORT_ORDR_5 = #{newSort}</when>
+                <when test="level == 6">SORT_ORDR_6 = #{newSort}</when>
+            </choose>
+        WHERE MENU_ID LIKE CONCAT(#{menuId}, '%')
+          AND MENU_ID != #{menuId}
+    </update>
+
 </mapper>
