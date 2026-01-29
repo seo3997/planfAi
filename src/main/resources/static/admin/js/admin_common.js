@@ -64,16 +64,16 @@ const AdminMenu = {
 
     async fetchTopMenus() {
         // Try to get from session cache first
-        const cached = sessionStorage.getItem('topMenus');
-        if (cached) {
-            this.state.topMenus = JSON.parse(cached);
-            return this.state.topMenus;
-        }
+        // const cached = sessionStorage.getItem('topMenus');
+        // if (cached) {
+        //     this.state.topMenus = JSON.parse(cached);
+        //     return this.state.topMenus;
+        // }
 
         try {
             const res = await axios.get('/api/admin/menu/user-menus', { params: { menuLevel: 3 } });
             this.state.topMenus = res.data;
-            sessionStorage.setItem('topMenus', JSON.stringify(res.data));
+            // sessionStorage.setItem('topMenus', JSON.stringify(res.data));
             return res.data;
         } catch (err) {
             console.error('Failed to fetch top menus', err);
@@ -86,18 +86,18 @@ const AdminMenu = {
         localStorage.setItem('activeTopId', topMenuId);
 
         // Try cache
-        const cacheKey = 'leftMenus_' + topMenuId;
-        const cached = sessionStorage.getItem(cacheKey);
-        if (cached) {
-            this.state.leftMenus = JSON.parse(cached);
-            return this.state.leftMenus;
-        }
+        // const cacheKey = 'leftMenus_' + topMenuId;
+        // const cached = sessionStorage.getItem(cacheKey);
+        // if (cached) {
+        //     this.state.leftMenus = JSON.parse(cached);
+        //     return this.state.leftMenus;
+        // }
 
         try {
             const res = await axios.get('/api/admin/menu/user-menus', { params: { parentMenuId: topMenuId } });
             const filtered = res.data.filter(m => m.menuTyCode !== '30');
             this.state.leftMenus = filtered;
-            sessionStorage.setItem(cacheKey, JSON.stringify(filtered));
+            // sessionStorage.setItem(cacheKey, JSON.stringify(filtered));
             return this.state.leftMenus;
         } catch (err) {
             console.error('Failed to fetch left menus', err);
