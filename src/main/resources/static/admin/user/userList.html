@@ -11,10 +11,12 @@
     <script src="/admin/js/admin_common.js"></script>
     <link href="/admin/css/admin_style.css" rel="stylesheet">
     <style>
-        .search-table { width: 100%; border: 1px solid #7ea1d3; border-radius: 4px; border-collapse: collapse; overflow: hidden; background: #fff; margin-bottom: 20px; table-layout: fixed; }
-        .search-table th { background: #f8f9fa; padding: 12px 20px; width: 140px; font-weight: 500; font-size: 14px; text-align: left; vertical-align: middle; border: 1px solid #dee2e6; }
-        .search-table td { padding: 8px 15px; vertical-align: middle; border: 1px solid #dee2e6; }
-        .form-select-sm, .form-control-sm { border-radius: 0; border: 1px solid #ced4da; height: 35px; }
+        .search-table { width: 100%; border: 2px solid #3a5a9a; border-top: 3px solid #3a5a9a; border-collapse: collapse; background: #fff; }
+        .search-table th { background: #fff; padding: 8px 20px; width: 130px; font-weight: 500; font-size: 13px; text-align: left; vertical-align: middle; border: none; color: #333; }
+        .search-table td { padding: 8px 15px; vertical-align: middle; border: none; }
+        .search-actions-row { background: #fff; border-top: 1px solid #f0f0f0; }
+        .search-actions-row td { padding: 0; }
+        .form-select-sm, .form-control-sm { border-radius: 0; border: 1px solid #ced4da; height: 32px; font-size: 13px; }
         .btn-init { background-color: #31c4b6; color: white; border: none; padding: 8px 20px; border-radius: 4px; }
         .btn-search-submit { background-color: #2b4c80; color: white; border: none; padding: 8px 25px; border-radius: 4px; }
         .radio-group label { margin-right: 15px; font-size: 14px; cursor: pointer; }
@@ -91,8 +93,8 @@
                             </div>
                         </td>
                     </tr>
-                    <tr>
-                        <td colspan="4" class="search-actions bg-light border-top shadow-sm">
+                    <tr class="search-actions-row">
+                        <td colspan="4">
                             <div class="d-flex justify-content-end p-2 gap-2">
                                 <button class="btn-init" @click="resetSearch"><i class="bi bi-arrow-counterclockwise"></i> 초기화</button>
                                 <button class="btn-search-submit" @click="fetchUsers"><i class="bi bi-search"></i> 검색</button>
