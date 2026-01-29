@@ -102,19 +102,12 @@
                 </div>
 
                 <!-- 페이징 -->
-                <nav class="mt-4" v-if="totalPages > 0">
-                    <ul class="pagination pagination-sm justify-content-center">
-                        <li class="page-item" :class="{ disabled: currentPage === 1 }">
-                            <a class="page-link" href="#" @click.prevent="changePage(currentPage - 1)"><i class="bi bi-chevron-left"></i></a>
-                        </li>
-                        <li v-for="p in totalPages" :key="p" class="page-item" :class="{ active: p === currentPage }">
-                            <a class="page-link" href="#" @click.prevent="changePage(p)">{{ p }}</a>
-                        </li>
-                        <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-                            <a class="page-link" href="#" @click.prevent="changePage(currentPage + 1)"><i class="bi bi-chevron-right"></i></a>
-                        </li>
-                    </ul>
-                </nav>
+                <admin-pagination 
+                    :total-count="totalCount" 
+                    :current-page="currentPage" 
+                    :page-size="pageSize"
+                    @change-page="handlePageChange">
+                </admin-pagination>
 
                 <admin-footer></admin-footer>
             </main>
@@ -157,6 +150,7 @@
                         sch_bbs_se_code: '',
                         sch_text: ''
                     };
+                    currentPage.value = 1;
                     fetchBoardList();
                 };
 
@@ -165,10 +159,7 @@
                     return dt.split(' ')[0].replace(/-/g, '.');
                 };
 
-                const totalPages = computed(() => Math.ceil(totalCount.value / pageSize) || 0);
-
-                const changePage = (p) => {
-                    if (p < 1 || p > totalPages.value) return;
+                const handlePageChange = (p) => {
                     currentPage.value = p;
                     fetchBoardList();
                 };
@@ -188,9 +179,9 @@
                 });
 
                 return {
-                    boardList, totalCount, currentPage, totalPages, pageSize,
+                    boardList, totalCount, currentPage, pageSize,
                     searchDto, categoryCodes,
-                    fetchBoardList, resetSearch, changePage, goDetail, goForm, formatDate
+                    fetchBoardList, resetSearch, handlePageChange, goDetail, goForm, formatDate
                 };
             }
         });

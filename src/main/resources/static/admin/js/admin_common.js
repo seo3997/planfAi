@@ -308,12 +308,48 @@ const AdminCode = {
     }
 };
 
+const AdminPagination = {
+    props: {
+        totalCount: { type: Number, default: 0 },
+        currentPage: { type: Number, default: 1 },
+        pageSize: { type: Number, default: 10 }
+    },
+    template: `
+        <nav class="mt-4" v-if="totalPages > 0">
+            <ul class="pagination pagination-sm justify-content-center">
+                <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                    <a class="page-link" href="#" @click.prevent="changePage(currentPage - 1)">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+                <li v-for="p in totalPages" :key="p" class="page-item" :class="{ active: p === currentPage }">
+                    <a class="page-link" href="#" @click.prevent="changePage(p)">{{ p }}</a>
+                </li>
+                <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+                    <a class="page-link" href="#" @click.prevent="changePage(currentPage + 1)">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    `,
+    setup(props, { emit }) {
+        const totalPages = Vue.computed(() => Math.ceil(props.totalCount / props.pageSize) || 0);
+        const changePage = (p) => {
+            if (p < 1 || p > totalPages.value) return;
+            emit('change-page', p);
+        };
+        return { totalPages, changePage };
+    }
+};
+
 const AdminLayout = {
     register(app) {
         app.component('admin-header', AdminHeader);
         app.component('admin-sidebar', AdminSidebar);
         app.component('admin-footer', AdminFooter);
         app.component('admin-profile-modal', AdminProfileModal);
+        app.component('admin-pagination', AdminPagination);
     }
 };
 
