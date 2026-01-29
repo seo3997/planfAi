@@ -43,21 +43,21 @@
                     </div>
                     <table class="form-table">
                         <tr>
-                            <th>사용자ID</th>
+                            <th class="required">사용자ID</th>
                             <td>
                                 <input type="text" class="form-control bg-light" v-model="user.userId" readonly style="width: 350px;">
                             </td>
-                            <th>비밀번호</th>
+                            <th class="required">비밀번호</th>
                             <td>
                                 <input type="password" class="form-control" v-model="user.password" placeholder="변경 시에만 입력" style="width: 350px;">
                             </td>
                         </tr>
                         <tr>
-                            <th>이름</th>
+                            <th class="required">이름</th>
                             <td>
                                 <input type="text" class="form-control" v-model="user.userNm" placeholder="이름" style="width: 350px;">
                             </td>
-                            <th>연락처</th>
+                            <th class="required">연락처</th>
                             <td>
                                 <div class="input-group-contact">
                                     <input type="text" class="form-control text-center" v-model="contact.part1">
@@ -69,7 +69,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <th>이메일</th>
+                            <th class="required">이메일</th>
                             <td>
                                 <input type="email" class="form-control" v-model="user.email" placeholder="이메일" style="width: 350px;">
                             </td>
