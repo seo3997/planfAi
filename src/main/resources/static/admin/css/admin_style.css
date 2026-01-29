@@ -2133,6 +2133,12 @@ li.dropdown > ul.dropdown-menu > li.user-header > a {
 .form-control {
   font-size: 12px;
 }
+.form-control::placeholder,
+.search-input::placeholder,
+.date-input::placeholder {
+  color: #cbd5e1 !important;
+  opacity: 1;
+}
 
 /*
 	Button
