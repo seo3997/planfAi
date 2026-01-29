@@ -213,7 +213,7 @@ const AdminHeader = {
                 </nav>
                 <div class="user-info">
                     <i class="bi bi-person-fill me-1"></i> 
-                    <span @click="showProfileModal = true" style="cursor:pointer; text-decoration: underline;">{{ loginId }}</span>
+                    <span @click="showProfileModal = true" style="cursor:pointer;">{{ loginId }}</span>
                     <a href="/admin/logout.do" class="ms-3"><i class="bi bi-unlock-fill me-1"></i> Logout</a>
                 </div>
             </header>
