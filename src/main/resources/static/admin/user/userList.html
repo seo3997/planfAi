@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사용자 관리 - PlanfAi 관리자</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/admin/js/admin_common.js"></script>
+    <link href="/admin/css/admin_style.css" rel="stylesheet">
+    <style>
+        .search-table { width: 100%; border: 1px solid #7ea1d3; border-radius: 4px; border-collapse: collapse; overflow: hidden; background: #fff; margin-bottom: 20px; table-layout: fixed; }
+        .search-table th { background: #f8f9fa; padding: 12px 20px; width: 140px; font-weight: 500; font-size: 14px; text-align: left; vertical-align: middle; border: 1px solid #dee2e6; }
+        .search-table td { padding: 8px 15px; vertical-align: middle; border: 1px solid #dee2e6; }
+        .form-select-sm, .form-control-sm { border-radius: 0; border: 1px solid #ced4da; height: 35px; }
+        .btn-init { background-color: #31c4b6; color: white; border: none; padding: 8px 20px; border-radius: 4px; }
+        .btn-search-submit { background-color: #2b4c80; color: white; border: none; padding: 8px 25px; border-radius: 4px; }
+        .radio-group label { margin-right: 15px; font-size: 14px; cursor: pointer; }
+        .date-input-wrap { display: flex; align-items: center; gap: 5px; }
+        .date-input { width: 140px; border: 1px solid #ced4da; padding: 5px 10px; height: 34px; border-radius: 0; }
+        .btn-regist { background-color: #2b4c80; color: white; padding: 8px 18px; border-radius: 4px; text-decoration: none; font-size: 14px; }
+        .data-table thead th { background: #f4f7f9; color: #333; font-weight: 500; border-bottom: 1px solid #dee2e6; }
+        .data-table td { font-size: 13.5px; height: 50px; }
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; }
+        .status-active { background: #e6f7f5; color: #10a394; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <admin-header></admin-header>
+
+        <div class="main-container">
+            <admin-sidebar></admin-sidebar>
+
+            <main class="content">
+                <div class="page-title-box">
+                    <h2 class="page-title">사용자</h2>
+                    <div class="breadcrumb-area">
+                        <i class="bi bi-house-door text-muted"></i> > 기본정보 > <span class="text-primary fw-medium">사용자</span>
+                    </div>
+                </div>
+
+                <!-- Search Area -->
+                <table class="search-table mb-4">
+                    <tr>
+                        <th>사용자 상태</th>
+                        <td>
+                            <select class="form-select form-select-sm" style="width: 350px;" v-model="searchDto.searchStatus">
+                                <option value="전체">전체</option>
+                                <option v-for="st in statusCodes" :key="st.CODE" :value="st.CODE">{{ st.CODE_NM }}</option>
+                            </select>
+                        </td>
+                        <th>권한명</th>
+                        <td>
+                            <select class="form-select form-select-sm" style="width: 350px;" v-model="searchDto.searchAuthor">
+                                <option value="전체">전체</option>
+                                <option v-for="auth in authors" :key="auth.AUTHOR_ID" :value="auth.AUTHOR_ID">{{ auth.AUTHOR_NM }}</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>상세검색</th>
+                        <td colspan="3">
+                            <div class="d-flex gap-2">
+                                <select class="form-select form-select-sm" style="width: 120px;" v-model="searchDto.searchType">
+                                    <option value="이름">이름</option>
+                                    <option value="아이디">아이디</option>
+                                </select>
+                                <input type="text" class="form-control form-control-sm" style="width: 350px;" v-model="searchDto.searchKeyword" @keyup.enter="fetchUsers">
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>가입일</th>
+                        <td colspan="3">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="radio-group">
+                                    <label><input type="radio" v-model="dateType" value="all"> 전체</label>
+                                    <label><input type="radio" v-model="dateType" value="today"> 오늘</label>
+                                    <label><input type="radio" v-model="dateType" value="7days"> 7일</label>
+                                    <label><input type="radio" v-model="dateType" value="30days"> 30일</label>
+                                    <label><input type="radio" v-model="dateType" value="6months"> 6개월</label>
+                                </div>
+                                <div class="date-input-wrap">
+                                    <input type="date" class="date-input" v-model="searchDto.startDate">
+                                    <span>~</span>
+                                    <input type="date" class="date-input" v-model="searchDto.endDate">
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" class="search-actions bg-light border-top shadow-sm">
+                            <div class="d-flex justify-content-end p-2 gap-2">
+                                <button class="btn-init" @click="resetSearch"><i class="bi bi-arrow-counterclockwise"></i> 초기화</button>
+                                <button class="btn-search-submit" @click="fetchUsers"><i class="bi bi-search"></i> 검색</button>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="text-muted fs-7">
+                        검색결과 <span class="text-primary fw-bold">{{ totalCount }}</span>개
+                    </div>
+                    <a href="/admin/user/insertFormUserMgt.do" class="btn-regist"><i class="bi bi-pencil"></i> 등록</a>
+                </div>
+
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 80px;">No</th>
+                                <th style="width: 120px;">사용자No</th>
+                                <th>사용자ID</th>
+                                <th style="width: 200px;">권한명</th>
+                                <th style="width: 150px;">가입일</th>
+                                <th style="width: 120px;">상태</th>
+                                <th style="width: 150px;">등록자</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(user, index) in userList" :key="user.userNo" @click="goDetail(user.userNo)" style="cursor: pointer;">
+                                <td>{{ totalCount - ((currentPage - 1) * pageSize) - index }}</td>
+                                <td>{{ user.userNo }}</td>
+                                <td class="text-start px-3 text-dark">{{ user.userId }}</td>
+                                <td>{{ user.authorNm }}</td>
+                                <td>{{ formatDate(user.registDt) }}</td>
+                                <td>
+                                    <span class="status-badge" :class="user.userSttusNm === '활동' ? 'status-active' : ''">
+                                        {{ user.userSttusNm }}
+                                    </span>
+                                </td>
+                                <td>{{ user.registerNm || '' }}</td>
+                            </tr>
+                            <tr v-if="userList.length === 0">
+                                <td colspan="7" class="text-center py-5 text-muted">결과가 없습니다.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <nav class="mt-4" v-if="totalPages > 0">
+                    <ul class="pagination pagination-sm justify-content-center">
+                        <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                            <a class="page-link" href="#" @click.prevent="changePage(currentPage - 1)"><i class="bi bi-chevron-left"></i></a>
+                        </li>
+                        <li v-for="p in totalPages" :key="p" class="page-item" :class="{ active: p === currentPage }">
+                            <a class="page-link" href="#" @click.prevent="changePage(p)">{{ p }}</a>
+                        </li>
+                        <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+                            <a class="page-link" href="#" @click.prevent="changePage(currentPage + 1)"><i class="bi bi-chevron-right"></i></a>
+                        </li>
+                    </ul>
+                </nav>
+
+                <admin-footer></admin-footer>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, onMounted, computed, watch } = Vue;
+        const app = createApp({
+            setup() {
+                const userList = ref([]);
+                const authors = ref([]);
+                const statusCodes = ref([]);
+                const totalCount = ref(0);
+                const currentPage = ref(1);
+                const pageSize = 10;
+                
+                const searchDto = ref({
+                    searchStatus: '전체',
+                    searchAuthor: '전체',
+                    searchType: '이름',
+                    searchKeyword: '',
+                    startDate: '',
+                    endDate: ''
+                });
+
+                const dateType = ref('all');
+
+                const fetchAuthors = () => {
+                    axios.get('/api/admin/user/authors')
+                        .then(res => authors.value = res.data);
+                };
+
+                const fetchStatusCodes = () => {
+                    axios.get('/api/admin/user/status-codes')
+                        .then(res => statusCodes.value = res.data);
+                };
+
+                const fetchUsers = () => {
+                    axios.get('/api/admin/user/list', {
+                        params: { ...searchDto.value, page: currentPage.value, size: pageSize }
+                    }).then(res => {
+                        userList.value = res.data.list;
+                        totalCount.value = res.data.totalCount;
+                    });
+                };
+
+                const resetSearch = () => {
+                    searchDto.value = {
+                        searchStatus: '전체',
+                        searchAuthor: '전체',
+                        searchType: '이름',
+                        searchKeyword: '',
+                        startDate: '',
+                        endDate: ''
+                    };
+                    dateType.value = 'all';
+                    fetchUsers();
+                };
+
+                const formatDate = (dt) => {
+                    if (!dt) return '';
+                    return dt.split('T')[0].replace(/-/g, '.');
+                };
+
+                const totalPages = computed(() => Math.ceil(totalCount.value / pageSize));
+
+                const changePage = (p) => {
+                    if (p < 1 || p > totalPages.value) return;
+                    currentPage.value = p;
+                    fetchUsers();
+                };
+
+                const goDetail = (no) => {
+                    location.href = `/admin/user/selectUserMgt.do?userNo=${no}`;
+                };
+
+                watch(dateType, (val) => {
+                    const now = new Date();
+                    let start = new Date();
+                    const format = (d) => d.toISOString().split('T')[0];
+                    
+                    searchDto.value.endDate = format(now);
+                    
+                    switch(val) {
+                        case 'today':
+                            searchDto.value.startDate = format(now);
+                            break;
+                        case '7days':
+                            start.setDate(now.getDate() - 7);
+                            searchDto.value.startDate = format(start);
+                            break;
+                        case '30days':
+                            start.setDate(now.getDate() - 30);
+                            searchDto.value.startDate = format(start);
+                            break;
+                        case '6months':
+                            start.setMonth(now.getMonth() - 6);
+                            searchDto.value.startDate = format(start);
+                            break;
+                        default:
+                            searchDto.value.startDate = '';
+                            searchDto.value.endDate = '';
+                    }
+                });
+
+                onMounted(() => {
+                    AdminMenu.init();
+                    fetchAuthors();
+                    fetchStatusCodes();
+                    fetchUsers();
+                });
+
+                return { 
+                    userList, authors, statusCodes, totalCount, currentPage, pageSize, 
+                    searchDto, dateType, totalPages, fetchUsers, resetSearch, 
+                    formatDate, changePage, goDetail 
+                };
+            }
+        });
+        AdminLayout.register(app);
+        app.mount('#app');
+    </script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사용자 상세 - PlanfAi 관리자</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/admin/js/admin_common.js"></script>
+    <link href="/admin/css/admin_style.css" rel="stylesheet">
+    <style>
+        .form-section { background: #fff; border: 1px solid #dee2e6; padding: 0; margin-bottom: 30px; }
+        .section-title { padding: 15px 20px; font-size: 16px; font-weight: 600; color: #2b4c80; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 8px; }
+        .info-table { width: 100%; border-collapse: collapse; }
+        .info-table th { width: 200px; background: #f8f9fa; padding: 20px 25px; font-weight: 500; font-size: 14px; text-align: left; border-bottom: 1px solid #eee; border-right: 1px solid #eee; }
+        .info-table td { padding: 20px 25px; border-bottom: 1px solid #eee; font-size: 14px; color: #333; }
+        .btn-list { background-color: #fff; border: 1px solid #ced4da; padding: 8px 30px; border-radius: 4px; font-size: 14px; }
+        .btn-edit { background-color: #31c4b6; border: none; color: white; padding: 8px 30px; border-radius: 4px; font-size: 14px; }
+        .btn-delete { background-color: #ed5f39; border: none; color: white; padding: 8px 30px; border-radius: 4px; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <admin-header></admin-header>
+
+        <div class="main-container">
+            <admin-sidebar></admin-sidebar>
+
+            <main class="content">
+                <div class="page-title-box">
+                    <h2 class="page-title">사용자조회</h2>
+                    <div class="breadcrumb-area">
+                        <i class="bi bi-house-door text-muted"></i> > 기본정보 > <span class="text-primary fw-medium">사용자</span>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">
+                        <i class="bi bi-caret-right-fill text-primary"></i> 회원기본정보
+                    </div>
+                    <table class="info-table">
+                        <tr>
+                            <th>사용자ID</th>
+                            <td>{{ user.userId }}</td>
+                            <th>등록일</th>
+                            <td>{{ formatDate(user.registDt) }}</td>
+                        </tr>
+                        <tr>
+                            <th>사용자 권한</th>
+                            <td>{{ user.authorNm }}</td>
+                            <th>사용자 상태</th>
+                            <td>{{ user.userSttusCode }}</td>
+                        </tr>
+                        <tr>
+                            <th>이름</th>
+                            <td>{{ user.userNm }}</td>
+                            <th>연락처</th>
+                            <td>{{ user.cttpc }}</td>
+                        </tr>
+                        <tr>
+                            <th>이메일</th>
+                            <td colspan="3">{{ user.email }}</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="d-flex justify-content-center gap-2 mt-4 mb-5">
+                    <button class="btn btn-list" @click="goList"><i class="bi bi-reply"></i> 목록</button>
+                    <button class="btn btn-edit" @click="goEdit"><i class="bi bi-pencil-square"></i> 수정</button>
+                    <button class="btn btn-delete" @click="deleteUser"><i class="bi bi-trash"></i> 삭제</button>
+                </div>
+
+                <admin-footer></admin-footer>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, onMounted } = Vue;
+        const app = createApp({
+            setup() {
+                const user = ref({});
+                const userNo = new URLSearchParams(window.location.search).get('userNo');
+
+                const fetchUserDetail = () => {
+                    if(!userNo) return;
+                    axios.get(`/api/admin/user/${userNo}`)
+                        .then(res => user.value = res.data);
+                };
+
+                const formatDate = (dt) => {
+                    if (!dt) return '';
+                    return dt.split('T')[0].replace(/-/g, '.');
+                };
+
+                const goList = () => location.href = '/admin/user/selectPageListUserMgt.do';
+                const goEdit = () => location.href = `/admin/user/updateFormUserMgt.do?userNo=${userNo}`;
+                
+                const deleteUser = () => {
+                    if (confirm('정말 삭제하시겠습니까?')) {
+                        axios.delete(`/api/admin/user/${userNo}`)
+                            .then(() => {
+                                alert('삭제되었습니다.');
+                                goList();
+                            });
+                    }
+                };
+
+                onMounted(() => {
+                    AdminMenu.init();
+                    fetchUserDetail();
+                });
+
+                return { user, formatDate, goList, goEdit, deleteUser };
+            }
+        });
+        AdminLayout.register(app);
+        app.mount('#app');
+    </script>
+</body>
+</html>

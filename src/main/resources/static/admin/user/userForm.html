@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사용자 등록 - PlanfAi 관리자</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/admin/js/admin_common.js"></script>
+    <link href="/admin/css/admin_style.css" rel="stylesheet">
+    <style>
+        .form-section { background: #fff; border: 1px solid #dee2e6; padding: 0; margin-bottom: 30px; }
+        .section-title { padding: 15px 20px; font-size: 16px; font-weight: 600; color: #2b4c80; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 8px; }
+        .form-table { width: 100%; border-collapse: collapse; }
+        .form-table th { width: 150px; background: #f8f9fa; padding: 15px 20px; font-weight: 500; font-size: 14px; text-align: left; border-bottom: 1px solid #eee; border-right: 1px solid #eee; }
+        .form-table td { padding: 12px 20px; border-bottom: 1px solid #eee; }
+        .input-group-contact { display: flex; align-items: center; gap: 10px; width: 350px; }
+        .btn-list { background-color: #fff; border: 1px solid #ced4da; padding: 8px 30px; border-radius: 4px; font-size: 14px; }
+        .btn-submit { background-color: #2b4c80; color: white; border: none; padding: 8px 40px; border-radius: 4px; font-size: 14px; }
+        .radio-group label { margin-right: 25px; cursor: pointer; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <admin-header></admin-header>
+
+        <div class="main-container">
+            <admin-sidebar></admin-sidebar>
+
+            <main class="content">
+                <div class="page-title-box">
+                    <h2 class="page-title">사용자 등록</h2>
+                    <div class="breadcrumb-area">
+                        <i class="bi bi-house-door text-muted"></i> > 기본정보 > <span class="text-primary fw-medium">사용자</span>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">
+                        <i class="bi bi-caret-right-fill text-primary"></i> 기본정보
+                    </div>
+                    <table class="form-table">
+                        <tr>
+                            <th>사용자ID</th>
+                            <td>
+                                <input type="text" class="form-control" v-model="user.userId" placeholder="사용자ID" style="width: 350px;">
+                            </td>
+                            <th>비밀번호</th>
+                            <td>
+                                <input type="password" class="form-control" v-model="user.password" placeholder="비밀번호" style="width: 350px;">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>이름</th>
+                            <td>
+                                <input type="text" class="form-control" v-model="user.userNm" placeholder="이름" style="width: 350px;">
+                            </td>
+                            <th>연락처</th>
+                            <td>
+                                <div class="input-group-contact">
+                                    <input type="text" class="form-control text-center" v-model="contact.part1">
+                                    <span>-</span>
+                                    <input type="text" class="form-control text-center" v-model="contact.part2">
+                                    <span>-</span>
+                                    <input type="text" class="form-control text-center" v-model="contact.part3">
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>이메일</th>
+                            <td>
+                                <input type="email" class="form-control" v-model="user.email" placeholder="이메일" style="width: 350px;">
+                            </td>
+                            <th>사용자 상태 코드</th>
+                            <td>
+                                <select class="form-select" v-model="user.userSttusCode" style="width: 350px;">
+                                    <option v-for="st in statusCodes" :key="st.CODE" :value="st.CODE">{{ st.CODE_NM }}</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">
+                        <i class="bi bi-caret-right-fill text-primary"></i> 권한선택
+                    </div>
+                    <div class="p-4">
+                        <div class="radio-group">
+                            <label v-for="auth in authors" :key="auth.AUTHOR_ID">
+                                <input type="radio" v-model="user.authorId" :value="auth.AUTHOR_ID"> {{ auth.AUTHOR_NM }}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-center gap-2 mt-4 mb-5">
+                    <button class="btn btn-list" @click="goList"><i class="bi bi-reply"></i> 목록</button>
+                    <button class="btn btn-submit" @click="saveUser">등록</button>
+                </div>
+
+                <admin-footer></admin-footer>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, onMounted } = Vue;
+        const app = createApp({
+            setup() {
+                const authors = ref([]);
+                const statusCodes = ref([]);
+                const user = ref({
+                    userId: '',
+                    password: '',
+                    userNm: '',
+                    email: '',
+                    userSttusCode: '',
+                    authorId: ''
+                });
+                
+                const contact = ref({ part1: '', part2: '', part3: '' });
+
+                const fetchAuthors = () => {
+                    axios.get('/api/admin/user/authors')
+                        .then(res => {
+                            authors.value = res.data;
+                            if (authors.value.length > 0) {
+                                user.value.authorId = authors.value[0].AUTHOR_ID;
+                            }
+                        });
+                };
+
+                const fetchStatusCodes = () => {
+                    axios.get('/api/admin/user/status-codes')
+                        .then(res => {
+                            statusCodes.value = res.data;
+                            if (statusCodes.value.length > 0) {
+                                user.value.userSttusCode = statusCodes.value[0].CODE;
+                            }
+                        });
+                };
+
+                const saveUser = () => {
+                    if (!user.value.userId) return alert('아이디를 입력해주세요.');
+                    if (!user.value.password) return alert('비밀번호를 입력해주세요.');
+                    
+                    user.value.cttpc = `${contact.value.part1}-${contact.value.part2}-${contact.value.part3}`;
+                    
+                    axios.post('/api/admin/user', user.value)
+                        .then(res => {
+                            alert('등록되었습니다.');
+                            location.href = '/admin/user/selectPageListUserMgt.do';
+                        }).catch(err => alert('등록 중 오류 발생'));
+                };
+
+                const goList = () => location.href = '/admin/user/selectPageListUserMgt.do';
+
+                onMounted(() => {
+                    AdminMenu.init();
+                    fetchAuthors();
+                    fetchStatusCodes();
+                });
+
+                return { authors, statusCodes, user, contact, saveUser, goList };
+            }
+        });
+        AdminLayout.register(app);
+        app.mount('#app');
+    </script>
+</body>
+</html>
