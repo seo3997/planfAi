@@ -3478,7 +3478,6 @@ body {
 .search-box-wrapper {
   background: #fff;
   border: 2px solid #3a5a9a;
-  border-top: 3px solid #3a5a9a;
   padding: 15px 20px;
   margin-bottom: 20px;
   display: flex;
