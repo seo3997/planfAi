@@ -33,7 +33,7 @@ div.error2{width:900px; margin:0 auto;}
 .wrapper-inbox{border: 0px !important}
 
 /* #pagetitle {text-align:left; margin:0 0 10 0; padding:0; height:30px; solid #d1d1d1; width:100%} */
-#pagetitle h1 {padding:3px 0px 2px 0px; float:left; font-size:18px; font-weight:bold; color:#000000;}
+#pagetitle h1 {padding:3px 0px 2px 0px; float:left; font-size:20px; font-weight:500; color:#111;}
 #pagetitle .location {height:20px; margin:0; padding:5 0 0 0;  font-size:11px;}
 #pagetitleSurvey {text-align:left; margin:0 0 10 0; padding:0; height:45px; border-bottom:1px solid #d1d1d1; width:100%}
 #pagetitleSurvey ul {float:left; margin:0; padding:0;}
@@ -49,11 +49,11 @@ div.error2{width:900px; margin:0 auto;}
 .form-group .tele70 {width:70px; float:left; }
 .form-group .input100 {width:100px; float:left; }
 
-.subtitle{margin-top:25px;font-size:18px;font-weight:700;color:#222}
+.subtitle{margin-top:25px;font-size:18px;font-weight:500;color:#222}
 .subtitle i{display:inline-block;width:4px;height:16px;margin-right:5px;border-radius:15px;line-height:18px;vertical-align:middle;background:#bbb}
 .subtitle span{font-weight:400}
 
-.subtitle2{font-size:18px;font-weight:700;color:#222}
+.subtitle2{font-size:18px;font-weight:500;color:#222}
 .subtitle2 i{display:inline-block;width:4px;height:16px;margin-right:5px;border-radius:15px;line-height:18px;vertical-align:middle;background:#bbb}
 .subtitle2 span{font-weight:400}
 
@@ -320,7 +320,7 @@ div.error2{width:900px; margin:0 auto;}
 .rolling-banner div button i{color:#777}
 .rolling-banner div a{padding:0}
 
-.m-mdtitle{margin:5px 0 0 0;margin-bottom:10px;padding:9px 10px;font-size:16px;font-weight:bold;text-align:center;background:linear-gradient(#f8f8f8 0%,#eee 10%,#ddd 40%,#cecece 60%,#bbb 100%)}
+.m-mdtitle{margin:5px 0 0 0;margin-bottom:10px;padding:9px 10px;font-size:16px;font-weight:500;text-align:center;background:linear-gradient(#f8f8f8 0%,#eee 10%,#ddd 40%,#cecece 60%,#bbb 100%)}
 .m-mdtitle span{font-size:15px}
 
 .m-itembox{display:inline-block;width:100%;padding:4px 0;clear:both}
@@ -349,8 +349,8 @@ div.error2{width:900px; margin:0 auto;}
 .m-notice-container{padding:10px 20px 0 10px}
 .m-notice-box{position:relative;width:100%;min-height:30px}
 .m-notice-box .img{display:inline-block;border:1px solid #8a8a8a}
-/* .m-notice-box .img img{} */
-.m-notice-box .mpop-title{display:block;font-size:13px;font-weight:700;color:#f0f0f0}
+/* removed unused notice styles */
+.m-notice-box .mpop-title{display:block;font-size:13px;font-weight:500;color:#f0f0f0}
 .m-notice-box .mpop-text{display:block;margin:5px 0 0 0;font-size:12px;font-weight:400;color:#c0c0c0}
 .m-notice-wrap .pull-right input[type=checkbox]{vertical-align:middle}
 .m-notice-wrap .pull-right .nview-text{padding:6px 10px 0 2px;font-size:12px;color:#fff !important;font-weight:normal !important;vertical-align:middle}
@@ -622,7 +622,7 @@ li.dropdown > ul.dropdown-menu > li.user-header{background-color:#fff; font-size
 li.dropdown > ul.dropdown-menu > li.user-header:nth-of-type(1){border-top: 0 transparent;}
 li.dropdown > ul.dropdown-menu > li.user-header > a{display:block;padding: 10px 5px; }
 
-#myInfoModal{}
+/* removed unused style */
 #myInfoModal .my-info{margin:0; padding:0;}
 /* #myInfoModal label, #myInfoModal div{margin-top: 10px;} */
 #myInfoModal .my-info label{padding-right: 0;padding-left: 0;}
@@ -700,7 +700,7 @@ li.dropdown > ul.dropdown-menu > li.user-header > a{display:block;padding: 10px 
 	Form
 */
 .form-inline .form-control{height: calc(1.5em + .75rem + 5px);font-size:12px;}
-.form-group label{min-width:70px;font-size:14px;font-weight:bold;}
+.form-group label{min-width:70px;font-size:14px;font-weight:500;}
 /* .form-group label.form-check-label{min-width: 40px;} */
 .form-group label.form-check-label{min-width: 35px;}
 .form-group label,
@@ -773,7 +773,7 @@ select ~ .w-30{width:183px !important;}
 
 .table > thead > tr > th,
 .table > tbody > tr > th,
-.table > tfoot > tr > th{background-color:#f9f9f9;color:#666;text-align:center;}
+.table > tfoot > tr > th{background-color:#f9f9f9;color:#555;text-align:center;font-weight: 500;}
 
 .table > thead > tr > td,
 .table > tbody > tr > td,
@@ -1010,7 +1010,7 @@ body {
     align-items: center;
     justify-content: center;
     font-size: 18px;
-    font-weight: bold;
+    font-weight: 600;
 }
 
 .admin-header .nav-area {
@@ -1077,8 +1077,8 @@ body {
 .sidebar .nav-link.category {
     padding: 18px 10px 8px 20px;
     color: var(--primary-blue);
-    font-size: 18px;
-    font-weight: bold;
+    font-size: 16px;
+    font-weight: 500;
     border-bottom: none;
     cursor: default;
 }
@@ -1096,7 +1096,7 @@ body {
 
 .sidebar .nav-link.active {
     color: var(--primary-blue);
-    font-weight: bold;
+    font-weight: 500;
 }
 
 .sidebar a.nav-link.active::before {
@@ -1122,8 +1122,8 @@ body {
 
 .page-title {
     font-size: 24px;
-    font-weight: bold;
-    color: #222;
+    font-weight: 500;
+    color: #1a1a1a;
     margin: 0;
 }
 
@@ -1139,7 +1139,7 @@ body {
 /* Search Area */
 .search-box-wrapper {
     background: #fff;
-    border: 2px solid #3668af;
+    border: 1px solid #cbd5e1;
     padding: 15px 20px;
     margin-bottom: 20px;
     display: flex;
@@ -1275,7 +1275,7 @@ body {
     font-size: 14px;
     color: #333;
     text-align: center;
-    font-weight: bold;
+    font-weight: 500;
 }
 
 .data-table td {
@@ -1320,7 +1320,7 @@ body {
     display: inline-block;
     padding: .35em .6em;
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 500;
     border-radius: .25rem;
 }
 
@@ -1340,7 +1340,7 @@ body {
 
 .login-title {
     font-size: 28px;
-    font-weight: bold;
+    font-weight: 500;
     margin-bottom: 30px;
     text-align: center;
     text-decoration: underline;
@@ -1369,7 +1369,7 @@ body {
 .login-form-group label {
     width: 120px;
     font-size: 18px;
-    font-weight: bold;
+    font-weight: 500;
     color: #444;
     text-align: right;
     margin-right: 25px;
@@ -1523,7 +1523,7 @@ body {
 
 .dash-card .accrue {
     font-size: 60px;
-    font-weight: 700;
+    font-weight: 600;
     line-height: 1;
 }
 
@@ -1603,16 +1603,13 @@ body {
 }
 
 .admin-footer {
-    padding: 30px 0;
+    padding: 15px 0;
     margin-top: auto;
-    border-top: 1px solid #e2e8f0;
-    text-align: center;
-    font-size: 13px;
+    text-align: right;
+    font-size: 12px;
     color: #94a3b8;
-    background-color: #fff;
-    width: 100%;
 }
 .admin-footer strong {
-    color: #475569;
-    font-weight: 600;
+    color: #94a3b8;
+    font-weight: 500;
 }
