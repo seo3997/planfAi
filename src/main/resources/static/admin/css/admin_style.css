@@ -1362,19 +1362,140 @@ body {
 
 /* Login Container */
 .login-wrap {
-    background: #f4f7f6;
+    background: #fff;
     height: 100vh;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    padding-top: 10vh;
+}
+
+.login-title {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    text-align: center;
+    text-decoration: underline;
+    text-underline-offset: 8px;
 }
 
 .login-box {
-    width: 400px;
+    width: 720px;
     background: white;
-    padding: 40px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    border-radius: 8px;
+    padding: 60px 50px;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+}
+
+.login-box form {
+    max-width: 520px;
+    margin: 0 auto;
+}
+
+.login-form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.login-form-group label {
+    width: 120px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #444;
+    text-align: right;
+    margin-right: 25px;
+    margin-bottom: 0;
+}
+
+.login-form-group .form-control {
+    flex: 1;
+    height: 48px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 0 15px;
+    font-size: 15px;
+}
+
+.login-form-group .form-control::placeholder {
+    color: #aaa;
+}
+
+.btn-login-submit {
+    width: calc(100% - 145px);
+    margin-left: 145px;
+    height: 52px;
+    background-color: #888;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 500;
+    margin-top: 25px;
+    cursor: pointer;
+}
+
+.btn-login-submit:hover {
+    background-color: #777;
+}
+
+.login-divider {
+    width: 100%;
+    border-top: 1px dashed #ccc;
+    margin: 30px 0 20px 0;
+}
+
+.login-options {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.login-option-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #ddd;
+    padding: 6px 15px;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #555;
+    cursor: pointer;
+}
+
+.login-option-item input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.login-footer-links {
+    width: 720px;
+    margin-top: 40px;
+    font-size: 14px;
+    color: #333;
+}
+
+.login-footer-link-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.btn-footer-link {
+    background-color: #888;
+    color: white;
+    border: none;
+    padding: 4px 15px;
+    border-radius: 4px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.btn-footer-link:hover {
+    background-color: #777;
 }
 /* Dashboard Specific Styles */
 .no-sidebar .content {
