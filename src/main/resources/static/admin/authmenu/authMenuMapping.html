@@ -20,8 +20,9 @@
             max-height: 800px;
             overflow-y: auto;
         }
-        .tree-node { list-style: none; padding-left: 16px; margin-top: 2px; }
-        .tree-toggle { cursor: pointer; margin-right: 2px; color: #999; font-size: 14px; line-height: 1; display: inline-flex; width: 16px; }
+        .tree-node { list-style: none; padding-left: 0; margin-top: 2px; }
+        .tree-node ul { padding-left: 20px; }
+        .tree-toggle { cursor: pointer; margin-right: 2px; color: #999; font-size: 14px; line-height: 1; display: inline-flex; width: 16px; align-items: center; justify-content: center; }
         .tree-info-panel {
             background: #fff;
             border: 1px solid #ddd;
@@ -31,7 +32,7 @@
         .auth-yn-checkbox {
             appearance: none; width: 16px; height: 16px; border: 1px solid #aaa;
             border-radius: 2px; cursor: pointer; position: relative;
-            vertical-align: middle; margin-right: 5px; background: #fff;
+            vertical-align: middle; margin-right: 4px; background: #fff;
         }
         .auth-yn-checkbox:checked { background-color: #3b5998; border-color: #3b5998; }
         .auth-yn-checkbox:checked::after {
