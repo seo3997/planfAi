@@ -11,10 +11,14 @@
     <script src="/admin/js/admin_common.js"></script>
     <link href="/admin/css/admin_style.css" rel="stylesheet">
     <style>
-        .form-table { width: 100%; border-collapse: collapse; background: #fff; margin-bottom: 30px; }
-        .form-table th { background: #f9f9f9; padding: 15px; border: 1px solid #ddd; width: 180px; text-align: center; font-weight: bold; }
-        .form-table td { padding: 10px 15px; border: 1px solid #ddd; }
-        .form-control { border-radius: 2px; }
+        .form-section { background: #fff; border: 1px solid #dee2e6; padding: 0; margin-bottom: 30px; }
+        .section-title { padding: 15px 20px; font-size: 16px; font-weight: 600; color: #2b4c80; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 8px; }
+        .form-table { width: 100%; border-collapse: collapse; }
+        .form-table th { width: 200px; background: #f8f9fa; padding: 12px 25px; font-weight: 500; font-size: 14px; text-align: left; border-bottom: 1px solid #eee; border-right: 1px solid #eee; }
+        .form-table td { padding: 10px 25px; border-bottom: 1px solid #eee; }
+        .form-control { border-radius: 0; border: 1px solid #ced4da; font-size: 14px; }
+        .btn-list { background-color: #6c757d; color: white; border: none; padding: 8px 20px; border-radius: 4px; }
+        .btn-submit { background-color: #2b4c80; color: white; border: none; padding: 8px 25px; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -28,35 +32,39 @@
                 <div class="page-title-box">
                     <h2 class="page-title">그룹코드 등록</h2>
                     <div class="breadcrumb-area">
-                        <i class="bi bi-house-door"></i> > 시스템 > <span class="text-dark fw-medium">코드관리</span>
+                        <i class="bi bi-house-door text-muted"></i> > 시스템 > <span class="text-primary fw-medium">코드관리</span>
                     </div>
                 </div>
 
-                <div class="card shadow-sm border-0 p-4" style="background-color: #f4f7f6;">
+                <div class="form-section">
+                    <div class="section-title">
+                        <i class="bi bi-caret-right-fill text-primary"></i> 그룹코드 정보
+                    </div>
                     <table class="form-table">
                         <tr>
                             <th>그룹코드</th>
-                            <td><input type="text" v-model="form.groupId" class="form-control" placeholder="그룹코드"></td>
+                            <td><input type="text" v-model="form.groupId" class="form-control" placeholder="그룹코드를 입력하세요"></td>
                         </tr>
                         <tr>
                             <th>그룹코드명</th>
-                            <td><input type="text" v-model="form.groupNm" class="form-control" placeholder="그룹코드명"></td>
+                            <td><input type="text" v-model="form.groupNm" class="form-control" placeholder="그룹코드명을 입력하세요"></td>
                         </tr>
                         <tr>
                             <th>영문그룹코드명</th>
-                            <td><input type="text" v-model="form.groupNmEng" class="form-control" placeholder="영문그룹코드명"></td>
+                            <td><input type="text" v-model="form.groupNmEng" class="form-control" placeholder="영문그룹코드명을 입력하세요"></td>
                         </tr>
                         <tr>
                             <th>비고</th>
-                            <td><textarea v-model="form.rm" class="form-control" rows="5" placeholder="비고"></textarea></td>
+                            <td><textarea v-model="form.rm" class="form-control" rows="3" placeholder="기타 참고사항을 입력하세요"></textarea></td>
                         </tr>
                     </table>
-
-                    <div class="d-flex justify-content-center gap-2">
-                        <button class="btn btn-outline-secondary px-4" @click="goBack"><i class="bi bi-reply-fill"></i> 목록</button>
-                        <button class="btn btn-primary px-4" style="background-color: #2b4b8a;" @click="saveGroup"><i class="bi bi-pencil-square"></i> 등록</button>
-                    </div>
                 </div>
+
+                <div class="d-flex justify-content-center gap-2 mt-4">
+                    <button class="btn-list" @click="goBack"><i class="bi bi-list"></i> 목록</button>
+                    <button class="btn-submit" @click="saveGroup"><i class="bi bi-check-lg"></i> 저장</button>
+                </div>
+
                 <admin-footer></admin-footer>
             </main>
         </div>
