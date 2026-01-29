@@ -10,6 +10,20 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="/admin/js/admin_common.js"></script>
     <link href="/admin/css/admin_style.css" rel="stylesheet">
+    <style>
+        .search-table { width: 100%; border: 2px solid #3a5a9a; border-collapse: collapse; background: #fff; }
+        .search-table th { background: #fff; padding: 8px 20px; width: 130px; font-weight: 500; font-size: 13px; text-align: left; vertical-align: middle; border: none; color: #333; }
+        .search-table td { padding: 8px 15px; vertical-align: middle; border: none; }
+        .search-actions-row { background: #fff; border-top: 1px solid #f0f0f0; }
+        .search-actions-row td { padding: 0; }
+        .form-select-sm, .form-control-sm { border-radius: 0; border: 1px solid #ced4da; height: 32px; font-size: 13px; }
+        .btn-init { background-color: #31c4b6; color: white; border: none; padding: 8px 20px; border-radius: 4px; }
+        .btn-search-submit { background-color: #2b4c80; color: white; border: none; padding: 8px 25px; border-radius: 4px; }
+        .btn-regist { background-color: #2b4c80; color: white; padding: 8px 18px; border-radius: 4px; text-decoration: none; font-size: 14px; }
+        .btn-delete { background-color: #ed5f39; color: white; border: none; padding: 8px 18px; border-radius: 4px; font-size: 14px; }
+        .data-table thead th { background: #f4f7f9; color: #333; font-weight: 500; border-bottom: 1px solid #dee2e6; height: 45px; text-align: center; }
+        .data-table td { font-size: 13.5px; height: 50px; text-align: center; border-bottom: 1px solid #eee; }
+    </style>
 </head>
 <body>
     <div id="app">
@@ -22,19 +36,36 @@
                 <div class="page-title-box">
                     <h2 class="page-title">코드관리</h2>
                     <div class="breadcrumb-area">
-                        <i class="bi bi-house-door"></i> > 시스템 > <span class="text-dark fw-medium">코드관리</span>
+                        <i class="bi bi-house-door text-muted"></i> > 시스템 > <span class="text-primary fw-medium">코드관리</span>
                     </div>
                 </div>
 
-                <!-- Search Area -->
-                <div class="search-box-wrapper">
-                    <input type="text" v-model="schGroupNm" @keyup.enter="fetchGroups" class="search-input" placeholder="그룹코드명">
-                    <button class="btn-search-icon" @click="fetchGroups"><i class="bi bi-search"></i></button>
-                </div>
+                <!-- 검색 영역 -->
+                <table class="search-table mb-4">
+                    <tr>
+                        <th>그룹명 검색</th>
+                        <td>
+                            <input type="text" class="form-control form-control-sm" style="width: 400px;" v-model="schGroupNm" placeholder="그룹코드명 또는 그룹코드를 입력하세요" @keyup.enter="fetchGroups">
+                        </td>
+                    </tr>
+                    <tr class="search-actions-row">
+                        <td colspan="2">
+                            <div class="d-flex justify-content-end p-2 gap-2">
+                                <button class="btn-init d-flex align-items-center" @click="resetSearch"><i class="bi bi-arrow-counterclockwise me-1"></i> 초기화</button>
+                                <button class="btn-search-submit d-flex align-items-center" @click="fetchGroups"><i class="bi bi-search me-1"></i> 검색</button>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
 
-                <div class="actions-area">
-                    <button class="btn btn-search" @click="deleteSelected" style="background-color: #ed5f39;"><i class="bi bi-trash"></i> 삭제</button>
-                    <button class="btn btn-search" @click="goRegister"><i class="bi bi-pencil-square"></i> 등록</button>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="text-muted fs-7">
+                        검색결과 <span class="text-primary fw-bold">{{ totCnt }}</span>개
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-delete" @click="deleteSelected"><i class="bi bi-trash"></i> 삭제</button>
+                        <button class="btn-regist" @click="goRegister"><i class="bi bi-pencil"></i> 등록</button>
+                    </div>
                 </div>
 
                 <div class="data-table-wrapper">
@@ -54,35 +85,27 @@
                             <tr v-for="(item, index) in groupList" :key="item.groupId" @click="goDetail(item.groupId)" style="cursor: pointer;">
                                 <td @click.stop><input type="checkbox" v-model="selectedIds" :value="item.groupId"></td>
                                 <td>{{ totCnt - ((page - 1) * size) - index }}</td>
-                                <td class="fw-medium">{{ item.groupId }}</td>
-                                <td class="text-start px-3">{{ item.groupNm }}</td>
-                                <td class="text-start px-3">{{ item.groupNmEng }}</td>
+                                <td class="fw-medium text-primary">{{ item.groupId }}</td>
+                                <td class="text-start px-3 text-dark">{{ item.groupNm }}</td>
+                                <td class="text-start px-3 text-muted">{{ item.groupNmEng }}</td>
                                 <td>{{ item.registerNm }}</td>
                                 <td>{{ item.registYmd }}</td>
                             </tr>
                             <tr v-if="groupList.length === 0">
-                                <td colspan="7" class="text-center py-5 text-muted">결과가 없습니다.</td>
+                                <td colspan="7" class="text-center py-5 text-muted">검색 결과가 없습니다.</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
 
-                <!-- Pagination -->
-                <div class="d-flex justify-content-center mt-4" v-if="totCnt > 0">
-                    <nav>
-                        <ul class="pagination pagination-sm">
-                            <li class="page-item" :class="{ disabled: page === 1 }">
-                                <a class="page-link" href="#" @click.prevent="changePage(page - 1)"><i class="bi bi-chevron-left"></i></a>
-                            </li>
-                            <li v-for="p in totalPages" :key="p" class="page-item" :class="{ active: p === page }">
-                                <a class="page-link" href="#" @click.prevent="changePage(p)">{{ p }}</a>
-                            </li>
-                            <li class="page-item" :class="{ disabled: page === totalPages }">
-                                <a class="page-link" href="#" @click.prevent="changePage(page + 1)"><i class="bi bi-chevron-right"></i></a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
+                <!-- 페이징 컴포넌트 -->
+                <admin-pagination 
+                    :total-count="totCnt" 
+                    :current-page="page" 
+                    :page-size="size"
+                    @change-page="handlePageChange">
+                </admin-pagination>
+
                 <admin-footer></admin-footer>
             </main>
         </div>
@@ -106,16 +129,22 @@
                     }).then(res => {
                         groupList.value = res.data.list;
                         totCnt.value = res.data.totCnt;
-                    }).catch(err => alert('조회 실패'));
+                    }).catch(err => {
+                        console.error('Fetch error:', err);
+                        alert('조회 중 오류가 발생했습니다.');
+                    });
                 };
 
-                const changePage = (p) => {
-                    if (p < 1 || p > totalPages.value) return;
-                    page.value = p;
+                const resetSearch = () => {
+                    schGroupNm.value = '';
+                    page.value = 1;
                     fetchGroups();
                 };
 
-                const totalPages = computed(() => Math.ceil(totCnt.value / size));
+                const handlePageChange = (p) => {
+                    page.value = p;
+                    fetchGroups();
+                };
 
                 const selectAll = () => {
                     if (allSelected.value) {
@@ -151,7 +180,10 @@
                     fetchGroups();
                 });
 
-                return { groupList, totCnt, page, size, schGroupNm, selectedIds, allSelected, totalPages, fetchGroups, changePage, selectAll, goRegister, goDetail, deleteSelected };
+                return { 
+                    groupList, totCnt, page, size, schGroupNm, selectedIds, allSelected, 
+                    fetchGroups, resetSearch, handlePageChange, selectAll, goRegister, goDetail, deleteSelected 
+                };
             }
         });
         AdminLayout.register(app);
