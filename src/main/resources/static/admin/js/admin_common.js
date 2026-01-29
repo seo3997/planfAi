@@ -108,37 +108,142 @@ const AdminMenu = {
 
 // --- Common Components ---
 
+const AdminProfileModal = {
+    template: `
+        <div class="profile-modal-overlay" @click.self="$emit('close')">
+            <div class="profile-modal">
+                <div class="profile-modal-header">
+                    <h3>나의 정보</h3>
+                    <button class="btn-close" @click="$emit('close')">&times;</button>
+                </div>
+                <div class="profile-modal-body">
+                    <div class="profile-form-group">
+                        <label>사용자ID</label>
+                        <div class="form-control-static">{{ user.userId }}</div>
+                    </div>
+                    <div class="profile-form-group">
+                        <label>비밀번호</label>
+                        <input type="password" class="form-control" v-model="user.password" placeholder="비밀번호">
+                    </div>
+                    <div class="profile-form-group">
+                        <label>이름</label>
+                        <input type="text" class="form-control" v-model="user.userNm" placeholder="이름">
+                    </div>
+                    <div class="profile-form-group">
+                        <label>이메일</label>
+                        <input type="email" class="form-control" v-model="user.email" placeholder="이메일">
+                    </div>
+                    <div class="profile-form-group">
+                        <label>연락처</label>
+                        <div class="contact-inputs">
+                            <input type="text" class="form-control" v-model="contact.part1">
+                            <span>-</span>
+                            <input type="text" class="form-control" v-model="contact.part2">
+                            <span>-</span>
+                            <input type="text" class="form-control" v-model="contact.part3">
+                        </div>
+                    </div>
+                    <div class="profile-form-group">
+                        <label>업체명</label>
+                        <div class="form-control-static">{{ user.authorNm || '관리업체' }}</div>
+                    </div>
+                </div>
+                <div class="profile-modal-footer">
+                    <button class="btn-close-footer" @click="$emit('close')">
+                        <i class="bi bi-x-square"></i> 닫기
+                    </button>
+                    <button class="btn-update" @click="updateProfile">수정</button>
+                </div>
+            </div>
+        </div>
+    `,
+    setup(props, { emit }) {
+        const user = Vue.ref({
+            userId: '',
+            password: '',
+            userNm: '',
+            email: '',
+            cttpc: ''
+        });
+        const contact = Vue.ref({ part1: '', part2: '', part3: '' });
+
+        const fetchProfile = () => {
+            axios.get('/api/admin/user/profile')
+                .then(res => {
+                    user.value = res.data;
+                    user.value.password = ''; // Don't show hash
+                    if (user.value.cttpc) {
+                        const parts = user.value.cttpc.split('-');
+                        contact.value.part1 = parts[0] || '';
+                        contact.value.part2 = parts[1] || '';
+                        contact.value.part3 = parts[2] || '';
+                    }
+                });
+        };
+
+        const updateProfile = () => {
+            user.value.cttpc = `${contact.value.part1}-${contact.value.part2}-${contact.value.part3}`;
+            axios.put('/api/admin/user/profile', user.value)
+                .then(res => {
+                    alert('수정되었습니다.');
+                    emit('close');
+                })
+                .catch(err => alert('수정 중 오류 발생'));
+        };
+
+        Vue.onMounted(fetchProfile);
+
+        return { user, contact, updateProfile };
+    }
+};
+
 const AdminHeader = {
     template: `
-        <header class="admin-header">
-            <div class="logo-area" @click="goHome" style="cursor:pointer">planF</div>
-            <nav class="nav-area">
-                <div v-for="menu in menuState.topMenus" 
-                     :key="menu.menuId" 
-                     class="nav-item" 
-                     :class="{ active: menuState.activeTopId === menu.menuId }"
-                     @click="changeTop(menu.menuId)">
-                    {{ menu.menuNm }}
+        <div>
+            <header class="admin-header">
+                <div class="logo-area" @click="goHome" style="cursor:pointer">planF</div>
+                <nav class="nav-area">
+                    <div v-for="menu in menuState.topMenus" 
+                         :key="menu.menuId" 
+                         class="nav-item" 
+                         :class="{ active: menuState.activeTopId === menu.menuId }"
+                         @click="changeTop(menu.menuId)">
+                        {{ menu.menuNm }}
+                    </div>
+                </nav>
+                <div class="user-info">
+                    <i class="bi bi-person-fill me-1"></i> 
+                    <span @click="showProfileModal = true" style="cursor:pointer; text-decoration: underline;">{{ loginId }}</span>
+                    <a href="/admin/logout.do" class="ms-3"><i class="bi bi-unlock-fill me-1"></i> Logout</a>
                 </div>
-            </nav>
-            <div class="user-info">
-                <i class="bi bi-person-fill me-1"></i> admin
-                <a href="/admin/logout.do" class="ms-3"><i class="bi bi-unlock-fill me-1"></i> Logout</a>
-            </div>
-        </header>
+            </header>
+            <admin-profile-modal v-if="showProfileModal" @close="showProfileModal = false"></admin-profile-modal>
+        </div>
     `,
     setup() {
         const menuState = AdminMenu.state;
+        const showProfileModal = Vue.ref(false);
+        const loginId = Vue.ref('admin');
+
+        const fetchLoginId = () => {
+             axios.get('/api/admin/user/profile')
+                .then(res => {
+                    loginId.value = res.data.userId;
+                });
+        };
+
         const changeTop = async (id) => {
             const leftMenus = await AdminMenu.fetchLeftMenus(id);
-            // After loading left menus, navigate to the first menu item if it exists
             const firstMenu = leftMenus.find(m => m.menuTyCode === '20');
             if (firstMenu && firstMenu.url) {
                 location.href = firstMenu.url;
             }
         };
         const goHome = () => location.href = '/admin/main.do';
-        return { menuState, changeTop, goHome };
+
+        Vue.onMounted(fetchLoginId);
+
+        return { menuState, changeTop, goHome, showProfileModal, loginId };
     }
 };
 
@@ -208,6 +313,7 @@ const AdminLayout = {
         app.component('admin-header', AdminHeader);
         app.component('admin-sidebar', AdminSidebar);
         app.component('admin-footer', AdminFooter);
+        app.component('admin-profile-modal', AdminProfileModal);
     }
 };
 

@@ -62,4 +62,28 @@ public class UserRestController {
         return ResponseEntity.ok(authors);
     }
 
+    @GetMapping("/profile")
+    public ResponseEntity<?> getProfile(HttpSession session) {
+        UserInfoVo admin = (UserInfoVo) session.getAttribute("adminUser");
+        if (admin == null)
+            return ResponseEntity.status(401).body("세션이 만료되었습니다.");
+
+        UserDto user = userService.selectUserDetail(admin.getUserNo());
+        return ResponseEntity.ok(user);
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<?> updateProfile(@RequestBody UserDto userDto, HttpSession session) {
+        UserInfoVo admin = (UserInfoVo) session.getAttribute("adminUser");
+        if (admin == null)
+            return ResponseEntity.status(401).body("세션이 만료되었습니다.");
+
+        // Ensure the user being updated is the logged-in user
+        userDto.setUserNo(admin.getUserNo());
+        userDto.setUpdusrNo(admin.getUserNo().intValue());
+
+        // Only update allowed fields: UserNm, Email, Password, Cttpc
+        userService.updateUser(userDto);
+        return ResponseEntity.ok("수정되었습니다.");
+    }
 }
