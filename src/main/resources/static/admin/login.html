@@ -1,84 +1,104 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>관리자 로그인 - PlanfAi</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="/admin/js/admin_common.js"></script>
     <!-- Custom Admin CSS -->
-    <link href="/admin/css/admin_style.css" rel="stylesheet">
-</head>
-<body>
+    <link href="/admin/css/admin_style.css" rel="stylesheet" />
+  </head>
+  <body>
     <div id="app" class="login-wrap">
-        <h1 class="login-title">planF 로그인</h1>
-        
-        <div class="login-box">
-            <form @submit.prevent="handleLogin">
-                <div class="login-form-group">
-                    <label>아이디</label>
-                    <input type="text" v-model="loginForm.userId" class="form-control" placeholder="아이디를 입력해주세요." required>
-                </div>
-                <div class="login-form-group">
-                    <label>비밀번호</label>
-                    <input type="password" v-model="loginForm.password" class="form-control" placeholder="비밀번호를 입력해주세요." required>
-                </div>
-                
-                <button type="submit" class="btn-login-submit">로그인</button>
-            </form>
+      <h1 class="login-title">planF 로그인</h1>
 
-            <div class="login-divider"></div>
+      <div class="login-box">
+        <form @submit.prevent="handleLogin">
+          <div class="login-form-group">
+            <label>아이디</label>
+            <input
+              type="text"
+              v-model="loginForm.userId"
+              class="form-control"
+              placeholder="아이디를 입력해주세요."
+              required
+            />
+          </div>
+          <div class="login-form-group">
+            <label>비밀번호</label>
+            <input
+              type="password"
+              v-model="loginForm.password"
+              class="form-control"
+              placeholder="비밀번호를 입력해주세요."
+              required
+            />
+          </div>
 
-            <div class="login-options">
-                <label class="login-option-item">
-                    <input type="checkbox" v-model="loginOptions.saveId"> 아이디 기억하기
-                </label>
-                <label class="login-option-item">
-                    <input type="checkbox" v-model="loginOptions.autoLogin"> 자동 로그인
-                </label>
-            </div>
+          <button type="submit" class="btn-login-submit">로그인</button>
+        </form>
+
+        <div class="login-divider"></div>
+
+        <div class="login-options">
+          <label class="login-option-item">
+            <input type="checkbox" v-model="loginOptions.saveId" /> 아이디
+            기억하기
+          </label>
+          <label class="login-option-item">
+            <input type="checkbox" v-model="loginOptions.autoLogin" /> 자동
+            로그인
+          </label>
         </div>
+      </div>
 
-        <div class="login-footer-links">
-            <div class="login-footer-link-row">
-                아직 회원이 아니시라면 지금회원으로 가입하세요.
-                <button class="btn-footer-link">회원가입</button>
-            </div>
-            <div class="login-footer-link-row">
-                아이디나 비밀번호를 분실하셨다면, 지금 찾아보세요.
-                <button class="btn-footer-link">아이디/비밀번호 찾기</button>
-            </div>
+      <div class="login-footer-links">
+        <div class="login-footer-link-row">
+          아직 회원이 아니시라면 지금회원으로 가입하세요.
+          <button class="btn-footer-link">회원가입</button>
         </div>
+        <div class="login-footer-link-row">
+          아이디나 비밀번호를 분실하셨다면, 지금 찾아보세요.
+          <button class="btn-footer-link">아이디/비밀번호 찾기</button>
+        </div>
+      </div>
 
-        <div class="admin-footer text-center" style="width: 720px; border-top: 1px solid #ddd; margin-top: 30px;">
-            Copyright 2026. <strong>planF</strong>. All rights reserved.
-        </div>
+      <div class="admin-footer">
+        Copyright 2026. <strong>planF</strong>. All rights reserved.
+      </div>
     </div>
 
     <script>
-        const { createApp, ref } = Vue;
-        createApp({
-            setup() {
-                const loginForm = ref({ userId: '', password: '' });
-                const loginOptions = ref({ saveId: false, autoLogin: false });
-                
-                const handleLogin = () => {
-                    axios.post('/api/admin/login', loginForm.value)
-                        .then(res => {
-                            if (res.data === 'success') {
-                                location.href = '/admin/main.do';
-                            }
-                        })
-                        .catch(err => {
-                            const msg = err.response ? err.response.data : '로그인 중 오류가 발생했습니다.';
-                            alert(msg);
-                        });
-                };
-                return { loginForm, loginOptions, handleLogin };
-            }
-        }).mount('#app');
+      const { createApp, ref } = Vue;
+      createApp({
+        setup() {
+          const loginForm = ref({ userId: "", password: "" });
+          const loginOptions = ref({ saveId: false, autoLogin: false });
+
+          const handleLogin = () => {
+            axios
+              .post("/api/admin/login", loginForm.value)
+              .then((res) => {
+                if (res.data === "success") {
+                  location.href = "/admin/main.do";
+                }
+              })
+              .catch((err) => {
+                const msg = err.response
+                  ? err.response.data
+                  : "로그인 중 오류가 발생했습니다.";
+                alert(msg);
+              });
+          };
+          return { loginForm, loginOptions, handleLogin };
+        },
+      }).mount("#app");
     </script>
-</body>
+  </body>
 </html>

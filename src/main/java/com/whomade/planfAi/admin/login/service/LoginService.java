@@ -35,13 +35,24 @@ public class LoginService {
         String dbHash = user.getPassword().trim();
 
         System.out.println("=== Authentication Debug ===");
-        System.out.println("Raw Password: [" + rawPassword + "]");
-        System.out.println("DB Hash:      [" + dbHash + "]");
-        System.out.println("New Hash of '1234': [" + passwordEncoder.encode("1234") + "]");
-        System.out.println("Match? : " + passwordEncoder.matches(rawPassword, dbHash));
+        System.out.println("Raw Password: [" + rawPassword + "] (length: "
+                + (rawPassword != null ? rawPassword.length() : "null") + ")");
+        System.out.println(
+                "DB Hash:      [" + dbHash + "] (length: " + (dbHash != null ? dbHash.length() : "null") + ")");
+
+        if (rawPassword != null) {
+            System.out.print("Raw Bytes: ");
+            for (byte b : rawPassword.getBytes()) {
+                System.out.format("%02X ", b);
+            }
+            System.out.println();
+        }
+
+        boolean isMatch = passwordEncoder.matches(rawPassword, dbHash);
+        System.out.println("Match Result: " + isMatch);
         System.out.println("============================");
 
-        if (!passwordEncoder.matches(rawPassword, dbHash)) {
+        if (!isMatch) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 

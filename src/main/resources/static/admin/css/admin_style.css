@@ -1,14 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+
 html, body {
     height: 100%;
     margin: 0;
     padding: 0;
 }
 body {
-    font-size: 12px;
+    font-family: 'Noto Sans KR', 'Malgun Gothic', 'Dotum', 'Apple SD Gothic Neo', sans-serif;
+    font-size: 15px;
     background-color: #f4f7f6;
+    color: #333;
 }
 #app {
-    height: 100%;
+    height: 100vh;
     display: flex;
     flex-direction: column;
 }
@@ -345,7 +349,7 @@ div.error2{width:900px; margin:0 auto;}
 .m-notice-container{padding:10px 20px 0 10px}
 .m-notice-box{position:relative;width:100%;min-height:30px}
 .m-notice-box .img{display:inline-block;border:1px solid #8a8a8a}
-.m-notice-box .img img{}
+/* .m-notice-box .img img{} */
 .m-notice-box .mpop-title{display:block;font-size:13px;font-weight:700;color:#f0f0f0}
 .m-notice-box .mpop-text{display:block;margin:5px 0 0 0;font-size:12px;font-weight:400;color:#c0c0c0}
 .m-notice-wrap .pull-right input[type=checkbox]{vertical-align:middle}
@@ -620,8 +624,7 @@ li.dropdown > ul.dropdown-menu > li.user-header > a{display:block;padding: 10px 
 
 #myInfoModal{}
 #myInfoModal .my-info{margin:0; padding:0;}
-#myInfoModal .my-info label,
-#myInfoModal .my-info div{margin-top: 10px;}
+/* #myInfoModal label, #myInfoModal div{margin-top: 10px;} */
 #myInfoModal .my-info label{padding-right: 0;padding-left: 0;}
 
 #sidebar.sidebar-menu,
@@ -741,8 +744,7 @@ select ~ .w-30{width:183px !important;}
 /*
 	Contents Tab
 */
-/* removed empty rulesets */
-.contents-tab{padding: 0; background-color: #fff; border-top: 1px solid #d2d2d2; border-right: 1px solid #d2d2d2; border-left: 1px solid #d2d2d2;}
+/* .contents-tab{} */
 .contents-tab > .nav-item{border-left: 0 none; border-right: 0 none;}
 .contents-tab > .nav-item > .nav-link {background-color: #fff; border-top: 2px solid transparent; border-bottom: 1px solid #d2d2d2; color: #999;border-radius: 0; border-left: 0 none; border-right: 0 none; font-weight: 600;}
 .contents-tab > .nav-item > .nav-link.active,
@@ -981,7 +983,7 @@ select ~ .w-30{width:183px !important;}
 body {
     background-color: var(--content-bg);
     font-family: 'Noto Sans KR', 'Malgun Gothic', 'Dotum', 'Apple SD Gothic Neo', sans-serif;
-    font-size: 14px;
+    font-size: 15px;
     margin: 0;
     padding: 0;
     line-height: 1.6;
@@ -1327,13 +1329,13 @@ body {
 
 /* Login Container */
 .login-wrap {
-    background: #fff;
+    background: #f4f7f6;
     height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
-    padding-top: 10vh;
+    justify-content: center;
+    padding: 20px;
 }
 
 .login-title {
@@ -1391,18 +1393,19 @@ body {
     width: calc(100% - 145px);
     margin-left: 145px;
     height: 52px;
-    background-color: #888;
+    background-color: var(--primary-blue);
     color: white;
     border: none;
     border-radius: 4px;
     font-size: 16px;
-    font-weight: 500;
+    font-weight: 600;
     margin-top: 25px;
     cursor: pointer;
+    transition: background-color 0.2s;
 }
 
 .btn-login-submit:hover {
-    background-color: #777;
+    background-color: #1e3a8a;
 }
 
 .login-divider {
@@ -1436,7 +1439,8 @@ body {
 }
 
 .login-footer-links {
-    width: 720px;
+    max-width: 720px;
+    width: 100%;
     margin-top: 40px;
     font-size: 14px;
     color: #333;
@@ -1531,7 +1535,7 @@ body {
 .btn-plus {
     width: 24px;
     height: 24px;
-    background-color: #d8dee3;
+    background-color: var(--primary-blue);
     color: white;
     display: flex;
     align-items: center;
@@ -1599,14 +1603,16 @@ body {
 }
 
 .admin-footer {
-    padding: 40px 0 20px 0;
+    padding: 30px 0;
     margin-top: auto;
     border-top: 1px solid #e2e8f0;
-    text-align: left;
-    font-size: 14px;
-    color: #999;
+    text-align: center;
+    font-size: 13px;
+    color: #94a3b8;
+    background-color: #fff;
+    width: 100%;
 }
 .admin-footer strong {
-    color: #4a5568;
+    color: #475569;
     font-weight: 600;
 }
