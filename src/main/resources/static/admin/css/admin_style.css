@@ -3618,26 +3618,315 @@ body {
   border-collapse: collapse;
 }
 
-.data-table th {
-  background-color: var(--table-header);
+.data-table thead th {
+  background-color: #f4f7f9;
   border: 1px solid #ddd;
   padding: 12px;
   font-size: 14px;
   color: #333;
   text-align: center;
   font-weight: 500;
+  height: 45px;
+  vertical-align: middle;
 }
 
 .data-table td {
   border: 1px solid #ddd;
   padding: 10px 12px;
   text-align: center;
-  font-size: 14px;
+  font-size: 13.5px;
+  height: 42px;
+  vertical-align: middle;
 }
 
 .data-table tr:hover {
   background-color: #fcfcfc;
   cursor: pointer;
+}
+
+/* Form & Info Tables (Detail/Form pages) */
+.form-section {
+  background: #fff;
+  border: 1px solid #dee2e6;
+  padding: 0;
+  margin-bottom: 30px;
+}
+
+.section-title {
+  padding: 15px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #2b4c80;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-table, .info-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.form-table th, .info-table th {
+  width: 200px;
+  background: #f8f9fa;
+  padding: 12px 25px;
+  font-weight: 500;
+  font-size: 14px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+  border-right: 1px solid #eee;
+}
+
+.form-table td, .info-table td {
+  padding: 10px 25px;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+  color: #333;
+}
+
+/* Common Buttons */
+.btn-list {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: opacity 0.2s;
+}
+
+.btn-submit, .btn-regist {
+  background-color: #2b4c80;
+  color: white;
+  border: none;
+  padding: 8px 25px;
+  border-radius: 4px;
+  font-size: 14px;
+  text-decoration: none;
+  display: inline-block;
+  transition: opacity 0.2s;
+}
+
+.btn-delete {
+  background-color: #ed5f39;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: opacity 0.2s;
+}
+
+.btn-search-submit {
+  background-color: #2b4c80;
+  color: white;
+  border: none;
+  padding: 8px 25px;
+  border-radius: 4px;
+}
+
+.btn-table-edit {
+  background: #fff;
+  border: 1px solid #3a5a9a;
+  color: #3a5a9a;
+  padding: 2px 10px;
+  font-size: 12px;
+  border-radius: 2px;
+}
+
+.btn-table-del {
+  background: #fff;
+  border: 1px solid #ed5f39;
+  color: #ed5f39;
+  padding: 2px 10px;
+  font-size: 12px;
+  border-radius: 2px;
+}
+
+/* Search Area Styles */
+.search-table {
+  width: 100%;
+  border: 2px solid #3a5a9a;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.search-table th {
+  background: #fff;
+  padding: 8px 20px;
+  width: 130px;
+  font-weight: 500;
+  font-size: 13px;
+  text-align: left;
+  vertical-align: middle;
+  border: none;
+  color: #333;
+}
+
+.search-table td {
+  padding: 8px 15px;
+  vertical-align: middle;
+  border: none;
+}
+
+.search-actions-row {
+  background: #fff;
+  border-top: 1px solid #f0f0f0;
+}
+
+.search-actions-row td {
+  padding: 0;
+}
+
+.search-box-wrapper {
+  background: #fff;
+  padding: 20px;
+  border: 1px solid #ddd;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.search-input {
+  flex: 1;
+  padding: 8px 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+/* Form Elements */
+.form-select-sm, .form-control-sm {
+  border-radius: 0;
+  border: 1px solid #ced4da;
+  height: 32px;
+  font-size: 13px;
+}
+
+.date-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.date-input {
+  width: 140px;
+  border: 1px solid #ced4da;
+  padding: 5px 10px;
+  height: 34px;
+  border-radius: 0;
+}
+
+.radio-group label {
+  margin-right: 15px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* Status & Badges */
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.status-active {
+  background: #e6f7f5;
+  color: #10a394;
+}
+
+.btn-init {
+  background-color: #31c4b6;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 4px;
+}
+
+/* Tree & Menu Mapping View */
+.tree-container {
+  background: #fff;
+  padding: 20px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  min-height: 600px;
+  max-height: 800px;
+  overflow-y: auto;
+}
+
+.tree-node {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 2px;
+}
+
+.tree-node ul {
+  padding-left: 20px;
+}
+
+.tree-toggle {
+  cursor: pointer;
+  margin-right: 2px;
+  color: #999;
+  font-size: 14px;
+  line-height: 1;
+  display: inline-flex;
+  width: 16px;
+  align-items: center;
+  justify-content: center;
+}
+
+.tree-info-panel {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 20px;
+  border-radius: 4px;
+}
+
+.auth-yn-checkbox {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 1px solid #aaa;
+  border-radius: 2px;
+  cursor: pointer;
+  position: relative;
+  vertical-align: middle;
+  margin-right: 4px;
+  background: #fff;
+}
+
+.auth-yn-checkbox:checked {
+  background-color: #3b5998;
+  border-color: #3b5998;
+}
+
+.auth-yn-checkbox:checked::after {
+  content: "\F633";
+  font-family: "bootstrap-icons";
+  color: white;
+  font-size: 13px;
+  position: absolute;
+  top: -1px;
+  left: 0px;
+  font-weight: bold;
+}
+
+.menu-label {
+  font-size: 13px;
+  color: #333;
+  margin-left: 2px;
+}
+
+.tree-placeholder {
+  display: inline-block;
+  width: 18px;
+}
+
+.btn-list:hover, .btn-submit:hover, .btn-regist:hover, .btn-delete:hover {
+  opacity: 0.85;
+  color: white;
 }
 
 /* ==========================================================================
