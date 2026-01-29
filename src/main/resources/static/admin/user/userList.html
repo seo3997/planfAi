@@ -147,19 +147,12 @@
                 </div>
 
                 <!-- Pagination -->
-                <nav class="mt-4" v-if="totalPages > 0">
-                    <ul class="pagination pagination-sm justify-content-center">
-                        <li class="page-item" :class="{ disabled: currentPage === 1 }">
-                            <a class="page-link" href="#" @click.prevent="changePage(currentPage - 1)"><i class="bi bi-chevron-left"></i></a>
-                        </li>
-                        <li v-for="p in totalPages" :key="p" class="page-item" :class="{ active: p === currentPage }">
-                            <a class="page-link" href="#" @click.prevent="changePage(p)">{{ p }}</a>
-                        </li>
-                        <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-                            <a class="page-link" href="#" @click.prevent="changePage(currentPage + 1)"><i class="bi bi-chevron-right"></i></a>
-                        </li>
-                    </ul>
-                </nav>
+                <admin-pagination 
+                    :total-count="totalCount" 
+                    :current-page="currentPage" 
+                    :page-size="pageSize"
+                    @change-page="handlePageChange">
+                </admin-pagination>
 
                 <admin-footer></admin-footer>
             </main>
@@ -203,6 +196,8 @@
                     }).then(res => {
                         userList.value = res.data.list;
                         totalCount.value = res.data.totalCount;
+                    }).catch(err => {
+                        console.error('Fetch users error:', err);
                     });
                 };
 
@@ -216,6 +211,7 @@
                         endDate: ''
                     };
                     dateType.value = 'all';
+                    currentPage.value = 1;
                     fetchUsers();
                 };
 
@@ -224,10 +220,7 @@
                     return dt.split('T')[0].replace(/-/g, '.');
                 };
 
-                const totalPages = computed(() => Math.ceil(totalCount.value / pageSize));
-
-                const changePage = (p) => {
-                    if (p < 1 || p > totalPages.value) return;
+                const handlePageChange = (p) => {
                     currentPage.value = p;
                     fetchUsers();
                 };
@@ -274,11 +267,16 @@
 
                 return { 
                     userList, authors, statusCodes, totalCount, currentPage, pageSize, 
-                    searchDto, dateType, totalPages, fetchUsers, resetSearch, 
-                    formatDate, changePage, goDetail 
+                    searchDto, dateType, fetchUsers, resetSearch, 
+                    formatDate, handlePageChange, goDetail 
                 };
             }
         });
+        AdminLayout.register(app);
+        app.mount('#app');
+    </script>
+</body>
+</html>
         AdminLayout.register(app);
         app.mount('#app');
     </script>
