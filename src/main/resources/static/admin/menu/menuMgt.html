@@ -5,206 +5,406 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>메뉴 관리 - PlanfAi 관리자</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="/admin/js/admin_common.js"></script>
     <link href="/admin/css/admin_style.css" rel="stylesheet">
+    <style>
+        .menu-mgmt-container { display: flex; gap: 20px; align-items: flex-start; }
+        
+        /* Left: Tree Section */
+        .tree-section {
+            flex: 0 0 400px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            min-height: 800px;
+        }
+        .tree-header { margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; display: flex; gap: 5px; }
+        .btn-tree-ctrl { font-size: 13px; padding: 4px 10px; background: #f5f5f5; border: 1px solid #ccc; border-radius: 3px; }
+        
+        .tree-list { list-style: none; padding-left: 0; margin: 0; }
+        .tree-node { list-style: none; padding-left: 20px; margin-top: 5px; position: relative; }
+        .tree-label-row { display: flex; align-items: center; cursor: pointer; padding: 4px 8px; border-radius: 3px; transition: background 0.2s; }
+        .tree-label-row:hover { background: #f0f7ff; }
+        .tree-label-row.selected { background: #d7ebff; font-weight: bold; color: #2b579a; }
+        .tree-toggle { color: #888; margin-right: 5px; cursor: pointer; display: inline-block; width: 14px; text-align: center; }
+        .tree-label { font-size: 14px; color: #333; }
+        .selected .tree-label { color: #2b579a; }
+
+        /* Right: Form Section */
+        .form-section { flex: 1; display: flex; flex-direction: column; gap: 20px; }
+        .mgmt-card { background: #fff; border: 1px solid #ddd; border-top: 2px solid #3b5998; border-radius: 4px; padding: 25px; }
+        .form-table { width: 100%; border-collapse: collapse; margin-bottom: 0; }
+        .form-table th { background: #f9f9f9; padding: 12px 15px; border: 1px solid #ddd; font-size: 13px; color: #333; font-weight: bold; text-align: left; width: 150px; }
+        .form-table td { padding: 8px 15px; border: 1px solid #ddd; vertical-align: middle; }
+        .form-control, .form-select { border: 1px solid #ccc; font-size: 13px; padding: 6px 10px; border-radius: 3px; }
+        .form-control:read-only { background-color: #f1f1f1 !important; color: #666; cursor: default; }
+        .required::after { content: " *"; color: #ed5f39; }
+
+        .btn-action-group { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
+        .btn-update { background-color: #36c3bc; color: white; border: none; padding: 8px 18px; border-radius: 4px; font-weight: bold; }
+        .btn-delete-major { background-color: #ed5f39; color: white; border: none; padding: 8px 18px; border-radius: 4px; font-weight: bold; }
+        .btn-new-major { background-color: #2b579a; color: white; border: none; padding: 8px 18px; border-radius: 4px; font-weight: bold; }
+        .btn-register { background-color: #2b579a; color: white; border: none; padding: 10px 30px; border-radius: 4px; font-weight: bold; font-size: 15px; }
+    </style>
 </head>
 <body>
     <div id="app">
-        <!-- Common Header Component -->
         <admin-header></admin-header>
 
         <div class="main-container">
-            <!-- Common Sidebar Component -->
             <admin-sidebar></admin-sidebar>
 
-            <!-- Main Content -->
             <main class="content">
                 <div class="page-title-box">
-                    <h2 class="page-title">메뉴 관리</h2>
+                    <h2 class="page-title">메뉴관리</h2>
                     <div class="breadcrumb-area">
-                        <i class="bi bi-house-door"></i> > 시스템 > <span class="text-dark fw-bold">메뉴 관리</span>
+                        <i class="bi bi-house-door"></i> > 시스템 > <span class="text-dark fw-bold">메뉴관리</span>
                     </div>
                 </div>
 
-                <!-- Search Area -->
-                <div class="search-box-wrapper">
-                    <input type="text" v-model="schText" @keyup.enter="fetchMenus" class="search-input" placeholder="메뉴명 또는 URL">
-                    <button class="btn-search-icon" @click="fetchMenus"><i class="bi bi-search"></i></button>
-                </div>
+                <div class="menu-mgmt-container">
+                    <!-- Left: Menu Tree -->
+                    <div class="tree-section">
+                        <div class="tree-header">
+                            <button class="btn-tree-ctrl" @click="toggleAll(false)"><i class="bi bi-folder me-1"></i>접기</button>
+                            <button class="btn-tree-ctrl" @click="toggleAll(true)"><i class="bi bi-folder2-open me-1"></i>펼치기</button>
+                        </div>
+                        <ul class="tree-list">
+                            <tree-item 
+                                v-for="node in menuTree" 
+                                :key="node.menuId" 
+                                :node="node" 
+                                :selected-id="selectedId" 
+                                :expanded-ids="expandedIds"
+                                @select="selectMenu"
+                                @toggle="toggleNode">
+                            </tree-item>
+                        </ul>
+                    </div>
 
-                <div class="data-table-wrapper">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 50px;"><input type="checkbox"></th>
-                                <th style="width: 15%;">메뉴 ID</th>
-                                <th>메뉴명</th>
-                                <th>URL</th>
-                                <th style="width: 10%;">정렬</th>
-                                <th style="width: 10%;">사용여부</th>
-                                <th style="width: 15%;">액션</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="menu in menuList" :key="menu.menuId" :class="'menu-level-' + menu.menuLevel">
-                                <td><input type="checkbox"></td>
-                                <td>{{ menu.menuId }}</td>
-                                <td class="text-start">
-                                    <span v-if="menu.menuLevel > 1" :style="{ marginLeft: (menu.menuLevel-1)*20 + 'px' }" class="text-muted me-1">└</span>
-                                    {{ menu.menuNm }}
-                                </td>
-                                <td>{{ menu.url }}</td>
-                                <td>{{ menu.sortOrdr }}</td>
-                                <td>
-                                    <span class="badge" :class="menu.useYn === 'Y' ? 'badge-use' : 'badge-nuse'">
-                                        {{ menu.useYn === 'Y' ? '사용' : '미사용' }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <button class="btn btn-sm btn-table-sub me-1" @click="openModal(menu.menuId)">하위</button>
-                                    <button class="btn btn-sm btn-table-edit me-1" @click="editMenu(menu)">수정</button>
-                                    <button v-if="menu.menuLevel > 1" class="btn btn-sm btn-table-del" @click="deleteMenu(menu.menuId)">삭제</button>
-                                </td>
-                            </tr>
-                            <tr v-if="menuList.length === 0">
-                                <td colspan="7" class="text-center py-5 text-muted">등록된 메뉴가 없습니다.</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <!-- Right: Management Forms -->
+                    <div class="form-section">
+                        <!-- Top: Edit Form -->
+                        <div v-if="selectedId" class="mgmt-card">
+                            <table class="form-table">
+                                <tr>
+                                    <th class="required">상위메뉴 ID</th>
+                                    <td><input type="text" v-model="editForm.parentMenuId" class="form-control" readonly></td>
+                                    <th class="required">상위메뉴명</th>
+                                    <td><input type="text" v-model="editForm.parentMenuNm" class="form-control" readonly></td>
+                                </tr>
+                                <tr>
+                                    <th class="required">메뉴 ID</th>
+                                    <td><input type="text" v-model="editForm.menuId" class="form-control" readonly></td>
+                                    <th class="required">메뉴레벨</th>
+                                    <td><input type="text" v-model="editForm.menuLevel" class="form-control" readonly></td>
+                                </tr>
+                                <tr>
+                                    <th class="required">메뉴명</th>
+                                    <td colspan="3"><input type="text" v-model="editForm.menuNm" class="form-control"></td>
+                                </tr>
+                                <tr>
+                                    <th class="required">메뉴유형</th>
+                                    <td>
+                                        <select v-model="editForm.menuTyCode" class="form-select">
+                                            <option value="10">카테고리</option>
+                                            <option value="20">메뉴</option>
+                                            <option value="30">기능</option>
+                                        </select>
+                                    </td>
+                                    <th class="required">정렬순서</th>
+                                    <td><input type="number" v-model="editForm.sortOrdr" class="form-control"></td>
+                                </tr>
+                                <tr>
+                                    <th>전시여부</th>
+                                    <td colspan="3">
+                                        <select v-model="editForm.useYn" class="form-select">
+                                            <option value="Y">예</option>
+                                            <option value="N">아니오</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>URL</th>
+                                    <td colspan="3"><input type="text" v-model="editForm.url" class="form-control"></td>
+                                </tr>
+                            </table>
+                            <div class="btn-action-group">
+                                <button class="btn-update" @click="saveEdit"><i class="bi bi-pencil-square me-1"></i>수정</button>
+                                <button class="btn-delete-major" @click="deleteMenu(selectedId)"><i class="bi bi-trash me-1"></i>삭제</button>
+                                <button class="btn-new-major" @click="showNewForm"><i class="bi bi-plus-lg me-1"></i>신규등록</button>
+                            </div>
+                        </div>
+                        <div v-else class="mgmt-card text-center py-5 text-muted">
+                            좌측 트리에서 메뉴를 선택해주세요.
+                        </div>
+
+                        <!-- Bottom: New Registration Form (Shown on '신규등록' click) -->
+                        <div v-if="isNewFormVisible" class="mgmt-card">
+                            <div class="cardTitle mb-3" style="font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                                <i class="bi bi-plus-square-fill color-blue me-2"></i>신규 메뉴 추가
+                            </div>
+                            <table class="form-table">
+                                <tr>
+                                    <th class="required">상위메뉴 ID</th>
+                                    <td colspan="3">
+                                        <div class="d-flex gap-2 align-items-center">
+                                            <input type="text" v-model="newForm.parentMenuId" class="form-control" readonly style="width: 250px;">
+                                            <input type="text" v-model="newForm.subMenuId" class="form-control" placeholder="메뉴ID 4자리" maxlength="4" style="width: 150px;">
+                                            <button class="btn btn-sm btn-outline-secondary" @click="checkIdDuplicate">중복확인</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="required">메뉴명</th>
+                                    <td colspan="3"><input type="text" v-model="newForm.menuNm" class="form-control"></td>
+                                </tr>
+                                <tr>
+                                    <th class="required">메뉴유형</th>
+                                    <td>
+                                        <select v-model="newForm.menuTyCode" class="form-select">
+                                            <option value="10">카테고리</option>
+                                            <option value="20">메뉴</option>
+                                            <option value="30">기능</option>
+                                        </select>
+                                    </td>
+                                    <th class="required">정렬순서</th>
+                                    <td><input type="number" v-model="newForm.sortOrdr" class="form-control"></td>
+                                </tr>
+                                <tr>
+                                    <th>전시여부</th>
+                                    <td colspan="3">
+                                        <select v-model="newForm.useYn" class="form-select">
+                                            <option value="Y">예</option>
+                                            <option value="N">아니오</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>URL</th>
+                                    <td colspan="3"><input type="text" v-model="newForm.url" class="form-control"></td>
+                                </tr>
+                            </table>
+                            <div class="d-flex justify-content-end mt-2">
+                                <button class="btn btn-sm btn-outline-danger" @click="isNewFormVisible = false">삭제</button>
+                            </div>
+                            <div class="text-center mt-4">
+                                <button class="btn-register" @click="registerMenu">등록</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </main>
         </div>
+    </div>
 
-        <!-- Menu Form Modal - Moved INSIDE #app -->
-        <div class="modal fade" id="menuModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">{{ modalTitle }}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label class="form-label">부모 메뉴 ID</label>
-                            <input type="text" v-model="form.parentMenuId" class="form-control" style="background-color: #f8f9fa;" readonly>
-                        </div>
-                        <div class="row">
-                            <div class="col-6 mb-3">
-                                <label class="form-label">메뉴 ID (4자리)</label>
-                                <input type="text" v-model="form.subMenuId" class="form-control" placeholder="예: 1000" maxlength="4" :readonly="isEdit">
-                            </div>
-                            <div class="col-6 mb-3">
-                                <label class="form-label">메뉴 유형</label>
-                                <select v-model="form.menuTyCode" class="form-select">
-                                    <option value="10">카테고리</option>
-                                    <option value="20">메뉴</option>
-                                    <option value="30">기능</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">메뉴명</label>
-                            <input type="text" v-model="form.menuNm" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">URL</label>
-                            <input type="text" v-model="form.url" class="form-control">
-                        </div>
-                        <div class="row">
-                            <div class="col-6 mb-3">
-                                <label class="form-label">정렬 순서</label>
-                                <input type="number" v-model="form.sortOrdr" class="form-control">
-                            </div>
-                            <div class="col-6 mb-3">
-                                <label class="form-label">사용 여부</label>
-                                <select v-model="form.useYn" class="form-select">
-                                    <option value="Y">사용</option>
-                                    <option value="N">미사용</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                        <button type="button" class="btn btn-primary" @click="saveMenu">저장</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> <!-- End of #app -->
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Recursive Tree Component -->
     <script>
-        const { createApp, ref, onMounted } = Vue;
+        const TreeItem = {
+            name: 'TreeItem',
+            props: ['node', 'selectedId', 'expandedIds'],
+            emits: ['select', 'toggle'],
+            template: `
+                <li class="tree-node">
+                    <div class="tree-label-row" 
+                         :class="{ selected: selectedId === node.menuId }" 
+                         @click="$emit('select', node)">
+                        <span class="tree-toggle" @click.stop="$emit('toggle', node)">
+                            <template v-if="node.children && node.children.length > 0">
+                                <i :class="expandedIds.has(node.menuId) ? 'bi bi-dash-square' : 'bi bi-plus-square'"></i>
+                            </template>
+                        </span>
+                        <span class="tree-label">{{ node.menuNm }}</span>
+                    </div>
+                    <ul v-if="node.children && node.children.length > 0 && expandedIds.has(node.menuId)" class="tree-list">
+                        <tree-item 
+                            v-for="child in node.children" 
+                            :key="child.menuId" 
+                            :node="child" 
+                            :selected-id="selectedId"
+                            :expanded-ids="expandedIds"
+                            @select="$emit('select', $event)"
+                            @toggle="$emit('toggle', $event)">
+                        </tree-item>
+                    </ul>
+                </li>
+            `
+        };
+    </script>
+
+    <script>
+        const { createApp, ref, reactive, onMounted, computed } = Vue;
+
         const app = createApp({
+            components: { TreeItem },
             setup() {
-                const menuList = ref([]);
-                const schText = ref('');
-                const form = ref({ parentMenuId: '', subMenuId: '', menuTyCode: '20', menuNm: '', url: '', sortOrdr: 1, useYn: 'Y' });
-                const modalTitle = ref('메뉴 등록');
-                const isEdit = ref(false);
-                let modalObj = null;
+                const flatMenus = ref([]);
+                const selectedId = ref('');
+                const expandedIds = ref(new Set());
+                const isNewFormVisible = ref(false);
+
+                const editForm = reactive({
+                    parentMenuId: '', parentMenuNm: '', menuId: '', menuLevel: '',
+                    menuNm: '', menuTyCode: '20', sortOrdr: 1, useYn: 'Y', url: ''
+                });
+
+                const newForm = reactive({
+                    parentMenuId: '', subMenuId: '',
+                    menuNm: '', menuTyCode: '20', sortOrdr: 1, useYn: 'Y', url: ''
+                });
+
+                // Compute hierarchical structure from flat list
+                const menuTree = computed(() => {
+                    const list = JSON.parse(JSON.stringify(flatMenus.value));
+                    const map = {};
+                    const roots = [];
+
+                    list.forEach(m => {
+                        m.children = [];
+                        map[m.menuId] = m;
+                    });
+
+                    list.forEach(m => {
+                        const pid = m.menuId.length > 4 ? m.menuId.substring(0, m.menuId.length - 4) : '';
+                        if (pid && map[pid]) {
+                            map[pid].children.push(m);
+                        } else {
+                            roots.push(m);
+                        }
+                    });
+
+                    return roots;
+                });
 
                 const fetchMenus = () => {
                     axios.get('/api/admin/menu')
-                        .then(res => menuList.value = res.data)
+                        .then(res => flatMenus.value = res.data)
                         .catch(err => alert('메뉴 조회 실패'));
                 };
 
-                const openModal = (parentId = '') => {
-                    isEdit.value = false;
-                    form.value = { parentMenuId: parentId, subMenuId: '', menuTyCode: '20', menuNm: '', url: '', sortOrdr: 1, useYn: 'Y' };
-                    modalTitle.value = parentId ? '하위 메뉴 추가' : '최상위 메뉴 추가';
-                    modalObj.show();
+                const selectMenu = (node) => {
+                    selectedId.value = node.menuId;
+                    isNewFormVisible.value = false;
+                    
+                    // Fill edit form
+                    const pid = node.menuId.length > 4 ? node.menuId.substring(0, node.menuId.length - 4) : '';
+                    const parent = flatMenus.value.find(m => m.menuId === pid);
+                    
+                    editForm.parentMenuId = pid || 'NONE';
+                    editForm.parentMenuNm = parent ? parent.menuNm : '최상위';
+                    editForm.menuId = node.menuId;
+                    editForm.menuLevel = node.menuLevel;
+                    editForm.menuNm = node.menuNm;
+                    editForm.menuTyCode = node.menuTyCode;
+                    editForm.sortOrdr = node.sortOrdr;
+                    editForm.useYn = node.useYn;
+                    editForm.url = node.url;
                 };
 
-                const editMenu = (menu) => {
-                    isEdit.value = true;
-                    const fullId = menu.menuId;
-                    modalTitle.value = '메뉴 수정';
-                    form.value = {
-                        menuId: fullId,
-                        parentMenuId: fullId.length > 4 ? fullId.substring(0, fullId.length - 4) : '',
-                        subMenuId: fullId.substring(fullId.length - 4),
-                        menuTyCode: menu.menuTyCode,
-                        menuNm: menu.menuNm,
-                        url: menu.url,
-                        sortOrdr: menu.sortOrdr,
-                        useYn: menu.useYn
-                    };
-                    modalObj.show();
-                };
-
-                const deleteMenu = (menuId) => {
-                    if (confirm('해당 메뉴와 모든 하위 메뉴가 삭제됩니다. 계속하시겠습니까?')) {
-                        axios.delete(`/api/admin/menu/${menuId}`)
-                            .then(() => {
-                                alert('삭제되었습니다.');
-                                fetchMenus();
-                            })
-                            .catch(err => AdminUtil.handleApiError(err, '삭제 실패'));
+                const toggleNode = (node) => {
+                    if (expandedIds.value.has(node.menuId)) {
+                        expandedIds.value.delete(node.menuId);
+                    } else {
+                        expandedIds.value.add(node.menuId);
                     }
                 };
 
-                const saveMenu = () => {
-                    axios.post('/api/admin/menu', form.value)
-                        .then(() => {
-                            modalObj.hide();
-                            fetchMenus();
-                        })
-                        .catch(err => AdminUtil.handleApiError(err, '저장 실패'));
+                const toggleAll = (expand) => {
+                    if (expand) {
+                        flatMenus.value.forEach(m => expandedIds.value.add(m.menuId));
+                    } else {
+                        expandedIds.value.clear();
+                    }
+                };
+
+                const showNewForm = () => {
+                    isNewFormVisible.value = true;
+                    // Pre-fill parent ID for new menu
+                    newForm.parentMenuId = selectedId.value;
+                    newForm.subMenuId = '';
+                    newForm.menuNm = '';
+                    newForm.menuTyCode = '20';
+                    newForm.sortOrdr = 1;
+                    newForm.useYn = 'Y';
+                    newForm.url = '';
+                    
+                    // Auto-scroll to bottom of page
+                    setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 50);
+                };
+
+                const checkIdDuplicate = () => {
+                    const fullId = newForm.parentMenuId + newForm.subMenuId;
+                    if (newForm.subMenuId.length !== 4) return alert('추가 ID는 4자리여야 합니다.');
+                    
+                    if (flatMenus.value.some(m => m.menuId === fullId)) {
+                        alert('이미 존재하는 메뉴 ID입니다.');
+                    } else {
+                        alert('사용 가능한 ID입니다.');
+                    }
+                };
+
+                const saveEdit = () => {
+                    axios.post('/api/admin/menu', {
+                        menuId: editForm.menuId,
+                        parentMenuId: editForm.parentMenuId === 'NONE' ? '' : editForm.parentMenuId,
+                        subMenuId: editForm.menuId.substring(editForm.menuId.length - 4),
+                        menuNm: editForm.menuNm,
+                        menuTyCode: editForm.menuTyCode,
+                        sortOrdr: editForm.sortOrdr,
+                        useYn: editForm.useYn,
+                        url: editForm.url
+                    })
+                    .then(() => {
+                        alert('저장되었습니다.');
+                        fetchMenus();
+                    })
+                    .catch(err => AdminUtil.handleApiError(err));
+                };
+
+                const registerMenu = () => {
+                    if (!newForm.subMenuId) return alert('메뉴 ID를 입력해주세요.');
+                    axios.post('/api/admin/menu', {
+                        parentMenuId: newForm.parentMenuId,
+                        subMenuId: newForm.subMenuId,
+                        menuNm: newForm.menuNm,
+                        menuTyCode: newForm.menuTyCode,
+                        sortOrdr: newForm.sortOrdr,
+                        useYn: newForm.useYn,
+                        url: newForm.url
+                    })
+                    .then(() => {
+                        alert('신규 메뉴가 등록되었습니다.');
+                        isNewFormVisible.value = false;
+                        fetchMenus();
+                    })
+                    .catch(err => AdminUtil.handleApiError(err));
+                };
+
+                const deleteMenu = (id) => {
+                    if (confirm('해당 메뉴와 하위 메뉴가 모두 삭제됩니다. 계속하시겠습니까?')) {
+                        axios.delete(`/api/admin/menu/${id}`)
+                            .then(() => {
+                                alert('삭제되었습니다.');
+                                selectedId.value = '';
+                                fetchMenus();
+                            })
+                            .catch(err => AdminUtil.handleApiError(err));
+                    }
                 };
 
                 onMounted(() => {
-                    AdminMenu.init(); // GNB/LNB Init
-                    modalObj = new bootstrap.Modal(document.getElementById('menuModal'));
+                    AdminMenu.init();
                     fetchMenus();
                 });
 
-                return { menuList, schText, form, modalTitle, isEdit, openModal, editMenu, deleteMenu, saveMenu, fetchMenus };
+                return { 
+                    flatMenus, menuTree, selectedId, expandedIds, editForm, newForm, isNewFormVisible,
+                    selectMenu, toggleNode, toggleAll, showNewForm, checkIdDuplicate, saveEdit, registerMenu, deleteMenu 
+                };
             }
         });
         AdminLayout.register(app);
