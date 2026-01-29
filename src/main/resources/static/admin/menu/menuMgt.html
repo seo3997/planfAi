@@ -49,6 +49,19 @@
         .btn-delete-major { background-color: #ed5f39; color: white; border: none; padding: 8px 18px; border-radius: 4px; font-weight: bold; }
         .btn-new-major { background-color: #2b579a; color: white; border: none; padding: 8px 18px; border-radius: 4px; font-weight: bold; }
         .btn-register { background-color: #2b579a; color: white; border: none; padding: 10px 30px; border-radius: 4px; font-weight: bold; font-size: 15px; }
+        
+        .btn-dup-check {
+            border: 1px solid #ccc;
+            background: #fff;
+            padding: 5px 15px;
+            font-size: 13px;
+            color: #333;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-dup-check:hover { background: #f0f0f0; border-color: #bbb; }
+        .is-checked { border-color: #36c3bc; color: #36c3bc; background: #eafffe; }
     </style>
 </head>
 <body>
@@ -143,7 +156,7 @@
                             좌측 트리에서 메뉴를 선택해주세요.
                         </div>
 
-                        <!-- Bottom: New Registration Form (Shown on '신규등록' click) -->
+                        <!-- Bottom: New Registration Form -->
                         <div v-if="isNewFormVisible" class="mgmt-card">
                             <div class="cardTitle mb-3" style="font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
                                 <i class="bi bi-plus-square-fill color-blue me-2"></i>신규 메뉴 추가
@@ -154,8 +167,10 @@
                                     <td colspan="3">
                                         <div class="d-flex gap-2 align-items-center">
                                             <input type="text" v-model="newForm.parentMenuId" class="form-control" readonly style="width: 250px;">
-                                            <input type="text" v-model="newForm.subMenuId" class="form-control" placeholder="메뉴ID 4자리" maxlength="4" style="width: 150px;">
-                                            <button class="btn btn-sm btn-outline-secondary" @click="checkIdDuplicate">중복확인</button>
+                                            <input type="text" v-model="newForm.subMenuId" class="form-control" placeholder="메뉴ID 4자리" maxlength="4" style="width: 150px;" @input="isIdChecked = false">
+                                            <button class="btn-dup-check" :class="{ 'is-checked': isIdChecked }" @click="checkIdDuplicate">
+                                                {{ isIdChecked ? '확인완료' : '중복확인' }}
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -190,7 +205,7 @@
                                 </tr>
                             </table>
                             <div class="d-flex justify-content-end mt-2">
-                                <button class="btn btn-sm btn-outline-danger" @click="isNewFormVisible = false">삭제</button>
+                                <button class="btn-delete-major" style="padding: 5px 15px; font-size: 13px;" @click="isNewFormVisible = false">삭제</button>
                             </div>
                             <div class="text-center mt-4">
                                 <button class="btn-register" @click="registerMenu">등록</button>
@@ -237,7 +252,7 @@
     </script>
 
     <script>
-        const { createApp, ref, reactive, onMounted, computed } = Vue;
+        const { createApp, ref, reactive, onMounted, computed, watch } = Vue;
 
         const app = createApp({
             components: { TreeItem },
@@ -246,6 +261,7 @@
                 const selectedId = ref('');
                 const expandedIds = ref(new Set());
                 const isNewFormVisible = ref(false);
+                const isIdChecked = ref(false);
 
                 const editForm = reactive({
                     parentMenuId: '', parentMenuNm: '', menuId: '', menuLevel: '',
@@ -282,7 +298,10 @@
 
                 const fetchMenus = () => {
                     axios.get('/api/admin/menu')
-                        .then(res => flatMenus.value = res.data)
+                        .then(res => {
+                            flatMenus.value = res.data;
+                            toggleAll(true); // Auto-expand all on initial load
+                        })
                         .catch(err => alert('메뉴 조회 실패'));
                 };
 
@@ -323,7 +342,7 @@
 
                 const showNewForm = () => {
                     isNewFormVisible.value = true;
-                    // Pre-fill parent ID for new menu
+                    isIdChecked.value = false;
                     newForm.parentMenuId = selectedId.value;
                     newForm.subMenuId = '';
                     newForm.menuNm = '';
@@ -332,22 +351,27 @@
                     newForm.useYn = 'Y';
                     newForm.url = '';
                     
-                    // Auto-scroll to bottom of page
                     setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 50);
                 };
 
                 const checkIdDuplicate = () => {
-                    const fullId = newForm.parentMenuId + newForm.subMenuId;
-                    if (newForm.subMenuId.length !== 4) return alert('추가 ID는 4자리여야 합니다.');
+                    if (!/^\d{4}$/.test(newForm.subMenuId)) {
+                        return alert('메뉴 ID는 숫자 4자리여야 합니다.');
+                    }
                     
+                    const fullId = newForm.parentMenuId + newForm.subMenuId;
                     if (flatMenus.value.some(m => m.menuId === fullId)) {
+                        isIdChecked.value = false;
                         alert('이미 존재하는 메뉴 ID입니다.');
                     } else {
+                        isIdChecked.value = true;
                         alert('사용 가능한 ID입니다.');
                     }
                 };
 
                 const saveEdit = () => {
+                    if (!editForm.menuNm.trim()) return alert('메뉴명을 입력해주세요.');
+                    
                     axios.post('/api/admin/menu', {
                         menuId: editForm.menuId,
                         parentMenuId: editForm.parentMenuId === 'NONE' ? '' : editForm.parentMenuId,
@@ -366,7 +390,9 @@
                 };
 
                 const registerMenu = () => {
-                    if (!newForm.subMenuId) return alert('메뉴 ID를 입력해주세요.');
+                    if (!isIdChecked.value) return alert('먼저 중복확인을 해주세요.');
+                    if (!newForm.menuNm.trim()) return alert('메뉴명을 입력해주세요.');
+                    
                     axios.post('/api/admin/menu', {
                         parentMenuId: newForm.parentMenuId,
                         subMenuId: newForm.subMenuId,
@@ -402,7 +428,7 @@
                 });
 
                 return { 
-                    flatMenus, menuTree, selectedId, expandedIds, editForm, newForm, isNewFormVisible,
+                    flatMenus, menuTree, selectedId, expandedIds, editForm, newForm, isNewFormVisible, isIdChecked,
                     selectMenu, toggleNode, toggleAll, showNewForm, checkIdDuplicate, saveEdit, registerMenu, deleteMenu 
                 };
             }
