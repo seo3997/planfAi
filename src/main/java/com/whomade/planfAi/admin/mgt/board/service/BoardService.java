@@ -83,4 +83,25 @@ public class BoardService {
     public void deleteBoard(DataMap param) {
         boardMapper.deleteBoard(param);
     }
+
+    @Transactional
+    public void deleteFile(String fileId) throws Exception {
+        DataMap param = new DataMap();
+        param.put("file_id", fileId);
+        DataMap fileInfo = boardMapper.selectFile(param);
+
+        if (fileInfo != null) {
+            CoFileVO fvo = new CoFileVO();
+            fvo.setFile_id(fileInfo.getString("FILE_ID"));
+            fvo.setFile_nm(fileInfo.getString("FILE_NM"));
+            fvo.setFile_ext_nm(fileInfo.getString("FILE_EXTSN_NM"));
+            fvo.setFile_aslt_path(fileInfo.getString("FILE_ABSLT_COURS"));
+
+            // 물리 파일 삭제 시도
+            coFileMngUtil.deleteFile(fvo);
+
+            // DB 삭제
+            boardMapper.deleteFile(param);
+        }
+    }
 }

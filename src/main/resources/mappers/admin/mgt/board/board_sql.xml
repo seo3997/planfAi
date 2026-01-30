@@ -190,15 +190,23 @@
 	<select id="selectFileList" parameterType="dataMap" resultType="dataMap">
 	/* admin.mgt.board.selectFileList */
 	SELECT FILE_SEQ, DOC_ID, FILE_ID, FILE_NM, FILE_EXTSN_NM, 
-	       FILE_SIZE, FILE_PARTN_COURS, CNTNTS_TY, SORT_ORDR
+	       FILE_SIZE, FILE_PARTN_COURS, FILE_ABSLT_COURS, CNTNTS_TY, SORT_ORDR
 	FROM tb_file
 	WHERE DOC_ID = #{atch_doc_id}
 	ORDER BY SORT_ORDR ASC
 	</select>
 
+	<select id="selectFile" parameterType="dataMap" resultType="dataMap">
+	/* admin.mgt.board.selectFile */
+	SELECT FILE_SEQ, DOC_ID, FILE_ID, FILE_NM, FILE_EXTSN_NM, 
+	       FILE_SIZE, FILE_PARTN_COURS, FILE_ABSLT_COURS, CNTNTS_TY
+	FROM tb_file
+	WHERE FILE_ID = #{file_id}
+	</select>
+
 	<update id="deleteFile" parameterType="dataMap">
 	/* admin.mgt.board.deleteFile */
-	DELETE FROM tb_file WHERE FILE_SEQ = #{file_seq}
+	DELETE FROM tb_file WHERE FILE_ID = #{file_id}
 	</update>
 
 </mapper>

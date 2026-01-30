@@ -150,12 +150,13 @@ public class CoFileMngUtil {
         Path absDir = Paths.get(storage.getUploadDir(), dateFolder);
         Files.createDirectories(absDir);
 
-        String originalName = sanitizeFilename(file.getOriginalFilename());
+        String rawOriginalName = file.getOriginalFilename();
+        String originalName = sanitizeFilename(rawOriginalName);
         String fileId = SysUtil.getFileId();
         String contentType = file.getContentType();
         long size = file.getSize();
 
-        String ext = getExt(originalName);
+        String ext = getExt(rawOriginalName);
 
         // 저장 파일명
         String storeName;
@@ -428,9 +429,12 @@ public class CoFileMngUtil {
     private static String sanitizeFilename(String filename) {
         if (filename == null)
             return "file";
-        String name = filename.replace("\\\\", "/");
+        // Windows path separator handling
+        String name = filename.replace("\\", "/");
+        // Extract only the filename
         name = name.substring(name.lastIndexOf('/') + 1);
-        return name.replaceAll("[\\\\r\\\\n\\\\t]", "_");
+        // Remove control characters (fixed bug where 'r', 'n', 't' were removed)
+        return name.replaceAll("[\\r\\n\\t]", "_");
     }
 
     @SuppressWarnings("unused")

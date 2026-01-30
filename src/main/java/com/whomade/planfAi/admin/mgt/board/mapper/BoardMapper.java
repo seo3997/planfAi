@@ -24,5 +24,7 @@ public interface BoardMapper {
 
     List<DataMap> selectFileList(DataMap param);
 
+    DataMap selectFile(DataMap param);
+
     int deleteFile(DataMap param);
 }

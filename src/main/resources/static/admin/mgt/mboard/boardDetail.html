@@ -51,9 +51,24 @@
                             <th style="vertical-align: top;">내용</th>
                             <td colspan="3">
                                 <div class="content-area">{{ board.CN }}</div>
-                                <div v-if="imageFiles.length > 0" class="mt-4 pt-3 border-top">
+                                <!-- 화면표시 설정일 때 이미지만 본문에 노출 -->
+                                <div v-if="board.ATCH_YN === 'N' && imageFiles.length > 0" class="mt-4 pt-3 border-top">
                                     <div v-for="file in imageFiles" :key="file.FILE_ID">
-                                        <img :src="'/common/img/board/' + file.FILE_ID" style="max-width: 100%; margin-bottom: 15px; border: 1px solid #eee;" />
+                                        <img :src="getFileUrl(file)" style="max-width: 100%; margin-bottom: 15px; border: 1px solid #eee;" />
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- 다운로드 설정일 때 파일 목록 노출 -->
+                        <tr v-if="board.ATCH_YN === 'Y' && board.fileList && board.fileList.length > 0">
+                            <th>첨부파일</th>
+                            <td colspan="3">
+                                <div class="file-list">
+                                    <div v-for="file in board.fileList" :key="file.FILE_ID" class="mb-1">
+                                        <a :href="getFileUrl(file)" :download="file.FILE_NM" class="text-decoration-none small">
+                                            <i class="bi bi-download me-1"></i> {{ file.FILE_NM }}
+                                            <span class="text-muted">({{ formatSize(file.FILE_SIZE) }})</span>
+                                        </a>
                                     </div>
                                 </div>
                             </td>
@@ -98,6 +113,21 @@
                     });
                 });
 
+                const getFileUrl = (file) => {
+                    if (!file) return '';
+                    // FILE_PARTN_COURS already contains the path (saved in DB)
+                    const extsn = file.FILE_EXTSN_NM ? '.' + file.FILE_EXTSN_NM : '';
+                    return `${file.FILE_PARTN_COURS}${file.FILE_ID}${extsn}`;
+                };
+
+                const formatSize = (bytes) => {
+                    if (!bytes || bytes === 0) return '0 B';
+                    const k = 1024;
+                    const sizes = ['B', 'KB', 'MB', 'GB'];
+                    const i = Math.floor(Math.log(bytes) / Math.log(k));
+                    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+                };
+
                 const formatDate = (dt) => {
                     if (!dt) return '';
                     return dt.split(' ')[0].replace(/-/g, '.');
@@ -126,7 +156,7 @@
                     fetchBoardDetail();
                 });
 
-                return { board, imageFiles, goList, goUpdate, deleteBoard, formatDate };
+                return { board, imageFiles, goList, goUpdate, deleteBoard, formatDate, getFileUrl, formatSize };
             }
         });
         AdminLayout.register(app);

@@ -98,4 +98,14 @@ public class BoardRestController {
         boardService.deleteBoard(param);
         return ResponseEntity.ok("success");
     }
+
+    @DeleteMapping("/file/{fileId}")
+    public ResponseEntity<String> deleteFile(@PathVariable String fileId) {
+        try {
+            boardService.deleteFile(fileId);
+            return ResponseEntity.ok("success");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+        }
+    }
 }
