@@ -29,6 +29,8 @@
 
 ## 3. 프로젝트 구조 (Standard Directory Layout)
 
+이 프로젝트는 **관리자(Admin)**와 사용자 서비스(Front) 도메인을 패키지 레벨에서 물리적으로 분리한다.
+
 ```text
 src/main/java/com/whomade/planfAi/
 ├── PlanfAiApplication.java

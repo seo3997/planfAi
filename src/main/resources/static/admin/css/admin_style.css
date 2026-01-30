@@ -2620,9 +2620,6 @@ select ~ .w-30 {
     margin-top: 4px;
   }
 }
-.vw-page .card > .card-body.viewForm > .form-group > label {
-  /* background-color: #fffcf8; */
-}
 .vw-page .card > .card-body.viewForm > .form-group > div {
   line-height: 32px;
 }
@@ -3626,7 +3623,7 @@ body {
   color: #333;
   text-align: center;
   font-weight: 500;
-  height: 45px;
+  height: 42px;
   vertical-align: middle;
 }
 
@@ -3635,7 +3632,7 @@ body {
   padding: 10px 12px;
   text-align: center;
   font-size: 13.5px;
-  height: 42px;
+  height: 40px;
   vertical-align: middle;
 }
 
