@@ -1,8 +1,23 @@
-HELP.md
-target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+# --- Root Level System/Build Paths ---
+target/                 # 루트에 생기는 불필요한 빌드 폴더 차단
+.idea/                  # 루트의 IntelliJ 설정 폴더 차단
+.vscode/                # 루트의 VS Code 설정 폴더 차단
+.DS_Store               # Mac 시스템 파일
+*.log                   # 루트의 모든 로그 파일
+
+# --- Project Specific Custom Paths ---
+development-source/target/
+development-source/logs/
+development-source/*.log
+development-source/HELP.md
+
+# --- AI Agents & Specs ---
+# agents/configs/local-settings.md
+
+# --- Spring Boot / Maven ---
+.mvn/wrapper/maven-wrapper.jar
+!development-source/**/src/main/**/target/
+!development-source/**/src/test/**/target/
 
 ### STS ###
 .apt_generated
@@ -14,31 +29,22 @@ target/
 .sts4-cache
 
 ### IntelliJ IDEA ###
-.idea
 *.iws
 *.iml
 *.ipr
+out/
 
 ### NetBeans ###
-/nbproject/private/
-/nbproject/public/
-/nbproject/project.properties
-/nbproject/project.xml
-/build/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
+**/nbproject/private/
+**/nbproject/public/
+**/nbproject/project.properties
+**/nbproject/project.xml
+**/build/
+**/nbbuild/
+**/dist/
+**/nbdist/
+**/.nb-gradle/
 
-### VS Code ###
-.vscode/
-
-### Mac OS ###
-.DS_Store
-
-### yml ###
-src/main/resources/application-dev.yml
-src/main/resources/application-*.yml
-
-*.log
-logs/
+### Sensitive Configs (환경별 설정 파일) ###
+development-source/src/main/resources/application-dev.yml
+development-source/src/main/resources/application-*.yml
