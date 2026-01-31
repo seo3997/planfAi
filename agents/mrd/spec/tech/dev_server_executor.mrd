@@ -33,3 +33,11 @@ URL 생성: application.yml에서 추출한 server.port를 결합하여 로컬 �
 자동 호출: start 명령 시 서버 실행 후 약 10초간 대기하거나 로그를 확인하여 서버 구동이 완료되면, Google Chrome을 사용하여 해당 URL을 자동으로 실행한다.
 
 실행 명령어: open -a "Google Chrome" http://localhost:PORT/index.html 형식을 사용하여 맥북 환경에 최적화한다.
+
+## 6. 커스텀 명령어 매핑 (Natural Language Mapping)
+- **명령어**: "로컬서버에서 planf 실행해" 또는 "개발서버 실행해"
+- **매핑 동작**: 
+    1. 프로젝트 루트(`/Users/soo/Documents/AiWork/planfAi/development-source`)로 이동한다.
+    2. `./run.sh start` 명령을 실행한다.
+    3. 터미널에 빌드 및 실행 로그를 실시간으로 출력하여 사용자에게 진행 상황을 알린다.
+    4. 최종적으로 브라우저가 열리는지 확인한다.
