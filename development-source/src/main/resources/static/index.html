@@ -2310,10 +2310,23 @@
                           </td>
                         </tr>
                         <tr>
-                          <td class="text-muted ps-3 fst-italic">
-                            ㄴ 이자/감가상각 포함
+                          <td
+                            class="text-muted ps-3 fst-italic clickable-link"
+                            @click="showDeprModal = true"
+                          >
+                            ㄴ (-) 감가상각비
+                            <span
+                              class="small text-primary"
+                              style="text-decoration: underline"
+                              >(상세)</span
+                            >
                           </td>
-                          <td></td>
+                          <td
+                            class="text-end text-muted pe-4"
+                            style="font-size: 0.85rem"
+                          >
+                            {{ formatCurrency(expertResult.totalDepreciation) }}
+                          </td>
                           <td></td>
                         </tr>
                       </tbody>
@@ -4020,6 +4033,107 @@
         </div>
         <!-- End showLaborModal -->
 
+        <!-- Depreciation Detail Modal -->
+        <div v-if="showDeprModal" class="modal-backdrop fade show"></div>
+        <div
+          v-if="showDeprModal"
+          class="modal fade show d-block"
+          tabindex="-1"
+          style="z-index: 1055"
+        >
+          <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow-lg">
+              <div class="modal-header bg-white border-bottom-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold text-dark">
+                  <i class="bi bi-bar-chart-fill text-primary me-2"></i>감가상각비 상세 내역
+                </h5>
+                <button
+                  type="button"
+                  class="btn-close"
+                  @click="showDeprModal = false"
+                ></button>
+              </div>
+              <div class="modal-body p-4 pt-2">
+                <div class="card border-0 bg-light rounded-4 mb-4">
+                  <div class="card-body py-3">
+                    <div class="row text-center">
+                      <div class="col-6 border-end">
+                        <small class="text-muted d-block mb-1">월 감가상각비 합계</small>
+                        <strong class="fs-4 text-primary">{{ formatCurrency(expertResult.totalDepreciation) }}</strong>
+                      </div>
+                      <div class="col-6">
+                        <small class="text-muted d-block mb-1">연 감가상각비 합계</small>
+                        <strong class="fs-4 text-danger">{{ formatCurrency(expertResult.totalDepreciation * 12) }}</strong>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="table-responsive rounded-3 border border-light shadow-sm">
+                  <table class="table table-hover align-middle mb-0 small">
+                    <thead class="table-light">
+                      <tr class="text-center text-muted">
+                        <th>구분</th>
+                        <th>자산항목</th>
+                        <th>투자금액</th>
+                        <th>상각기간(년)</th>
+                        <th>월 상각액</th>
+                      </tr>
+                    </thead>
+                    <tbody class="bg-white">
+                      <!-- Mfg -->
+                      <template v-for="(list, key) in expertData.invest.production">
+                         <tr v-for="inv in list.filter(i => i.investYn === 'Y' && i.investPrice > 0)" :key="'deprM'+inv.id">
+                           <td class="text-center"><span class="badge bg-secondary-subtle text-secondary">제조</span></td>
+                           <td class="fw-bold">{{ inv.investTitle }}</td>
+                           <td class="text-end pe-3">{{ formatCurrency(inv.investPrice) }}</td>
+                           <td class="text-center">{{ inv.investYear }}년</td>
+                           <td class="text-end pe-3 fw-bold text-primary">{{ formatCurrency(inv.investAmtYear) }}</td>
+                         </tr>
+                      </template>
+                      <!-- Sales -->
+                      <template v-for="(list, key) in expertData.invest.sales">
+                         <tr v-for="inv in list.filter(i => i.investYn === 'Y' && i.investPrice > 0)" :key="'deprS'+inv.id">
+                           <td class="text-center"><span class="badge bg-primary-subtle text-primary">판매/관리</span></td>
+                           <td class="fw-bold">{{ inv.investTitle }}</td>
+                           <td class="text-end pe-3">{{ formatCurrency(inv.investPrice) }}</td>
+                           <td class="text-center">{{ inv.investYear }}년</td>
+                           <td class="text-end pe-3 fw-bold text-primary">{{ formatCurrency(inv.investAmtYear) }}</td>
+                         </tr>
+                      </template>
+                      <tr v-if="expertResult.totalDepreciation === 0">
+                        <td colspan="5" class="text-center py-4 text-muted">상각 대상 자산이 없습니다.</td>
+                      </tr>
+                    </tbody>
+                    <tfoot class="table-light fw-bold" v-if="expertResult.totalDepreciation > 0">
+                      <tr>
+                        <td colspan="4" class="text-center py-3">월 합계 (Monthly Total)</td>
+                        <td class="text-end pe-3 text-danger fs-6">{{ formatCurrency(expertResult.totalDepreciation) }}</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+                
+                <div class="bg-primary-subtle bg-opacity-10 p-3 rounded-3 mt-4">
+                  <div class="d-flex">
+                    <i class="bi bi-info-circle-fill text-primary me-2 mt-1"></i>
+                    <div>
+                      <p class="mb-1 fw-bold text-primary small">안내사항</p>
+                      <p class="mb-0 text-muted small" style="line-height: 1.5">
+                        월 상각액은 <strong>투자금액 / (상각기간 * 12개월)</strong>로 계산된 정액법 기준입니다. 
+                        토지, 권리금, 보증금 등은 상각 대상에서 제외됩니다.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer border-top-0 pb-4 px-4">
+                <button type="button" class="btn btn-dark px-4" @click="showDeprModal = false">확인 및 닫기</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Expense Detail Modal -->
         <div
           v-if="showExpenseDetailModal"
@@ -4680,6 +4794,7 @@
           const reports = ref([]);
           const currentReportId = ref(null);
           const showProjectionModal = ref(false);
+          const showDeprModal = ref(false);
           const isReportWide = ref(false);
           const showMaterialModal = ref(false);
           const showLaborModal = ref(false);
@@ -5811,7 +5926,21 @@
               });
             }
 
-            // 5. Investment Calculation (Total Budget)
+            // 5. Investment Calculation (Total Budget & Depreciation)
+            const sumDepr = (sec) => {
+              let total = 0;
+              if (!sec) return 0;
+              Object.values(sec).forEach((list) => {
+                if (Array.isArray(list))
+                  list.forEach((inv) => {
+                    if (inv.investYn === "Y") total += inv.investAmtYear || 0;
+                  });
+              });
+              return total;
+            };
+            const Dash_Depr =
+              sumDepr(data.invest.production) + sumDepr(data.invest.sales);
+
             const TotalInvestment =
               sumInvestBudget(data.invest.production) +
               sumInvestBudget(data.invest.sales);
@@ -6162,6 +6291,7 @@
               Dash_COGS,
               Dash_Labor,
               Dash_Exp,
+              Dash_Depr,
               Interest_mon: Interest_total,
               OP,
               opIncome: OP,
@@ -6370,6 +6500,7 @@
               totalMaterialCost: analysis.Dash_COGS,
               totalLaborCost: analysis.Dash_Labor,
               totalInterest: analysis.Interest_mon,
+              totalDepreciation: analysis.Dash_Depr,
               totalExpense: analysis.Dash_Exp + analysis.Interest_mon,
               opIncome: analysis.OP,
 
@@ -7020,6 +7151,7 @@
             isSaving,
             reports,
             showProjectionModal,
+            showDeprModal,
             showMaterialModal,
             liteData,
             expertData,
