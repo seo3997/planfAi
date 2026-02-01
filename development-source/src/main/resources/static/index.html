@@ -2311,20 +2311,17 @@
                         </tr>
                         <tr>
                           <td
-                            class="text-muted ps-3 fst-italic clickable-link"
+                            class="text-muted clickable-link"
                             @click="showDeprModal = true"
                           >
-                            ㄴ (-) 감가상각비
+                            (-) 감가상각비
                             <span
                               class="small text-primary"
                               style="text-decoration: underline"
                               >(상세)</span
                             >
                           </td>
-                          <td
-                            class="text-end text-muted pe-4"
-                            style="font-size: 0.85rem"
-                          >
+                          <td class="text-end fw-bold">
                             {{ formatCurrency(expertResult.totalDepreciation) }}
                           </td>
                           <td></td>
@@ -2604,42 +2601,33 @@
                               </td>
                             </tr>
                             <tr class="text-muted" style="font-size: 0.65rem">
-                              <td class="ps-3 fst-italic">- 인건비(제조)</td>
+                              <td class="ps-3 fst-italic">(+) 인건비 (상세)</td>
                               <td
                                 v-for="b in expertResult.bepAnalysis"
                                 class="text-end"
                               >
-                                {{ formatNumber(Math.round(b.mfgLabor/1000)) }}
+                                {{ formatNumber(Math.round(b.laborFC/1000)) }}
                               </td>
                             </tr>
                             <tr class="text-muted" style="font-size: 0.65rem">
-                              <td class="ps-3 fst-italic">- 제조경비(고정)</td>
+                              <td class="ps-3 fst-italic">(+) 감가상각비 (상세)</td>
                               <td
                                 v-for="b in expertResult.bepAnalysis"
                                 class="text-end"
                               >
-                                {{ formatNumber(Math.round(b.mfgFC/1000)) }}
-                              </td>
-                            </tr>
-                            <tr class="text-muted" style="font-size: 0.65rem">
-                              <td class="ps-3 fst-italic">- 판관비(고정)</td>
-                              <td
-                                v-for="b in expertResult.bepAnalysis"
-                                class="text-end"
-                              >
-                                {{ formatNumber(Math.round(b.adminFC/1000)) }}
+                                {{ formatNumber(Math.round(b.deprFC/1000)) }}
                               </td>
                             </tr>
                             <tr
                               class="text-muted border-bottom"
                               style="font-size: 0.65rem"
                             >
-                              <td class="ps-3 fst-italic">- 이자비용</td>
+                              <td class="ps-3 fst-italic">(+) 판관비/경비 (상세보기)</td>
                               <td
                                 v-for="b in expertResult.bepAnalysis"
                                 class="text-end"
                               >
-                                {{ formatNumber(Math.round(b.interest/1000)) }}
+                                {{ formatNumber(Math.round(b.otherFC/1000)) }}
                               </td>
                             </tr>
                             <tr class="table-warning">
@@ -4247,7 +4235,7 @@
                       </thead>
                       <tbody>
                         <tr
-                          v-for="exp in expertData.expense.sales.filter(e => e.expenseAmt?.[0] > 0)"
+                          v-for="exp in expertData.expense.sales.filter(e => e.expenseAmt?.[0] > 0 && e.expenseTitle !== '급여')"
                           :key="exp.expenseTitle"
                         >
                           <td class="ps-3 fw-bold">{{ exp.expenseTitle }}</td>
@@ -4263,7 +4251,7 @@
                           </td>
                         </tr>
                         <tr
-                          v-if="expertData.expense.sales.filter(e => e.expenseAmt?.[0] > 0).length === 0"
+                          v-if="expertData.expense.sales.filter(e => e.expenseAmt?.[0] > 0 && e.expenseTitle !== '급여').length === 0"
                         >
                           <td colspan="4" class="text-center py-3 text-muted">
                             입력된 판매관리비가 없습니다.
@@ -4277,13 +4265,13 @@
                           </td>
                           <td class="text-end pe-3 text-success">
                             {{
-                            formatCurrency(sumArrayIdx(expertData.expense.sales,
-                            'expenseAmt', 0)) }}
+                            formatCurrency(expertData.expense.sales.filter(e => e.expenseTitle !== '급여').reduce((s, e) => s + (e.expenseAmt?.[0] || 0), 0))
+                            }}
                           </td>
                           <td class="text-end pe-3 small">
                             {{
-                            formatCurrency(sumArrayIdx(expertData.expense.sales,
-                            'expenseAmtYear', 0)) }}
+                            formatCurrency(expertData.expense.sales.filter(e => e.expenseTitle !== '급여').reduce((s, e) => s + (e.expenseAmtYear?.[0] || 0), 0))
+                            }}
                           </td>
                         </tr>
                       </tfoot>
@@ -5886,14 +5874,35 @@
               });
             }
 
+            // 5. Investment Calculation (Total Budget & Depreciation)
+            const sumDepr = (sec) => {
+              let total = 0;
+              if (!sec) return 0;
+              Object.values(sec).forEach((list) => {
+                if (Array.isArray(list))
+                  list.forEach((inv) => {
+                    if (inv.investYn === "Y") total += inv.investAmtYear || 0;
+                  });
+              });
+              return total;
+            };
+            const Dash_Depr =
+              sumDepr(data.invest.production) + sumDepr(data.invest.sales);
+
+            const TotalInvestment =
+              sumInvestBudget(data.invest.production) +
+              sumInvestBudget(data.invest.sales);
+
             // 5. Final Dashboard Values (Monthly)
             let Dash_COGS = (cogsResult[0]?.totalCogs || 0) / 12;
 
-            // Dashboard Rows: Always show SG&A (Sales/Admin Expense) rows
-            // Manufacturing expenses are already embedded in Dash_COGS for industry '1'
-            // For non-manufacturing, they are excluded from COGS per user request.
-            let Dash_Labor = salesExpRes.lExp;
-            let Dash_Exp = salesExpRes.oExp;
+            // Dashboard Rows: Optimized categorization
+            let Dash_Labor = prodLaborSalaries + salesLaborSalaries; // Jobs Only
+            
+            // Dash_Exp includes all expenses EXCEPT Depreciation, Interest, and Salary (as labor is Jobs Only)
+            let Dash_Exp = allExp
+              .filter(e => e.expenseTitle !== "감가상각비" && e.expenseTitle !== "이자비용" && e.expenseTitle !== "급여")
+              .reduce((sum, e) => sum + (e.expenseAmt?.[0] || 0), 0);
 
             // Operating Profit = Revenue - COGS - SG&A
             const OP = S_mon - Dash_COGS - Dash_Labor - Dash_Exp;
@@ -5926,24 +5935,6 @@
               });
             }
 
-            // 5. Investment Calculation (Total Budget & Depreciation)
-            const sumDepr = (sec) => {
-              let total = 0;
-              if (!sec) return 0;
-              Object.values(sec).forEach((list) => {
-                if (Array.isArray(list))
-                  list.forEach((inv) => {
-                    if (inv.investYn === "Y") total += inv.investAmtYear || 0;
-                  });
-              });
-              return total;
-            };
-            const Dash_Depr =
-              sumDepr(data.invest.production) + sumDepr(data.invest.sales);
-
-            const TotalInvestment =
-              sumInvestBudget(data.invest.production) +
-              sumInvestBudget(data.invest.sales);
 
             // 6. Modified Operating Profit (for Diagnosis)
             // OP - (Mfg Depreciation) - (Sales Depreciation) - (Sales Bad Debt)
@@ -6124,35 +6115,26 @@
               const marginalProfitRate =
                 rev > 0 ? (marginalProfit / rev) * 100 : 0;
 
-              // Fixed Costs
-              const mfgLabor = sumArrayIdx(
-                data.job.production,
-                "jobAmtYear",
-                i,
-              );
-              const mfgFC = (data.expense?.production || []).reduce(
-                (sum, e) => {
-                  return (
-                    sum +
-                    (e.expenseTVaCd !== "매출액"
-                      ? e.expenseAmtYear?.[i] || 0
-                      : 0)
-                  );
-                },
-                0,
-              );
-              const adminFC = (data.expense?.sales || []).reduce((sum, e) => {
-                return (
-                  sum +
-                  (e.expenseTVaCd !== "매출액" ? e.expenseAmtYear?.[i] || 0 : 0)
-                );
-              }, 0);
-              const interest = sumArrayIdx(
-                data.loan.debt,
-                "loanRateAmtYear",
-                i,
-              );
-              const totalFC = mfgLabor + mfgFC + adminFC + interest;
+              // Fixed Costs (Redefined per User Request)
+              // 고정비 = 인건비 (Jobs) + 판매경비(이자 제외) + 감가상각비 (Assets)
+              const laborFC =
+                sumArrayIdx(data.job.production, "jobAmtYear", i) +
+                sumArrayIdx(data.job.sales, "jobAmtYear", i);
+
+              const deprFC = Dash_Depr * 12; // Monthly asset depr * 12
+
+              // 판매경비(기타 고정비): 매출액 연동 제외 & 상각(리스트내) 제외 & 이자 제외 & 급여 제외
+              // (이자비용은 영업이익 계산과 관계없으므로 고정비 합계에서도 제외)
+              const otherFC = allExp
+                .filter(e => {
+                  const isDepr = e.expenseTitle === "감가상각비";
+                  const isInterest = e.expenseTitle === "이자비용";
+                  const isSalary = e.expenseTitle === "급여";
+                  return e.expenseTVaCd !== "매출액" && !isDepr && !isInterest && !isSalary;
+                })
+                .reduce((sum, e) => sum + (e.expenseAmtYear?.[i] || 0), 0);
+
+              const totalFC = laborFC + otherFC + deprFC;
 
               const bepPoint =
                 marginalProfitRate > 0
@@ -6174,10 +6156,9 @@
                 totalVC,
                 marginalProfit,
                 marginalProfitRate,
-                mfgLabor,
-                mfgFC,
-                adminFC,
-                interest,
+                laborFC,
+                deprFC,
+                otherFC,
                 totalFC,
                 bepPoint,
                 bepRate,
