@@ -2207,24 +2207,24 @@
                               >
                               <h5
                                 class="fw-bold mb-0"
-                                :class="expertResult.targetGap >= 0 ? 'text-success' : 'text-warning-emphasis'"
+                                :class="expertResult.totalRevenue >= expertResult.bepRevenue ? 'text-success' : 'text-danger'"
                               >
-                                {{ expertResult.targetGap >= 0 ? '목표 달성 중!'
-                                : '목표까지 매출 증대 필요' }}
+                                {{ expertResult.totalRevenue >= expertResult.bepRevenue ? '손익분기점 통과!'
+                                : '목표(BEP)까지 매출 증대 필요' }}
                               </h5>
                             </div>
                             <div
                               class="text-end"
-                              v-if="expertResult.targetGap < 0"
+                              v-if="expertResult.totalRevenue < expertResult.bepRevenue"
                             >
                               <small
                                 class="text-muted d-block"
                                 style="font-size: 0.65rem"
-                                >추가 필요 매출액</small
+                                >추가 필요 매출액(Gap to BEP)</small
                               >
                               <strong class="text-danger fs-5"
                                 >+{{
-                                formatCurrency(expertResult.revenueNeededForTarget)
+                                formatCurrency(expertResult.bepRevenue - expertResult.totalRevenue)
                                 }}</strong
                               >
                             </div>
@@ -2232,10 +2232,10 @@
                               <small
                                 class="text-muted d-block"
                                 style="font-size: 0.65rem"
-                                >목표 초과 수익</small
+                                >BEP 초과 달성 중</small
                               >
                               <strong class="text-success fs-5"
-                                >{{ formatCurrency(expertResult.targetGap)
+                                >+{{ formatCurrency(expertResult.totalRevenue - expertResult.bepRevenue)
                                 }}</strong
                               >
                             </div>
@@ -2376,9 +2376,9 @@
                           >{{ formatCurrency(expertResult.bepRevenue) }}</span
                         >
                       </div>
-                      <div class="d-flex justify-content-between small">
-                        <span>고정비 합계</span>
-                        <span
+                      <div class="d-flex justify-content-between small clickable-link" @click="showFixedCostModal = true" style="cursor: pointer">
+                        <span>고정비 합계 <span class="small text-primary">(상세)</span></span>
+                        <span class="fw-bold"
                           >{{ formatCurrency(expertResult.totalFixedCost)
                           }}</span
                         >
@@ -2465,6 +2465,15 @@
                                 class="text-end text-danger"
                               >
                                 {{ formatNumber(Math.round(p.sga/1000)) }}
+                              </td>
+                            </tr>
+                            <tr class="text-muted border-bottom">
+                              <td>(-) 감가상각비</td>
+                              <td
+                                v-for="p in expertResult.yearlyPNL"
+                                class="text-end text-danger"
+                              >
+                                {{ formatNumber(Math.round(p.depr/1000)) }}
                               </td>
                             </tr>
                             <tr class="table-info">
@@ -2572,26 +2581,19 @@
                               </td>
                             </tr>
                             <tr class="text-muted" style="font-size: 0.65rem">
-                              <td class="ps-3 fst-italic">- 제조경비(변동)</td>
-                              <td
-                                v-for="b in expertResult.bepAnalysis"
-                                class="text-end"
-                              >
-                                {{ formatNumber(Math.round(b.mfgVC/1000)) }}
-                              </td>
-                            </tr>
-                            <tr
-                              class="text-muted border-bottom"
-                              style="font-size: 0.65rem"
-                            >
-                              <td class="ps-3 fst-italic">- 판관비(변동)</td>
-                              <td
-                                v-for="b in expertResult.bepAnalysis"
-                                class="text-end"
-                              >
-                                {{ formatNumber(Math.round(b.adminVC/1000)) }}
-                              </td>
-                            </tr>
+                               <td class="ps-3 fst-italic" style="cursor: pointer" @click="openVarExpDetail(0)">
+                                 - 기타 변동경비 <span class="badge bg-primary-subtle text-primary border-primary-subtle" style="font-size: 0.5rem">보기</span>
+                               </td>
+                               <td
+                                 v-for="(b, idx) in expertResult.bepAnalysis"
+                                 class="text-end"
+                                 style="cursor: pointer"
+                                 @click="openVarExpDetail(idx)"
+                                 title="클릭하여 상세 내역 보기"
+                               >
+                                 {{ formatNumber(Math.round(b.yearlyVC_Exp/1000)) }}
+                               </td>
+                             </tr>
                             <tr class="table-info">
                               <td class="fw-bold">3. 한계이익 (1-2)</td>
                               <td
@@ -2642,18 +2644,32 @@
                                 {{ formatNumber(Math.round(b.deprFC/1000)) }}
                               </td>
                             </tr>
-                            <tr
-                              class="text-muted border-bottom"
-                              style="font-size: 0.65rem"
-                            >
-                              <td class="ps-3 fst-italic">(+) 판관비/경비 (상세보기)</td>
+                            <tr class="text-muted" style="font-size: 0.65rem">
+                              <td class="ps-3 fst-italic">(+) 이자비용 (상세)</td>
                               <td
                                 v-for="b in expertResult.bepAnalysis"
                                 class="text-end"
                               >
-                                {{ formatNumber(Math.round(b.otherFC/1000)) }}
+                                {{ formatNumber(Math.round(b.interestFC/1000)) }}
                               </td>
                             </tr>
+                            <tr
+                               class="text-muted border-bottom"
+                               style="font-size: 0.65rem"
+                             >
+                               <td class="ps-3 fst-italic" style="cursor: pointer" @click="openSgaFixedDetail(0)">
+                                 (+) 판관비/경비 <span class="badge bg-secondary-subtle text-secondary border-secondary-subtle" style="font-size: 0.5rem">상세보기</span>
+                               </td>
+                               <td
+                                 v-for="(b, idx) in expertResult.bepAnalysis"
+                                 class="text-end"
+                                 style="cursor: pointer"
+                                 @click="openSgaFixedDetail(idx)"
+                                 title="클릭하여 상세 내역 보기"
+                               >
+                                 {{ formatNumber(Math.round(b.otherFC/1000)) }}
+                               </td>
+                             </tr>
                             <tr class="table-warning">
                               <td class="fw-bold text-dark">
                                 6. 손익분기점 매출액
@@ -3013,7 +3029,9 @@
           </div>
         </div>
 
-        <!-- (Detailed Report Modal removed as per user request for inline wide view) -->
+      </div> <!-- End .glass-container -->
+
+      <!-- Detail Modals (Placed outside glass container to fix layering/scrolling issues) -->
 
         <!-- Projection Detail Modal (Advanced Layout) -->
         <div v-if="showProjectionModal" class="modal-backdrop fade show"></div>
@@ -4045,750 +4063,335 @@
         </div>
         <!-- End showLaborModal -->
 
-        <!-- Depreciation Detail Modal -->
-        <div v-if="showDeprModal" class="modal-backdrop fade show"></div>
-        <div
-          v-if="showDeprModal"
-          class="modal fade show d-block"
-          tabindex="-1"
-          style="z-index: 1055"
-        >
-          <div class="modal-dialog modal-lg modal-dialog-scrollable">
-            <div class="modal-content border-0 shadow-lg">
-              <div class="modal-header bg-white border-bottom-0 pt-4 px-4">
-                <h5 class="modal-title fw-bold text-dark">
-                  <i class="bi bi-bar-chart-fill text-primary me-2"></i>감가상각비 상세 내역
-                </h5>
-                <button
-                  type="button"
-                  class="btn-close"
-                  @click="showDeprModal = false"
-                ></button>
-              </div>
-              <div class="modal-body p-4 pt-2">
-                <div class="card border-0 bg-light rounded-4 mb-4">
-                  <div class="card-body py-3">
-                    <div class="row text-center">
-                      <div class="col-6 border-end">
-                        <small class="text-muted d-block mb-1">월 감가상각비 합계</small>
-                        <strong class="fs-4 text-primary">{{ formatCurrency(expertResult.totalDepreciation) }}</strong>
-                      </div>
-                      <div class="col-6">
-                        <small class="text-muted d-block mb-1">연 감가상각비 합계</small>
-                        <strong class="fs-4 text-danger">{{ formatCurrency(expertResult.totalDepreciation * 12) }}</strong>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="table-responsive rounded-3 border border-light shadow-sm">
-                  <table class="table table-hover align-middle mb-0 small">
-                    <thead class="table-light">
-                      <tr class="text-center text-muted">
-                        <th>구분</th>
-                        <th>자산항목</th>
-                        <th>투자금액</th>
-                        <th>상각기간(년)</th>
-                        <th>월 상각액</th>
-                      </tr>
-                    </thead>
-                    <tbody class="bg-white">
-                      <!-- Mfg -->
-                      <template v-for="(list, key) in expertData.invest.production">
-                         <tr v-for="inv in list.filter(i => i.investYn === 'Y' && i.investPrice > 0)" :key="'deprM'+inv.id">
-                           <td class="text-center"><span class="badge bg-secondary-subtle text-secondary">제조</span></td>
-                           <td class="fw-bold">{{ inv.investTitle }}</td>
-                           <td class="text-end pe-3">{{ formatCurrency(inv.investPrice) }}</td>
-                           <td class="text-center">{{ inv.investYear }}년</td>
-                           <td class="text-end pe-3 fw-bold text-primary">{{ formatCurrency(inv.investAmtYear) }}</td>
-                         </tr>
-                      </template>
-                      <!-- Sales -->
-                      <template v-for="(list, key) in expertData.invest.sales">
-                         <tr v-for="inv in list.filter(i => i.investYn === 'Y' && i.investPrice > 0)" :key="'deprS'+inv.id">
-                           <td class="text-center"><span class="badge bg-primary-subtle text-primary">판매/관리</span></td>
-                           <td class="fw-bold">{{ inv.investTitle }}</td>
-                           <td class="text-end pe-3">{{ formatCurrency(inv.investPrice) }}</td>
-                           <td class="text-center">{{ inv.investYear }}년</td>
-                           <td class="text-end pe-3 fw-bold text-primary">{{ formatCurrency(inv.investAmtYear) }}</td>
-                         </tr>
-                      </template>
-                      <tr v-if="expertResult.totalDepreciation === 0">
-                        <td colspan="5" class="text-center py-4 text-muted">상각 대상 자산이 없습니다.</td>
-                      </tr>
-                    </tbody>
-                    <tfoot class="table-light fw-bold" v-if="expertResult.totalDepreciation > 0">
-                      <tr>
-                        <td colspan="4" class="text-center py-3">월 합계 (Monthly Total)</td>
-                        <td class="text-end pe-3 text-danger fs-6">{{ formatCurrency(expertResult.totalDepreciation) }}</td>
-                      </tr>
-                    </tfoot>
-                  </table>
-                </div>
-                
-                <div class="bg-primary-subtle bg-opacity-10 p-3 rounded-3 mt-4">
-                  <div class="d-flex">
-                    <i class="bi bi-info-circle-fill text-primary me-2 mt-1"></i>
-                    <div>
-                      <p class="mb-1 fw-bold text-primary small">안내사항</p>
-                      <p class="mb-0 text-muted small" style="line-height: 1.5">
-                        월 상각액은 <strong>투자금액 / (상각기간 * 12개월)</strong>로 계산된 정액법 기준입니다. 
-                        토지, 권리금, 보증금 등은 상각 대상에서 제외됩니다.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="modal-footer border-top-0 pb-4 px-4">
-                <button type="button" class="btn btn-dark px-4" @click="showDeprModal = false">확인 및 닫기</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Expense Detail Modal -->
-        <div
-          v-if="showExpenseDetailModal"
-          class="modal-backdrop fade show"
-        ></div>
-        <div
-          v-if="showExpenseDetailModal"
-          class="modal fade show d-block"
-          tabindex="-1"
-          style="z-index: 1055"
-        >
-          <div class="modal-dialog modal-lg modal-dialog-scrollable">
-            <div
-              class="modal-content shadow-lg border-0 border-top border-4 border-primary"
-            >
-              <div class="modal-header bg-white">
-                <h5 class="modal-title fw-bold text-primary">
-                  📊 경비 상세 내역 (판관비/제조경비)
-                </h5>
-                <button
-                  type="button"
-                  class="btn-close"
-                  @click="showExpenseDetailModal = false"
-                ></button>
-              </div>
-              <div class="modal-body bg-light">
-                <div class="alert alert-info py-2 small mb-3">
-                  <i class="bi bi-info-circle-fill me-1"></i>
-                  제조업의 경우, <strong>제조경비</strong>는 매출원가(COGS)에
-                  포함되어 계산됩니다.
-                </div>
-                <!-- Manufacturing Expenses (Only if industryCd is 1) -->
-                <div v-if="expertData.basic.industryCd === '1'" class="mb-5">
-                  <div class="d-flex align-items-center mb-3">
-                    <i class="bi bi-factory text-warning fs-4 me-2"></i>
-                    <h6 class="mb-0 fw-bold">제조경비 상세 (24종)</h6>
-                  </div>
-                  <div class="table-responsive bg-white rounded shadow-sm">
-                    <table
-                      class="table table-hover table-sm small align-middle mb-0"
-                    >
-                      <thead class="table-light">
-                        <tr class="text-center">
-                          <th>항목명</th>
-                          <th>적용기준</th>
-                          <th class="text-end pe-3">월 예상액</th>
-                          <th class="text-end pe-3">연간 총계</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr
-                          v-for="exp in expertData.expense.production.filter(e => e.expenseAmt?.[0] > 0)"
-                          :key="exp.expenseTitle"
-                        >
-                          <td class="ps-3 fw-bold">{{ exp.expenseTitle }}</td>
-                          <td class="text-center text-muted">
-                            {{ mfgExpMapping.find(m => m.title ===
-                            exp.expenseTitle)?.baseName || '-' }}
-                          </td>
-                          <td class="text-end pe-3 text-primary fw-bold">
-                            {{ formatCurrency(exp.expenseAmt?.[0]) }}
-                          </td>
-                          <td class="text-end pe-3 small">
-                            {{ formatCurrency(exp.expenseAmtYear?.[0]) }}
-                          </td>
-                        </tr>
-                        <tr
-                          v-if="expertData.expense.production.filter(e => e.expenseAmt?.[0] > 0).length === 0"
-                        >
-                          <td colspan="4" class="text-center py-3 text-muted">
-                            입력된 제조경비가 없습니다.
-                          </td>
-                        </tr>
-                      </tbody>
-                      <tfoot class="table-light fw-bold">
-                        <tr>
-                          <td colspan="2" class="text-center">제조경비 합계</td>
-                          <td class="text-end pe-3 text-primary">
-                            {{
-                            formatCurrency(sumArrayIdx(expertData.expense.production,
-                            'expenseAmt', 0)) }}
-                          </td>
-                          <td class="text-end pe-3 small">
-                            {{
-                            formatCurrency(sumArrayIdx(expertData.expense.production,
-                            'expenseAmtYear', 0)) }}
-                          </td>
-                        </tr>
-                      </tfoot>
-                    </table>
-                  </div>
-                </div>
-
-                <!-- Sales Expenses -->
-                <div>
-                  <div class="d-flex align-items-center mb-3">
-                    <i class="bi bi-graph-up-arrow text-success fs-4 me-2"></i>
-                    <h6 class="mb-0 fw-bold">판매관리비 상세 (30종)</h6>
-                  </div>
-                  <div class="table-responsive bg-white rounded shadow-sm">
-                    <table
-                      class="table table-hover table-sm small align-middle mb-0"
-                    >
-                      <thead class="table-light">
-                        <tr class="text-center">
-                          <th>항목명</th>
-                          <th>적용기준</th>
-                          <th class="text-end pe-3">월 예상액</th>
-                          <th class="text-end pe-3">연간 총계</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr
-                          v-for="exp in expertData.expense.sales.filter(e => e.expenseAmt?.[0] > 0 && e.expenseTitle !== '급여')"
-                          :key="exp.expenseTitle"
-                        >
-                          <td class="ps-3 fw-bold">{{ exp.expenseTitle }}</td>
-                          <td class="text-center text-muted">
-                            {{ salesExpMapping.find(m => m.title ===
-                            exp.expenseTitle)?.baseName || '-' }}
-                          </td>
-                          <td class="text-end pe-3 text-success fw-bold">
-                            {{ formatCurrency(exp.expenseAmt?.[0]) }}
-                          </td>
-                          <td class="text-end pe-3 small">
-                            {{ formatCurrency(exp.expenseAmtYear?.[0]) }}
-                          </td>
-                        </tr>
-                        <tr
-                          v-if="expertData.expense.sales.filter(e => e.expenseAmt?.[0] > 0 && e.expenseTitle !== '급여').length === 0"
-                        >
-                          <td colspan="4" class="text-center py-3 text-muted">
-                            입력된 판매관리비가 없습니다.
-                          </td>
-                        </tr>
-                      </tbody>
-                      <tfoot class="table-light fw-bold">
-                        <tr>
-                          <td colspan="2" class="text-center">
-                            판매관리비 합계
-                          </td>
-                          <td class="text-end pe-3 text-success">
-                            {{
-                            formatCurrency(expertData.expense.sales.filter(e => e.expenseTitle !== '급여').reduce((s, e) => s + (e.expenseAmt?.[0] || 0), 0))
-                            }}
-                          </td>
-                          <td class="text-end pe-3 small">
-                            {{
-                            formatCurrency(expertData.expense.sales.filter(e => e.expenseTitle !== '급여').reduce((s, e) => s + (e.expenseAmtYear?.[0] || 0), 0))
-                            }}
-                          </td>
-                        </tr>
-                      </tfoot>
-                    </table>
-                  </div>
-                  <div class="mt-3 small text-muted">
-                    <i class="bi bi-info-circle me-1"></i>제조업의 경우, 제조경비는 매출원가(COGS)에 포함되어 연간 수익에 반영됩니다. 항목별 경비만 표시됩니다.
-                  </div>
-                </div>
-              </div>
-              <div class="modal-footer">
-                <button
-                  type="button"
-                  class="btn btn-secondary"
-                  @click="showExpenseDetailModal = false"
-                >
-                  닫기
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
+        <!-- Detail Modals (Placed at root for proper layering) -->
+        
         <!-- Yearly Labor Registration Modal -->
-        <div
-          v-if="showLaborYearlyModal"
-          class="modal-backdrop fade show"
-          style="z-index: 1065"
-        ></div>
-        <div
-          v-if="showLaborYearlyModal"
-          class="modal fade show d-block"
-          tabindex="-1"
-          style="z-index: 1070"
-        >
+        <div v-if="showLaborYearlyModal" class="modal-backdrop fade show" style="z-index: 1065"></div>
+        <div v-if="showLaborYearlyModal" class="modal fade show d-block" tabindex="-1" style="z-index: 1070">
           <div class="modal-dialog">
-            <div class="modal-content">
+            <div class="modal-content border-0 shadow-lg">
               <div class="modal-header">
                 <h5 class="modal-title fw-bold">연도별 인건비 등록</h5>
-                <button
-                  type="button"
-                  class="btn-close"
-                  @click="closeLaborYearlyModal"
-                ></button>
+                <button type="button" class="btn-close" @click="closeLaborYearlyModal"></button>
               </div>
               <div class="modal-body">
                 <div class="row mb-3">
-                  <label class="col-sm-3 col-form-label text-end small fw-bold"
-                    >직위/성명</label
-                  >
+                  <label class="col-sm-3 col-form-label text-end small fw-bold">직위/성명</label>
                   <div class="col-sm-9 d-flex align-items-center">
-                    <span class="fw-bold"
-                      >{{ currentLaborYearly.jobTitle }}</span
-                    >
+                    <span class="fw-bold">{{ currentLaborYearly.jobTitle }}</span>
                   </div>
                 </div>
+                <!-- ... content ... -->
                 <div class="row mb-4">
-                  <label class="col-sm-3 col-form-label text-end small fw-bold"
-                    >인건비<br />증감율</label
-                  >
+                  <label class="col-sm-3 col-form-label text-end small fw-bold">인건비<br />증감율</label>
                   <div class="col-sm-9 d-flex align-items-center">
-                    <div
-                      class="input-group input-group-sm"
-                      style="width: 150px"
-                    >
-                      <input
-                        type="number"
-                        class="form-control text-end"
-                        v-model.number="currentLaborYearly.jobAmtRate"
-                        @input="calcLaborYearly"
-                      />
+                    <div class="input-group input-group-sm" style="width: 150px">
+                      <input type="number" class="form-control text-end" v-model.number="currentLaborYearly.jobAmtRate" @input="calcLaborYearly" />
                       <span class="input-group-text">%</span>
                     </div>
-                    <span class="small text-muted ms-2"
-                      >(2,3차년도 자동계산)</span
-                    >
                   </div>
                 </div>
-                <table
-                  class="table table-bordered small align-middle text-center"
-                >
-                  <thead class="table-light">
-                    <tr>
-                      <th>년도</th>
-                      <th>인건비(천원)</th>
-                    </tr>
-                  </thead>
+                <table class="table table-bordered small align-middle text-center">
+                  <thead class="table-light"><tr><th>년도</th><th>인건비(천원)</th></tr></thead>
                   <tbody>
-                    <tr
-                      v-for="(amt, i) in currentLaborYearly.jobAmtYear"
-                      :key="i"
-                    >
+                    <tr v-for="(amt, i) in currentLaborYearly.jobAmtYear" :key="i">
                       <td class="bg-light">{{ i+1 }}차년도</td>
-                      <td class="text-end pe-2">
-                        {{ formatNumber(Math.round(amt/1000)) }}
-                      </td>
+                      <td class="text-end pe-2">{{ formatNumber(Math.round(amt/1000)) }}</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
               <div class="modal-footer">
-                <button
-                  type="button"
-                  class="btn btn-danger btn-sm text-white"
-                  @click="saveLaborYearly"
-                  style="background-color: #ff8a80; border-color: #ff8a80"
-                >
-                  수정
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-secondary btn-sm"
-                  @click="closeLaborYearlyModal"
-                >
-                  Close
-                </button>
+                <button type="button" class="btn btn-danger btn-sm text-white" @click="saveLaborYearly" style="background-color: #ff8a80; border-color: #ff8a80">수정</button>
+                <button type="button" class="btn btn-secondary btn-sm" @click="closeLaborYearlyModal">Close</button>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Yearly Sales Modal (Per Menu) -->
-        <div
-          v-if="showYearlyModal"
-          class="modal-backdrop fade show"
-          style="z-index: 1075"
-        ></div>
-        <div
-          v-if="showYearlyModal"
-          class="modal fade show d-block"
-          tabindex="-1"
-          style="z-index: 1080"
-        >
+        <!-- Yearly Sales Modal -->
+        <div v-if="showYearlyModal" class="modal-backdrop fade show" style="z-index: 1075"></div>
+        <div v-if="showYearlyModal" class="modal fade show d-block" tabindex="-1" style="z-index: 1080">
           <div class="modal-dialog">
-            <div class="modal-content">
+            <div class="modal-content border-0 shadow-lg">
               <div class="modal-header">
                 <h5 class="modal-title fw-bold">연도별 매출등록</h5>
-                <button
-                  type="button"
-                  class="btn-close"
-                  @click="closeYearlyModal"
-                ></button>
+                <button type="button" class="btn-close" @click="closeYearlyModal"></button>
               </div>
               <div class="modal-body">
-                <!-- Menu Name -->
                 <div class="row mb-3">
-                  <label class="col-sm-3 col-form-label text-end small fw-bold"
-                    >메뉴명</label
-                  >
-                  <div class="col-sm-9 d-flex align-items-center">
-                    <span class="fw-bold">{{ currentMenu?.menuTitle }}</span>
-                  </div>
+                  <label class="col-sm-3 col-form-label text-end small fw-bold">메뉴명</label>
+                  <div class="col-sm-9 d-flex align-items-center"><span class="fw-bold">{{ currentMenu?.menuTitle }}</span></div>
                 </div>
-
-                <!-- Input Method -->
                 <div class="row mb-3">
-                  <label class="col-sm-3 col-form-label text-end small fw-bold"
-                    >입력방법선택</label
-                  >
+                  <label class="col-sm-3 col-form-label text-end small fw-bold">입력방법선택</label>
                   <div class="col-sm-9">
-                    <select
-                      class="form-select form-select-sm"
-                      v-model="currentYearly.menuCd"
-                      @change="onYMenuCdChange"
-                    >
+                    <select class="form-select form-select-sm" v-model="currentYearly.menuCd" @change="onYMenuCdChange">
                       <option value="1">증감율</option>
                       <option value="2">직접입력</option>
                     </select>
                   </div>
                 </div>
-
-                <!-- Rates (Visible if Cd=1) -->
                 <div v-if="currentYearly.menuCd === '1'">
                   <div class="row mb-2">
-                    <label class="col-sm-3 col-form-label text-end small"
-                      >판매수량<br />증감율</label
-                    >
+                    <label class="col-sm-3 col-form-label text-end small">판매수량<br />증감율</label>
                     <div class="col-sm-9 d-flex align-items-center">
                       <div class="input-group input-group-sm">
-                        <input
-                          type="number"
-                          class="form-control text-end"
-                          v-model.number="currentYearly.menuQtyRate"
-                          @input="calcYearly"
-                        />
+                        <input type="number" class="form-control text-end" v-model.number="currentYearly.menuQtyRate" @input="calcYearly" />
                         <span class="input-group-text">%</span>
                       </div>
                     </div>
                   </div>
                   <div class="row mb-3">
-                    <label class="col-sm-3 col-form-label text-end small"
-                      >판매단가<br />증감율</label
-                    >
+                    <label class="col-sm-3 col-form-label text-end small">판매단가<br />증감율</label>
                     <div class="col-sm-9 d-flex align-items-center">
                       <div class="input-group input-group-sm">
-                        <input
-                          type="number"
-                          class="form-control text-end"
-                          v-model.number="currentYearly.menuPriceRate"
-                          @input="calcYearly"
-                        />
+                        <input type="number" class="form-control text-end" v-model.number="currentYearly.menuPriceRate" @input="calcYearly" />
                         <span class="input-group-text">%</span>
                       </div>
                     </div>
                   </div>
                 </div>
-
-                <!-- Table -->
                 <table class="table table-bordered small align-middle">
-                  <thead class="table-light text-center">
-                    <tr>
-                      <th>년도</th>
-                      <th>판매수량</th>
-                      <th>판매단가</th>
-                      <th>판매금액(천원)</th>
-                    </tr>
-                  </thead>
+                  <thead class="table-light text-center"><tr><th>년도</th><th>판매수량</th><th>판매단가</th><th>판매금액(천원)</th></tr></thead>
                   <tbody>
-                    <!-- Year 1 (Fixed) -->
-                    <tr>
-                      <td class="bg-light text-center">1차년도</td>
-                      <td class="bg-light text-end pe-2">
-                        {{ formatNumber(currentYearly.menuQty[0]) }}
-                      </td>
-                      <td class="bg-light text-end pe-2">
-                        {{ formatNumber(currentYearly.menuPrice[0]) }}
-                      </td>
-                      <td class="bg-light text-end pe-2">
-                        {{
-                        formatNumber(Math.round(currentYearly.menuAmt[0]/1000))
-                        }}
-                      </td>
-                    </tr>
-                    <!-- Year 2 -->
-                    <tr>
-                      <td class="bg-light text-center">2차년도</td>
+                    <tr v-for="i in [0,1,2]">
+                      <td class="bg-light text-center">{{ i+1 }}차년도</td>
                       <td class="text-end pe-2">
-                        <input
-                          v-if="currentYearly.menuCd === '2'"
-                          type="number"
-                          class="form-control form-control-sm text-end"
-                          v-model.number="currentYearly.menuQty[1]"
-                          @input="calcYearlyDirect"
-                        />
-                        <span v-else
-                          >{{ formatNumber(currentYearly.menuQty[1]) }}</span
-                        >
+                         <input v-if="currentYearly.menuCd === '2' && i > 0" type="number" class="form-control form-control-sm text-end" v-model.number="currentYearly.menuQty[i]" @input="calcYearlyDirect" />
+                         <span v-else>{{ formatNumber(currentYearly.menuQty[i]) }}</span>
                       </td>
                       <td class="text-end pe-2">
-                        <input
-                          v-if="currentYearly.menuCd === '2'"
-                          type="number"
-                          class="form-control form-control-sm text-end"
-                          v-model.number="currentYearly.menuPrice[1]"
-                          @input="calcYearlyDirect"
-                        />
-                        <span v-else
-                          >{{ formatNumber(currentYearly.menuPrice[1]) }}</span
-                        >
+                         <input v-if="currentYearly.menuCd === '2' && i > 0" type="number" class="form-control form-control-sm text-end" v-model.number="currentYearly.menuPrice[i]" @input="calcYearlyDirect" />
+                         <span v-else>{{ formatNumber(currentYearly.menuPrice[i]) }}</span>
                       </td>
-                      <td class="bg-light text-end pe-2">
-                        {{
-                        formatNumber(Math.round(currentYearly.menuAmt[1]/1000))
-                        }}
-                      </td>
-                    </tr>
-                    <!-- Year 3 -->
-                    <tr>
-                      <td class="bg-light text-center">3차년도</td>
-                      <td class="text-end pe-2">
-                        <input
-                          v-if="currentYearly.menuCd === '2'"
-                          type="number"
-                          class="form-control form-control-sm text-end"
-                          v-model.number="currentYearly.menuQty[2]"
-                          @input="calcYearlyDirect"
-                        />
-                        <span v-else
-                          >{{ formatNumber(currentYearly.menuQty[2]) }}</span
-                        >
-                      </td>
-                      <td class="text-end pe-2">
-                        <input
-                          v-if="currentYearly.menuCd === '2'"
-                          type="number"
-                          class="form-control form-control-sm text-end"
-                          v-model.number="currentYearly.menuPrice[2]"
-                          @input="calcYearlyDirect"
-                        />
-                        <span v-else
-                          >{{ formatNumber(currentYearly.menuPrice[2]) }}</span
-                        >
-                      </td>
-                      <td class="bg-light text-end pe-2">
-                        {{
-                        formatNumber(Math.round(currentYearly.menuAmt[2]/1000))
-                        }}
-                      </td>
+                      <td class="bg-light text-end pe-2 text-danger fw-bold">{{ formatNumber(Math.round(currentYearly.menuAmt[i]/1000)) }}</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
               <div class="modal-footer">
-                <button
-                  type="button"
-                  class="btn btn-danger btn-sm"
-                  @click="saveYearlyModal"
-                >
-                  수정
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-secondary btn-sm"
-                  @click="closeYearlyModal"
-                >
-                  Close
-                </button>
+                <button type="button" class="btn btn-danger btn-sm text-white" @click="saveYearlyModal" style="background-color: #ff8a80; border-color: #ff8a80">수정</button>
+                <button type="button" class="btn btn-secondary btn-sm" @click="closeYearlyModal">Close</button>
               </div>
             </div>
           </div>
         </div>
-        <!-- End showYearlyModal -->
-        <!-- Yearly Material Cost Registration Modal -->
-        <div
-          v-if="showMaterialYearlyModal"
-          class="modal-backdrop fade show"
-          style="z-index: 1065"
-        ></div>
-        <div
-          v-if="showMaterialYearlyModal"
-          class="modal fade show d-block"
-          tabindex="-1"
-          style="z-index: 1070"
-        >
+
+        <!-- Yearly Material Modal -->
+        <div v-if="showMaterialYearlyModal" class="modal-backdrop fade show" style="z-index: 1085"></div>
+        <div v-if="showMaterialYearlyModal" class="modal fade show d-block" tabindex="-1" style="z-index: 1090">
           <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title fw-bold">연도별 재료비 등록</h5>
-                <button
-                  type="button"
-                  class="btn-close"
-                  @click="closeMaterialYearlyModal"
-                ></button>
-              </div>
+            <div class="modal-content border-0 shadow-lg">
+              <div class="modal-header"><h5 class="modal-title fw-bold">연도별 재료비 등록</h5><button type="button" class="btn-close" @click="closeMaterialYearlyModal"></button></div>
               <div class="modal-body">
-                <!-- Menu Info -->
-                <div class="row mb-3">
-                  <label class="col-sm-3 col-form-label text-end small fw-bold"
-                    >메뉴명</label
-                  >
-                  <div class="col-sm-9 d-flex align-items-center">
-                    <span class="fw-bold">{{ currentMenu?.menuTitle }}</span>
-                  </div>
+                <div class="row mb-3"><label class="col-sm-3 col-form-label text-end small fw-bold">메뉴명</label><div class="col-sm-9 d-flex align-items-center"><span class="fw-bold">{{ currentMenu?.menuTitle }}</span></div></div>
+                <div class="row mb-4"><label class="col-sm-3 col-form-label text-end small fw-bold">재료비비율<br />증감율</label>
+                  <div class="col-sm-9 d-flex align-items-center"><div class="input-group input-group-sm" style="width: 150px"><input type="number" class="form-control text-end" v-model.number="currentMaterialYearly.costAmtRate" @input="calcMaterialYearly" /><span class="input-group-text">%</span></div></div>
                 </div>
-
-                <!-- Increase Rate Input -->
-                <div class="row mb-4">
-                  <label class="col-sm-3 col-form-label text-end small fw-bold"
-                    >재료비비율<br />증감율</label
-                  >
-                  <div class="col-sm-9 d-flex align-items-center">
-                    <div
-                      class="input-group input-group-sm"
-                      style="width: 150px"
-                    >
-                      <input
-                        type="number"
-                        class="form-control text-end"
-                        v-model.number="currentMaterialYearly.costAmtRate"
-                        @input="calcMaterialYearly"
-                      />
-                      <span class="input-group-text">%</span>
-                    </div>
-                    <span class="small text-muted ms-2"
-                      >(2,3차년도 자동계산)</span
-                    >
-                  </div>
-                </div>
-
-                <!-- Table -->
-                <table
-                  class="table table-bordered small align-middle text-center"
-                >
-                  <thead class="table-light">
-                    <tr>
-                      <th>년도</th>
-                      <th>판매금액(천원)</th>
-                      <th>재료비 비율</th>
-                      <th>재료비(천원)</th>
-                    </tr>
-                  </thead>
+                <table class="table table-bordered small align-middle text-center">
+                  <thead class="table-light"><tr><th>년도</th><th>재료비 비율</th><th>재료비(천원)</th></tr></thead>
                   <tbody>
-                    <!-- Year 1 -->
-                    <tr>
-                      <td class="bg-light">1차년도</td>
-                      <td class="bg-light text-end pe-2">
-                        {{
-                        formatNumber(Math.round((currentMaterialYearly.DisplayYMenuAmt?.[0]
-                        || 0)/1000)) }}
-                      </td>
-                      <td class="bg-light">
-                        <div
-                          class="input-group input-group-sm justify-content-end border-0 bg-transparent"
-                        >
-                          <span class="pe-1"
-                            >{{ currentMaterialYearly.costRate?.[0] || 0
-                            }}</span
-                          >%
-                        </div>
-                      </td>
-                      <td class="bg-light text-end pe-2">
-                        {{
-                        formatNumber(Math.round((currentMaterialYearly.costAmt?.[0]
-                        || 0)/1000)) }}
-                      </td>
-                    </tr>
-                    <!-- Year 2 -->
-                    <tr>
-                      <td class="bg-light">2차년도</td>
-                      <td class="bg-light text-end pe-2">
-                        {{
-                        formatNumber(Math.round((currentMaterialYearly.DisplayYMenuAmt?.[1]
-                        || 0)/1000)) }}
-                      </td>
-                      <td class="bg-white">
-                        <div
-                          class="d-flex justify-content-center align-items-center"
-                        >
-                          <span class="fw-bold"
-                            >{{ currentMaterialYearly.costRate?.[1] || 0
-                            }}</span
-                          >
-                          <span class="small ms-1">%</span>
-                        </div>
-                      </td>
-                      <td class="bg-light text-end pe-2">
-                        {{
-                        formatNumber(Math.round((currentMaterialYearly.costAmt?.[1]
-                        || 0)/1000)) }}
-                      </td>
-                    </tr>
-                    <!-- Year 3 -->
-                    <tr>
-                      <td class="bg-light">3차년도</td>
-                      <td class="bg-light text-end pe-2">
-                        {{
-                        formatNumber(Math.round((currentMaterialYearly.DisplayYMenuAmt?.[2]
-                        || 0)/1000)) }}
-                      </td>
-                      <td class="bg-white">
-                        <div
-                          class="d-flex justify-content-center align-items-center"
-                        >
-                          <span class="fw-bold"
-                            >{{ currentMaterialYearly.costRate?.[2] || 0
-                            }}</span
-                          >
-                          <span class="small ms-1">%</span>
-                        </div>
-                      </td>
-                      <td class="bg-light text-end pe-2">
-                        {{
-                        formatNumber(Math.round((currentMaterialYearly.costAmt?.[2]
-                        || 0)/1000)) }}
-                      </td>
+                    <tr v-for="i in [0,1,2]">
+                      <td class="bg-light">{{ i+1 }}차년도</td>
+                      <td class="bg-white"><span class="fw-bold">{{ currentMaterialYearly.costRate?.[i] || 0 }}</span>%</td>
+                      <td class="bg-light text-end pe-2 text-danger fw-bold">{{ formatNumber(Math.round((currentMaterialYearly.costAmt?.[i] || 0)/1000)) }}</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
               <div class="modal-footer">
-                <!-- Button color red-ish as per user image '수정'-->
-                <button
-                  type="button"
-                  class="btn btn-danger btn-sm text-white"
-                  @click="saveMaterialYearly"
-                  style="background-color: #ff8a80; border-color: #ff8a80"
-                >
-                  수정
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-secondary btn-sm"
-                  @click="closeMaterialYearlyModal"
-                >
-                  Close
-                </button>
+                <button type="button" class="btn btn-danger btn-sm text-white" @click="saveMaterialYearly" style="background-color: #ff8a80; border-color: #ff8a80">수정</button>
+                <button type="button" class="btn btn-secondary btn-sm" @click="closeMaterialYearlyModal">Close</button>
               </div>
             </div>
           </div>
         </div>
-        <!-- End showMaterialYearlyModal -->
-      </div>
-      <!-- End .glass-container -->
+
+        <!-- Depreciation Detail Modal -->
+        <div v-if="showDeprModal" class="modal-backdrop fade show" style="z-index: 1050"></div>
+        <div v-if="showDeprModal" class="modal fade show d-block" tabindex="-1" style="z-index: 1055">
+          <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow-lg">
+              <div class="modal-header bg-white border-bottom-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold text-dark"><i class="bi bi-bar-chart-fill text-primary me-2"></i>감가상각비 상세 내역</h5>
+                <button type="button" class="btn-close" @click="showDeprModal = false"></button>
+              </div>
+              <div class="modal-body p-4 pt-2">
+                <div class="card border-0 bg-light rounded-4 mb-4">
+                  <div class="card-body py-3"><div class="row text-center"><div class="col-6 border-end"><small class="text-muted d-block mb-1">월 감가상각비 합계</small><strong class="fs-4 text-primary">{{ formatCurrency(expertResult.totalDepreciation) }}</strong></div><div class="col-6"><small class="text-muted d-block mb-1">연 감가상각비 합계</small><strong class="fs-4 text-danger">{{ formatCurrency(expertResult.totalDepreciation * 12) }}</strong></div></div></div>
+                </div>
+                <div class="table-responsive rounded-3 border border-light shadow-sm">
+                  <table class="table table-hover align-middle mb-0 small">
+                    <thead class="table-light"><tr class="text-center text-muted"><th>구분</th><th>자산항목</th><th>투자금액</th><th>상각기간(년)</th><th>월 상각액</th></tr></thead>
+                    <tbody class="bg-white">
+                      <template v-for="(list, key) in expertData.invest.production">
+                         <tr v-for="inv in list.filter(i => i.investYn === 'Y' && i.investPrice > 0)">
+                           <td class="text-center"><span class="badge bg-secondary-subtle text-secondary">제조</span></td><td class="fw-bold">{{ inv.investTitle }}</td><td class="text-end pe-3">{{ formatCurrency(inv.investPrice) }}</td><td class="text-center">{{ inv.investYear }}년</td><td class="text-end pe-3 fw-bold text-primary">{{ formatCurrency(inv.investAmtYear) }}</td>
+                         </tr>
+                      </template>
+                      <template v-for="(list, key) in expertData.invest.sales">
+                         <tr v-for="inv in list.filter(i => i.investYn === 'Y' && i.investPrice > 0)">
+                           <td class="text-center"><span class="badge bg-primary-subtle text-primary">판매/관리</span></td><td class="fw-bold">{{ inv.investTitle }}</td><td class="text-end pe-3">{{ formatCurrency(inv.investPrice) }}</td><td class="text-center">{{ inv.investYear }}년</td><td class="text-end pe-3 fw-bold text-primary">{{ formatCurrency(inv.investAmtYear) }}</td>
+                         </tr>
+                      </template>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="modal-footer border-top-0 pb-4 px-4"><button type="button" class="btn btn-dark w-100" @click="showDeprModal = false">확인 및 닫기</button></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fixed Cost Detail Modal -->
+        <div v-if="showFixedCostModal" class="modal-backdrop fade show" style="z-index: 1999"></div>
+        <div v-if="showFixedCostModal" class="modal fade show d-block" tabindex="-1" style="z-index: 2000">
+          <div class="modal-dialog modal-md modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+              <div class="modal-header bg-white border-bottom-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold text-dark">⚖️ 고정비 상세 내역 (Monthly)</h5>
+                <button type="button" class="btn-close" @click="showFixedCostModal = false"></button>
+              </div>
+              <div class="modal-body p-4 pt-2">
+                <p class="text-muted small mb-4">손익분기점(BEP) 계산에 사용되는 월별 고정비 항목입니다.</p>
+                <div class="list-group list-group-flush border-top border-bottom">
+                  <div class="list-group-item d-flex justify-content-between py-3"><span class="text-muted">인건비 (급여)</span><span class="fw-bold">{{ formatCurrency(expertResult.totalLaborCost) }}</span></div>
+                  <div class="list-group-item d-flex justify-content-between py-3"><span class="text-muted">감가상각비</span><span class="fw-bold">{{ formatCurrency(expertResult.totalDepreciation) }}</span></div>
+                  <div class="list-group-item d-flex justify-content-between py-3"><span class="text-muted">이자비용</span><span class="fw-bold">{{ formatCurrency(expertResult.totalInterest) }}</span></div>
+                  <div class="list-group-item py-3">
+                    <div class="d-flex justify-content-between mb-2">
+                      <span class="text-muted">기타 일반경비 (고정분)</span>
+                      <span class="fw-bold">{{ formatCurrency(expertResult.totalFixedExpense) }}</span>
+                    </div>
+                    <div class="ps-3 border-start ms-2">
+                       <div v-for="exp in filterFixedExpenses()" class="d-flex justify-content-between small text-muted mb-1">
+                         <span>ㄴ {{ exp.expenseTitle }}</span>
+                         <span>{{ formatCurrency(exp.expenseAmt[0]) }}</span>
+                       </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="d-flex justify-content-between mt-3 px-2">
+                  <strong class="fs-5">합계</strong>
+                  <strong class="fs-5 text-danger">{{ formatCurrency(expertResult.totalFixedCost) }}</strong>
+                </div>
+              </div>
+              <div class="modal-footer border-top-0 pb-4 px-4"><button type="button" class="btn btn-dark w-100" @click="showFixedCostModal = false">확인 및 닫기</button></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Expense Detail Modal -->
+        <div v-if="showExpenseDetailModal" class="modal-backdrop fade show" style="z-index: 1050"></div>
+        <div v-if="showExpenseDetailModal" class="modal fade show d-block" tabindex="-1" style="z-index: 1055">
+          <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content shadow-lg border-0 border-top border-4 border-primary">
+              <div class="modal-header bg-white">
+                <h5 class="modal-title fw-bold text-primary">📊 경비 상세 내역 (판관비/제조경비)</h5>
+                <button type="button" class="btn-close" @click="showExpenseDetailModal = false"></button>
+              </div>
+              <div class="modal-body bg-light">
+                <!-- content remains functionally same but organized -->
+                <div class="alert alert-info py-2 small mb-3"><i class="bi bi-info-circle-fill me-1"></i>제조업의 경우, 제조경비는 매출원가(COGS)에 포함됩니다.</div>
+                <div v-if="expertData.basic.industryCd === '1'" class="mb-5">
+                   <h6 class="fw-bold mb-3">제조경비 상세</h6>
+                   <div class="table-responsive bg-white rounded shadow-sm">
+                     <table class="table table-hover table-sm small align-middle mb-0">
+                       <thead class="table-light"><tr class="text-center"><th>항목명</th><th class="text-end pe-3">월 예상액</th></tr></thead>
+                       <tbody>
+                         <tr v-for="exp in filterActiveExpenses(expertData.expense.production)">
+                           <td class="ps-3 fw-bold">{{ exp.expenseTitle }}</td><td class="text-end pe-3 text-primary fw-bold">{{ formatCurrency(exp.expenseAmt[0]) }}</td>
+                         </tr>
+                       </tbody>
+                     </table>
+                   </div>
+                </div>
+                <h6 class="fw-bold mb-3">판매관리비 상세</h6>
+                <div class="table-responsive bg-white rounded shadow-sm">
+                  <table class="table table-hover table-sm small align-middle mb-0">
+                    <thead class="table-light"><tr class="text-center"><th>항목명</th><th class="text-end pe-3">월 예상액</th></tr></thead>
+                    <tbody>
+                      <tr v-for="exp in filterActiveExpenses(expertData.expense.sales, true)">
+                        <td class="ps-3 fw-bold">{{ exp.expenseTitle }}</td><td class="text-end pe-3 text-success fw-bold">{{ formatCurrency(exp.expenseAmt[0]) }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="modal-footer"><button type="button" class="btn btn-dark" @click="showExpenseDetailModal = false">닫기</button></div>
+            </div>
+          </div>
+        </div>        <!-- End showExpenseDetailModal -->
+
+        <!-- Variable Expense Detail Modal (BEP Breakdown) -->
+        <div v-if="showVarExpModal" class="modal-backdrop fade show" style="z-index: 1050"></div>
+        <div v-if="showVarExpModal" class="modal fade show d-block" tabindex="-1" style="z-index: 1055">
+          <div class="modal-dialog modal-md modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+              <div class="modal-header bg-white border-bottom-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold text-primary">📑 기타 변동경비 세부내역 ({{ bepDetailYearIdx + 1 }}차년도)</h5>
+                <button type="button" class="btn-close" @click="showVarExpModal = false"></button>
+              </div>
+              <div class="modal-body p-4 pt-2">
+                <p class="text-muted small mb-4">매출액에 연동되어 발생하는 변동성 경비 항목입니다.</p>
+                <div class="table-responsive rounded-3 border border-light">
+                  <table class="table table-hover table-sm mb-0 small">
+                    <thead class="table-light"><tr><th class="ps-3">항목명</th><th class="text-end pe-3">연간 금액</th></tr></thead>
+                    <tbody>
+                      <tr v-for="exp in filterYearlyVariableExpenses(bepDetailYearIdx)">
+                        <td class="ps-3">{{ exp.expenseTitle }}</td>
+                        <td class="text-end pe-3 fw-bold">{{ formatCurrency(exp.expenseAmtYear[bepDetailYearIdx]) }}</td>
+                      </tr>
+                    </tbody>
+                    <tfoot class="table-light fw-bold">
+                      <tr>
+                        <td class="ps-3">합계</td>
+                        <td class="text-end pe-3 text-primary">{{ formatCurrency(expertResult.bepAnalysis[bepDetailYearIdx].yearlyVC_Exp) }}</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </div>
+              <div class="modal-footer border-top-0 pb-4 px-4"><button type="button" class="btn btn-dark w-100" @click="showVarExpModal = false">닫기</button></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SGA Fixed Expense Detail Modal (BEP Breakdown) -->
+        <div v-if="showSgaFixedModal" class="modal-backdrop fade show" style="z-index: 1050"></div>
+        <div v-if="showSgaFixedModal" class="modal fade show d-block" tabindex="-1" style="z-index: 1055">
+          <div class="modal-dialog modal-md modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+              <div class="modal-header bg-white border-bottom-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold text-dark">📜 판관비/경비 세부내역 ({{ bepDetailYearIdx + 1 }}차년도)</h5>
+                <button type="button" class="btn-close" @click="showSgaFixedModal = false"></button>
+              </div>
+              <div class="modal-body p-4 pt-2">
+                <p class="text-muted small mb-4">인건비, 상각비, 이자를 제외한 고정성 일반경비 항목입니다.</p>
+                <div class="table-responsive rounded-3 border border-light">
+                  <table class="table table-hover table-sm mb-0 small">
+                    <thead class="table-light"><tr><th class="ps-3">항목명</th><th class="text-end pe-3">연간 금액</th></tr></thead>
+                    <tbody>
+                      <tr v-for="exp in filterYearlySgaExpenses(bepDetailYearIdx)">
+                        <td class="ps-3">{{ exp.expenseTitle }}</td>
+                        <td class="text-end pe-3 fw-bold">{{ formatCurrency(exp.expenseAmtYear[bepDetailYearIdx]) }}</td>
+                      </tr>
+                    </tbody>
+                    <tfoot class="table-light fw-bold">
+                      <tr>
+                        <td class="ps-3">합계</td>
+                        <td class="text-end pe-3 text-danger">{{ formatCurrency(expertResult.bepAnalysis[bepDetailYearIdx].otherFC) }}</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </div>
+              <div class="modal-footer border-top-0 pb-4 px-4"><button type="button" class="btn btn-dark w-100" @click="showSgaFixedModal = false">닫기</button></div>
+            </div>
+          </div>
+        </div>
+
     </div>
     <!-- End #app -->
 
@@ -4805,6 +4408,7 @@
           const currentReportId = ref(null);
           const showProjectionModal = ref(false);
           const showDeprModal = ref(false);
+          const showFixedCostModal = ref(false);
           const isReportWide = ref(false);
           const showMaterialModal = ref(false);
           const showLaborModal = ref(false);
@@ -5912,30 +5516,40 @@
               sumInvestBudget(data.invest.production) +
               sumInvestBudget(data.invest.sales);
 
-            // 5. Final Dashboard Values (Monthly)
+            // 5. Final Dashboard Values (Monthly) - Based on Section 13 Spec
             const Dash_Material = Math.round(sumArrayIdx(data.cost.costY, "costAmt", 0) / 12);
             
-            // Dash_Labor: Use authority source (Step 3 Jobs)
-            const Dash_Labor = prodLaborSalaries + salesLaborSalaries;
-            
-            // Dash_Exp: Use Step 4 expenses (Exclude Salary to avoid doubling, Exclude Depr/Int for separate rows)
-            const Dash_Exp = allExp
-              .filter(e => e.expenseTitle !== "급여" && e.expenseTitle !== "감가상각비" && e.expenseTitle !== "이자비용")
+            // 2.1 Variable Costs (변동비) = 재료비 + 매출연동형 경비
+            const Dash_VC_Exp = allExp
+              .filter(e => e.expenseTVaCd === "매출액" && e.expenseTitle !== "급여" && e.expenseTitle !== "감가상각비" && e.expenseTitle !== "이자비용")
               .reduce((sum, e) => sum + (e.expenseAmt?.[0] || 0), 0);
+            const mVC = Dash_Material + Dash_VC_Exp;
 
-            // Operating Profit = Revenue - Material - Labor - Expenses - Depreciation
-            const OP = S_mon - Dash_Material - Dash_Labor - Dash_Exp - Dash_Depr;
+            // 2.2 Fixed Costs (고정비) = 인건비 + 월정액 경비 + 감가상각비 + 이자비용
+            const Dash_Labor = prodLaborSalaries + salesLaborSalaries;
+            const Dash_FC_Exp = allExp
+              .filter(e => e.expenseTVaCd !== "매출액" && e.expenseTitle !== "급여" && e.expenseTitle !== "감가상각비" && e.expenseTitle !== "이자비용")
+              .reduce((sum, e) => sum + (e.expenseAmt?.[0] || 0), 0);
+            
+            // Note: BEP uses Interest in FC, but Operating Profit excludes Interest
+            const mFC_for_BEP = Dash_Labor + Dash_FC_Exp + Dash_Depr + Interest_total;
+            const mFC_for_OP = Dash_Labor + Dash_FC_Exp + Dash_Depr;
+
+            // 1. 실질 영업이익 (Monthly OP) = 매출액 - (매출원가 + 판관비)
+            // 판관비 includes Depreciation per spec
+            const OP = S_mon - (Dash_Material + Dash_Labor + Dash_VC_Exp + Dash_FC_Exp + Dash_Depr);
 
             // 6. Yearly P&L Calculation (Step 10)
             const yearlyPNL = [];
             for (let i = 0; i < 3; i++) {
-              let rev, cogs, sga, nonOp;
+              let rev, cogs, sga, depr, nonOp;
 
               if (i === 0) {
                 // 1차년도: 대시보드 월 예상 수치 * 12 (정확한 동기화)
                 rev = S_mon * 12;
                 cogs = Dash_Material * 12;
-                sga = Math.round((Dash_Labor + Dash_Exp + Dash_Depr) * 12);
+                sga = Math.round((Dash_Labor + Dash_VC_Exp + Dash_FC_Exp) * 12);
+                depr = Math.round(Dash_Depr * 12);
                 nonOp = Interest_total * 12;
               } else {
                 // 2,3차년도: 입력된 연도별 데이터 (JSON) 기반 계산
@@ -5947,14 +5561,14 @@
                 const yearlyExp = allExp
                   .filter(e => e.expenseTitle !== "급여" && e.expenseTitle !== "감가상각비" && e.expenseTitle !== "이자비용")
                   .reduce((sum, e) => sum + (e.expenseAmtYear?.[i] || 0), 0);
-                const yearlyDepr = Dash_Depr * 12;
-
-                sga = Math.round(yearlyLabor + yearlyExp + yearlyDepr);
+                
+                sga = Math.round(yearlyLabor + yearlyExp);
+                depr = Math.round(Dash_Depr * 12);
                 nonOp = sumArrayIdx(data.loan.debt, "loanRateAmtYear", i);
               }
 
               const gp = rev - cogs;
-              const op = gp - sga;
+              const op = gp - (sga + depr);
               const ord = op - nonOp;
 
               yearlyPNL.push({
@@ -5962,6 +5576,7 @@
                 cogs,
                 gp,
                 sga,
+                depr,
                 op,
                 nonOp,
                 ord,
@@ -6127,32 +5742,37 @@
               const rev = sumArrayIdx(data.sale.menuY, "menuAmt", i);
               const materials = sumArrayIdx(data.cost.costY, "costAmt", i);
 
-              // Variable Costs = Only Material Costs (per User Request)
-              const totalVC = materials;
+              // 1. 한계이익 산출: 매출액 - (재료비 + 매출연동형 경비)
+              const yearlyVC_Exp = allExp
+                .filter(e => e.expenseTVaCd === "매출액" && e.expenseTitle !== "급여" && e.expenseTitle !== "감가상각비" && e.expenseTitle !== "이자비용")
+                .reduce((sum, e) => sum + (e.expenseAmtYear?.[i] || 0), 0);
+              
+              const totalVC = materials + yearlyVC_Exp;
 
               const marginalProfit = rev - totalVC;
               const marginalProfitRate =
                 rev > 0 ? (marginalProfit / rev) * 100 : 0;
 
-              // Fixed Costs (Redefined per User Request)
-              // 고정비 = 인건비 + 판관비/경비 + 감가상각비
+              // 3. 고정비 총계 산출: 인건비 + 월정액 경비 + 감가상각비 + 이자비용
+              // 9.2 공식: 이자비용 포함하여 보수적 평가
               const laborFC =
                 sumArrayIdx(data.job.production, "jobAmtYear", i) +
                 sumArrayIdx(data.job.sales, "jobAmtYear", i);
 
               const deprFC = Dash_Depr * 12;
+              const interestFC = sumArrayIdx(data.loan.debt, "loanRateAmtYear", i);
 
-              // 판관비/경비 (이자, 급여, 감가상각비 제외한 모든 리스트 항목을 고정비로 간주)
               const otherFC = allExp
                 .filter(e => {
                   const isDepr = e.expenseTitle === "감가상각비";
                   const isInterest = e.expenseTitle === "이자비용";
                   const isSalary = e.expenseTitle === "급여";
-                  return !isDepr && !isInterest && !isSalary;
+                  const isVariable = e.expenseTVaCd === "매출액";
+                  return !isDepr && !isInterest && !isSalary && !isVariable;
                 })
                 .reduce((sum, e) => sum + (e.expenseAmtYear?.[i] || 0), 0);
 
-              const totalFC = laborFC + otherFC + deprFC;
+              const totalFC = laborFC + otherFC + deprFC + interestFC;
 
               const bepPoint =
                 marginalProfitRate > 0
@@ -6169,12 +5789,14 @@
               bepAnalysis.push({
                 rev,
                 materials,
+                yearlyVC_Exp, // Added for detail breakdown
                 totalVC,
                 marginalProfit,
                 marginalProfitRate,
                 laborFC,
                 deprFC,
                 otherFC,
+                interestFC, // Added for detail breakdown
                 totalFC,
                 bepPoint,
                 bepRate,
@@ -6287,12 +5909,15 @@
               totalRevenue: S_mon,
               Dash_Material,
               Dash_Labor,
-              Dash_Exp,
+              Dash_VC_Exp,
+              Dash_FC_Exp,
               Dash_Depr,
               Interest_mon: Interest_total,
               OP,
               opIncome: OP,
               bepRevenue: Math.round((bepAnalysis[0]?.bepPoint || 0) / 12),
+              totalFixedCost: Math.round((bepAnalysis[0]?.totalFC || 0) / 12),
+              marginalProfitRate: bepAnalysis[0]?.marginalProfitRate || 0,
               TotalInvestment,
               diagnosis,
               cogsYearly: cogsResult,
@@ -6484,7 +6109,7 @@
                 : "0.0";
             const expenseRatio =
               analysis.S_mon > 0
-                ? ((analysis.Dash_Exp / analysis.S_mon) * 100).toFixed(1)
+                ? (((analysis.Dash_VC_Exp + analysis.Dash_FC_Exp) / analysis.S_mon) * 100).toFixed(1)
                 : "0.0";
 
             return {
@@ -6494,9 +6119,10 @@
               totalLaborCost: analysis.Dash_Labor,
               totalInterest: analysis.Interest_mon,
               totalDepreciation: analysis.Dash_Depr,
-              totalExpense: analysis.Dash_Exp,
+              totalExpense: analysis.Dash_VC_Exp + analysis.Dash_FC_Exp, // Total SGA Overhead
               opIncome: analysis.OP,
-              totalCOGS: analysis.Dash_Material, // Legacy sync if needed
+              totalCOGS: analysis.Dash_Material,
+              marginalProfitRate: analysis.marginalProfitRate,
 
               opMargin,
               materialRatio,
@@ -6510,6 +6136,7 @@
                     ((analysis.S_mon - analysis.Dash_COGS) / analysis.S_mon)
                   : 0,
               totalFixedCost: analysis.totalFixedCost,
+              totalFixedExpense: analysis.Dash_FC_Exp,
               bepRevenue: analysis.bepRevenue,
               diagnosis: analysis.diagnosis,
               yearlyPNL: analysis.yearlyPNL,
@@ -7139,6 +6766,19 @@
             }
           });
 
+          const showVarExpModal = ref(false);
+          const showSgaFixedModal = ref(false);
+          const bepDetailYearIdx = ref(0);
+
+          const openVarExpDetail = (idx) => {
+            bepDetailYearIdx.value = idx;
+            showVarExpModal.value = true;
+          };
+          const openSgaFixedDetail = (idx) => {
+            bepDetailYearIdx.value = idx;
+            showSgaFixedModal.value = true;
+          };
+
           return {
             mode,
             userEmail,
@@ -7146,6 +6786,7 @@
             reports,
             showProjectionModal,
             showDeprModal,
+            showFixedCostModal,
             showMaterialModal,
             liteData,
             expertData,
@@ -7210,6 +6851,72 @@
             calcLoanTotals,
             mfgExpMapping,
             salesExpMapping,
+            filterActiveExpenses: (list, excludeSalary = false) => {
+              if (!list) return [];
+              return list.filter((e) => {
+                const hasAmt = e.expenseAmt && e.expenseAmt[0] > 0;
+                if (!hasAmt) return false;
+                if (excludeSalary && e.expenseTitle === "급여") return false;
+                return true;
+              });
+            },
+            filterFixedExpenses: () => {
+              const all = [
+                ...(expertData.expense.production || []),
+                ...(expertData.expense.sales || []),
+              ];
+              return all.filter(
+                (e) =>
+                  e.expenseAmt &&
+                  e.expenseAmt[0] > 0 &&
+                  e.expenseTVaCd !== "매출액" &&
+                  e.expenseTitle !== "급여" &&
+                  e.expenseTitle !== "감가상각비" &&
+                  e.expenseTitle !== "이자비용",
+              );
+            },
+            filterYearlyVariableExpenses: (yearIdx) => {
+              const all = [
+                ...(expertData.expense.production || []),
+                ...(expertData.expense.sales || []),
+              ];
+              return all.filter(
+                (e) =>
+                  (e.expenseTVaCd === "매출액" || e.expenseTVaCd === "2") &&
+                  e.expenseTitle !== "급여" &&
+                  e.expenseTitle !== "감가상각비" &&
+                  e.expenseTitle !== "이자비용" &&
+                  e.expenseAmtYear &&
+                  e.expenseAmtYear[yearIdx] > 0,
+              );
+            },
+            filterYearlySgaExpenses: (yearIdx) => {
+              const all = [
+                ...(expertData.expense.production || []),
+                ...(expertData.expense.sales || []),
+              ];
+              return all.filter((e) => {
+                const isDepr = e.expenseTitle === "감가상각비";
+                const isInterest = e.expenseTitle === "이자비용";
+                const isSalary = e.expenseTitle === "급여";
+                const isVariable =
+                  e.expenseTVaCd === "매출액" || e.expenseTVaCd === "2";
+                return (
+                  !isDepr &&
+                  !isInterest &&
+                  !isSalary &&
+                  !isVariable &&
+                  e.expenseAmtYear &&
+                  e.expenseAmtYear[yearIdx] > 0
+                );
+              });
+            },
+            showVarExpModal,
+            showSgaFixedModal,
+            bepDetailYearIdx,
+            openVarExpDetail,
+            openSgaFixedDetail,
+            formatNumber,
           };
         },
       }).mount("#app");
