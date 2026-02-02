@@ -3394,29 +3394,41 @@
                     </h5>
                     <div class="row align-items-center">
                       <div class="col-md-5 border-end">
-                        <div class="d-flex justify-content-between mb-1">
-                          <small class="text-muted">당기 매출원가 (Monthly)</small>
-                          <strong class="text-dark">{{ formatCurrency(expertResult.totalCOGS) }}</strong>
+                        <!-- COGS Formula Breakdown -->
+                        <div class="mb-3">
+                          <div class="d-flex justify-content-between small text-muted mb-1">
+                            <span>(+) 기초재고액 (월평균)</span>
+                            <span>{{ formatCurrency(expertResult.beginningInv) }}</span>
+                          </div>
+                          
+                          <div class="d-flex justify-content-between mb-1">
+                            <span class="small text-muted fw-bold">(+) {{ expertResult.isMfg ? '당기제품제조원가' : '당기상품매입액' }}</span>
+                            <span class="fw-bold text-dark">{{ formatCurrency(expertResult.currentPeriodCost) }}</span>
+                          </div>
+                          <div v-if="expertResult.isMfg" class="ps-3 border-start ms-2 mb-2 small text-muted" style="font-size: 0.75rem">
+                            <div class="d-flex justify-content-between">
+                              <span>ㄴ 재료비/상품매입액</span>
+                              <span>{{ formatCurrency(expertResult.totalMaterialCost) }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                              <span>ㄴ 노무비/제조인건비</span>
+                              <span>{{ formatCurrency(expertResult.totalMfgLabor) }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                              <span>ㄴ 제조경비</span>
+                              <span>{{ formatCurrency(expertResult.totalMfgExp) }}</span>
+                            </div>
+                          </div>
+
+                          <div class="d-flex justify-content-between small text-muted border-top pt-1 mt-1">
+                            <span>(-) 기말재고액 (월평균)</span>
+                            <span>{{ formatCurrency(expertResult.endingInv) }}</span>
+                          </div>
                         </div>
-                        <div v-if="expertResult.isMfg" class="ps-2 border-start ms-1 mb-2">
-                          <div class="d-flex justify-content-between small text-muted">
-                            <span>ㄴ 재료비/상품매입액</span>
-                            <span>{{ formatCurrency(expertResult.totalMaterialCost) }}</span>
-                          </div>
-                          <div class="d-flex justify-content-between small text-muted">
-                            <span>ㄴ 노무비/제조인건비</span>
-                            <span>{{ formatCurrency(expertResult.totalMfgLabor) }}</span>
-                          </div>
-                          <div class="d-flex justify-content-between small text-muted">
-                            <span>ㄴ 제조경비</span>
-                            <span>{{ formatCurrency(expertResult.totalMfgExp) }}</span>
-                          </div>
-                        </div>
-                        <div v-else class="ps-2 border-start ms-1 mb-2">
-                          <div class="d-flex justify-content-between small text-muted">
-                            <span>ㄴ 당기 재료비/상품매입액</span>
-                            <span>{{ formatCurrency(expertResult.totalMaterialCost) }}</span>
-                          </div>
+
+                        <div class="d-flex justify-content-between border-top pt-2 mt-2">
+                          <strong class="text-primary">(=) 월 매출원가 (COGS)</strong>
+                          <strong class="text-primary fs-5">{{ formatCurrency(expertResult.totalCOGS) }}</strong>
                         </div>
                       </div>
                       <div class="col-md-3 border-end text-center">
@@ -5551,9 +5563,15 @@
             const mFC_for_BEP = Dash_Labor + Dash_FC_Exp + Dash_Depr + Interest_total;
             const mFC_for_OP = Dash_Labor + Dash_FC_Exp + Dash_Depr;
 
+            const Dash_Beginning_Inv_mon = Math.round((data.cogs?.beginningInv?.[0] || 0) / 12);
+            const Dash_Ending_Inv_mon = Math.round((data.cogs?.endingInv?.[0] || 0) / 12);
+
             // 1. 실질 영업이익 (Monthly OP) = 매출액 - (매출원가 + 판관비)
-            // 판관비 includes Depreciation per spec
-            const OP = S_mon - (Dash_Material + Dash_Labor + Dash_VC_Exp + Dash_FC_Exp + Dash_Depr);
+            // 매출원가 includes (Beginning + Current - Ending)
+            // 판관비 includes (SGA Labor + SGA Exp + Depr)
+            // Combined: OP = S_mon - (Current_Total_Cost + Beginning - Ending)
+            const Total_Current_Cost = Dash_Material + Dash_Labor + Dash_VC_Exp + Dash_FC_Exp + Dash_Depr;
+            const OP = S_mon - (Total_Current_Cost + Dash_Beginning_Inv_mon - Dash_Ending_Inv_mon);
 
             // 6. Yearly P&L Calculation (Step 10)
             const yearlyPNL = [];
@@ -5563,14 +5581,14 @@
               if (i === 0) {
                 // 1차년도: 대시보드 월 예상 수치 * 12 (정확한 동기화)
                 rev = S_mon * 12;
-                cogs = Dash_Material * 12;
+                cogs = cogsResult[i].totalCogs;
                 sga = Math.round((Dash_Labor + Dash_VC_Exp + Dash_FC_Exp) * 12);
                 depr = Math.round(Dash_Depr * 12);
                 nonOp = Interest_total * 12;
               } else {
                 // 2,3차년도: 입력된 연도별 데이터 (JSON) 기반 계산
                 rev = sumArrayIdx(data.sale.menuY, "menuAmt", i);
-                cogs = sumArrayIdx(data.cost.costY, "costAmt", i);
+                cogs = cogsResult[i].totalCogs;
 
                 const yearlyLabor = sumArrayIdx(data.job.production, "jobAmtYear", i) +
                                    sumArrayIdx(data.job.sales, "jobAmtYear", i);
@@ -5948,6 +5966,8 @@
                     e.expenseTitle !== "이자비용",
                 )
                 .reduce((sum, e) => sum + (e.expenseAmt?.[0] || 0), 0),
+              Dash_Beginning_Inv: Dash_Beginning_Inv_mon,
+              Dash_Ending_Inv: Dash_Ending_Inv_mon,
               ordAmtYear: yearlyPNL.map((p) => p.ord),
               assetAmtYear: bsAnalysis.map((b) => b.totalAsset),
               equityAmtYear: bsAnalysis.map((b) => b.totalEquity),
@@ -6138,11 +6158,16 @@
                 : "0.0";
 
             const isMfg = expertData.basic.industryCd === "1";
-            const totalCOGS = isMfg
+            const currentPeriodCost = isMfg
               ? analysis.Dash_Material +
                 analysis.Dash_Mfg_Labor +
                 analysis.Dash_Mfg_Exp
               : analysis.Dash_Material;
+            const totalCOGS =
+              analysis.Dash_Beginning_Inv +
+              currentPeriodCost -
+              analysis.Dash_Ending_Inv;
+
             const totalLaborCost = isMfg
               ? analysis.Dash_Labor - analysis.Dash_Mfg_Labor
               : analysis.Dash_Labor;
@@ -6154,6 +6179,9 @@
               totalRevenue: analysis.S_mon,
               yearlySales,
               totalCOGS,
+              currentPeriodCost,
+              beginningInv: analysis.Dash_Beginning_Inv,
+              endingInv: analysis.Dash_Ending_Inv,
               totalMaterialCost: analysis.Dash_Material,
               totalMfgLabor: analysis.Dash_Mfg_Labor,
               totalMfgExp: analysis.Dash_Mfg_Exp,
@@ -6181,9 +6209,8 @@
 
               targetGap,
               revenueNeededForTarget:
-                targetGap < 0 && analysis.S_mon - analysis.Dash_COGS > 0
-                  ? Math.abs(targetGap) /
-                    ((analysis.S_mon - analysis.Dash_COGS) / analysis.S_mon)
+                targetGap < 0 && analysis.marginalProfitRate > 0
+                  ? Math.abs(targetGap) / (analysis.marginalProfitRate / 100)
                   : 0,
               totalFixedCost: analysis.totalFixedCost,
               totalFixedExpense: analysis.Dash_FC_Exp,
