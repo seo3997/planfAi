@@ -2259,7 +2259,7 @@
                         <tr>
                           <td
                              class="text-muted"
-                             @click="showMaterialModal = true"
+                             @click="openCogsDetail(0, true)"
                              style="cursor: pointer"
                           >
                             (-) 매출원가 (COGS)
@@ -2429,10 +2429,15 @@
                               </td>
                             </tr>
                             <tr class="text-muted">
-                              <td>(-) 매출원가</td>
+                              <td style="cursor: pointer" @click="openCogsDetail(0)">
+                                (-) 매출원가 <span class="badge bg-primary-subtle text-primary border-primary-subtle" style="font-size: 0.5rem">보기</span>
+                              </td>
                               <td
-                                v-for="p in expertResult.yearlyPNL"
+                                v-for="(p, idx) in expertResult.yearlyPNL"
                                 class="text-end text-danger"
+                                style="cursor: pointer"
+                                @click="openCogsDetail(idx)"
+                                title="클릭하여 상세 내역 보기"
                               >
                                 {{ formatNumber(Math.round(p.cogs/1000)) }}
                               </td>
@@ -3375,7 +3380,7 @@
             <div class="modal-content">
               <div class="modal-header">
                 <h5 class="modal-title fw-bold">
-                  📉 재료비 상세 (Material Cost Projection)
+                  📉 매출원가 상세 ({{ cogsDetailYearIdx + 1 }}차년도 - {{ isCogsMonthly ? '월평균' : '연간합계' }})
                 </h5>
                 <button
                   type="button"
@@ -3391,53 +3396,54 @@
                        매출원가 (COGS) 요약
                        <span v-if="expertResult.isMfg" class="badge bg-primary ms-2" style="font-size: 0.6rem">제조업</span>
                        <span v-else class="badge bg-secondary ms-2" style="font-size: 0.6rem">비제조업</span>
+                       <span class="badge bg-dark ms-2" style="font-size: 0.6rem">{{ isCogsMonthly ? '월평균' : '연간' }}</span>
                     </h5>
                     <div class="row align-items-center">
                       <div class="col-md-5 border-end">
                         <!-- COGS Formula Breakdown -->
                         <div class="mb-3">
                           <div class="d-flex justify-content-between small text-muted mb-1">
-                            <span>(+) 기초재고액 (월평균)</span>
-                            <span>{{ formatCurrency(expertResult.beginningInv) }}</span>
+                            <span>(+) 기초재고액 ({{ isCogsMonthly ? '월평균' : '연간' }})</span>
+                            <span>{{ formatCurrency(isCogsMonthly ? (expertResult.cogsYearly[cogsDetailYearIdx]?.beginningInv || 0) / 12 : (expertResult.cogsYearly[cogsDetailYearIdx]?.beginningInv || 0)) }}</span>
                           </div>
                           
                           <div class="d-flex justify-content-between mb-1">
                             <span class="small text-muted fw-bold">(+) {{ expertResult.isMfg ? '당기제품제조원가' : '당기상품매입액' }}</span>
-                            <span class="fw-bold text-dark">{{ formatCurrency(expertResult.currentPeriodCost) }}</span>
+                            <span class="fw-bold text-dark">{{ formatCurrency(isCogsMonthly ? (expertResult.cogsYearly[cogsDetailYearIdx]?.currentPeriodCost || 0) / 12 : (expertResult.cogsYearly[cogsDetailYearIdx]?.currentPeriodCost || 0)) }}</span>
                           </div>
                           <div v-if="expertResult.isMfg" class="ps-3 border-start ms-2 mb-2 small text-muted" style="font-size: 0.75rem">
                             <div class="d-flex justify-content-between">
                               <span>ㄴ 재료비/상품매입액</span>
-                              <span>{{ formatCurrency(expertResult.totalMaterialCost) }}</span>
+                              <span>{{ formatCurrency(isCogsMonthly ? (expertResult.cogsYearly[cogsDetailYearIdx]?.materials || 0) / 12 : (expertResult.cogsYearly[cogsDetailYearIdx]?.materials || 0)) }}</span>
                             </div>
                             <div class="d-flex justify-content-between">
                               <span>ㄴ 노무비/제조인건비</span>
-                              <span>{{ formatCurrency(expertResult.totalMfgLabor) }}</span>
+                              <span>{{ formatCurrency(isCogsMonthly ? (expertResult.cogsYearly[cogsDetailYearIdx]?.mfgLabor || 0) / 12 : (expertResult.cogsYearly[cogsDetailYearIdx]?.mfgLabor || 0)) }}</span>
                             </div>
                             <div class="d-flex justify-content-between">
                               <span>ㄴ 제조경비</span>
-                              <span>{{ formatCurrency(expertResult.totalMfgExp) }}</span>
+                              <span>{{ formatCurrency(isCogsMonthly ? (expertResult.cogsYearly[cogsDetailYearIdx]?.mfgExp || 0) / 12 : (expertResult.cogsYearly[cogsDetailYearIdx]?.mfgExp || 0)) }}</span>
                             </div>
                           </div>
 
                           <div class="d-flex justify-content-between small text-muted border-top pt-1 mt-1">
-                            <span>(-) 기말재고액 (월평균)</span>
-                            <span>{{ formatCurrency(expertResult.endingInv) }}</span>
+                            <span>(-) 기말재고액 ({{ isCogsMonthly ? '월평균' : '연간' }})</span>
+                            <span>{{ formatCurrency(isCogsMonthly ? (expertResult.cogsYearly[cogsDetailYearIdx]?.endingInv || 0) / 12 : (expertResult.cogsYearly[cogsDetailYearIdx]?.endingInv || 0)) }}</span>
                           </div>
                         </div>
 
                         <div class="d-flex justify-content-between border-top pt-2 mt-2">
-                          <strong class="text-primary">(=) 월 매출원가 (COGS)</strong>
-                          <strong class="text-primary fs-5">{{ formatCurrency(expertResult.totalCOGS) }}</strong>
+                          <strong class="text-primary">(=) {{ isCogsMonthly ? '월' : '연' }} 매출원가 (COGS)</strong>
+                          <strong class="text-primary fs-5">{{ formatCurrency(isCogsMonthly ? (expertResult.cogsYearly[cogsDetailYearIdx]?.totalCogs || 0) / 12 : (expertResult.cogsYearly[cogsDetailYearIdx]?.totalCogs || 0)) }}</strong>
                         </div>
                       </div>
                       <div class="col-md-3 border-end text-center">
                         <small class="text-muted d-block">매출원가율</small>
-                        <strong class="fs-4">{{ expertResult.materialRatio }}%</strong>
+                        <strong class="fs-4">{{ (expertResult.cogsYearly[cogsDetailYearIdx]?.totalCogs / (expertResult.yearlyPNL[cogsDetailYearIdx]?.rev || 1) * 100).toFixed(1) }}%</strong>
                       </div>
                       <div class="col-md-4 text-center">
-                        <small class="text-muted d-block">1차년도 연 예상 매출원가</small>
-                        <strong class="fs-5 text-danger">{{ formatCurrency(expertResult.totalCOGS * 12) }}</strong>
+                        <small class="text-muted d-block">{{ cogsDetailYearIdx + 1 }}차년도 연 예상 매출원가</small>
+                        <strong class="fs-5 text-danger">{{ formatCurrency(expertResult.cogsYearly[cogsDetailYearIdx]?.totalCogs || 0) }}</strong>
                       </div>
                     </div>
                   </div>
@@ -4441,6 +4447,13 @@
           const showMaterialModal = ref(false);
           const showLaborModal = ref(false);
           const showExpenseDetailModal = ref(false);
+          const cogsDetailYearIdx = ref(0);
+          const isCogsMonthly = ref(true); // Default to monthly for dashboard
+          const openCogsDetail = (idx, monthly = false) => {
+            cogsDetailYearIdx.value = idx;
+            isCogsMonthly.value = monthly;
+            showMaterialModal.value = true;
+          };
 
           // Yearly Sales Logic
           const showYearlyModal = ref(false);
@@ -5493,12 +5506,14 @@
             for (let i = 0; i < 3; i++) {
               const mMaterials = sumArrayIdx(data.cost.costY, "costAmt", i); // 년도별 재료비 (cost.costY.costAmt)
 
+              let mExpFiltered = 0;
+              let mLaborTotal = 0;
               if (industryCd === "1") {
-                // 제조업: 당기총제조비용 = 재료비 + 노무비(제조인건비) + 제조경비(급여 제외 경비)
-                const mExpFiltered = (data.expense.production || [])
-                  .filter(e => e.expenseTitle !== "급여")
+                // 제조업: 당기총제조비용 = 재료비 + 노무비(제조인건비) + 제조경비(급여, 상각비, 이자 제외)
+                mExpFiltered = (data.expense.production || [])
+                  .filter(e => e.expenseTitle !== "급여" && e.expenseTitle !== "감가상각비" && e.expenseTitle !== "이자비용")
                   .reduce((sum, e) => sum + (e.expenseAmtYear?.[i] || 0), 0);
-                const mLaborTotal = sumArrayIdx(data.job.production, "jobAmtYear", i);
+                mLaborTotal = sumArrayIdx(data.job.production, "jobAmtYear", i);
                 currentCost = mMaterials + mExpFiltered + mLaborTotal;
               } else {
                 // 비제조업: 당기 상품매입액 = 년도별 재료비
@@ -5522,6 +5537,11 @@
               cogsResult.push({
                 currentPeriodCost: currentCost,
                 totalCogs: totalCogsVal,
+                materials: mMaterials,
+                mfgLabor: mLaborTotal,
+                mfgExp: mExpFiltered,
+                beginningInv: (data.cogs?.beginningInv?.[i] || 0),
+                endingInv: (data.cogs?.endingInv?.[i] || 0)
               });
             }
 
@@ -6994,6 +7014,9 @@
             openVarExpDetail,
             openSgaFixedDetail,
             formatNumber,
+            cogsDetailYearIdx,
+            isCogsMonthly,
+            openCogsDetail,
           };
         },
       }).mount("#app");
