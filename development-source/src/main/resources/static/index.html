@@ -2270,7 +2270,7 @@
                             >
                           </td>
                           <td class="text-end fw-bold">
-                            {{ formatCurrency(expertResult.totalMaterialCost) }}
+                            {{ formatCurrency(expertResult.totalCOGS) }}
                           </td>
                           <td class="text-end text-muted" style="width: 40px">
                             {{ expertResult.materialRatio }}%
@@ -3387,29 +3387,45 @@
                 <!-- Top Summary Card -->
                 <div class="card border-0 shadow-sm mb-4">
                   <div class="card-body bg-white py-3">
-                    <h5 class="fw-bold mb-3 border-bottom pb-2">재료비 요약</h5>
-                    <div class="row text-center">
-                      <div class="col-4 border-end">
-                        <small class="text-muted d-block">월 예상 재료비</small>
-                        <strong class="fs-5"
-                          >{{ formatCurrency(expertResult.totalMaterialCost)
-                          }}</strong
-                        >
+                    <h5 class="fw-bold mb-3 border-bottom pb-2">
+                       매출원가 (COGS) 요약
+                       <span v-if="expertResult.isMfg" class="badge bg-primary ms-2" style="font-size: 0.6rem">제조업</span>
+                       <span v-else class="badge bg-secondary ms-2" style="font-size: 0.6rem">비제조업</span>
+                    </h5>
+                    <div class="row align-items-center">
+                      <div class="col-md-5 border-end">
+                        <div class="d-flex justify-content-between mb-1">
+                          <small class="text-muted">당기 매출원가 (Monthly)</small>
+                          <strong class="text-dark">{{ formatCurrency(expertResult.totalCOGS) }}</strong>
+                        </div>
+                        <div v-if="expertResult.isMfg" class="ps-2 border-start ms-1 mb-2">
+                          <div class="d-flex justify-content-between small text-muted">
+                            <span>ㄴ 재료비/상품매입액</span>
+                            <span>{{ formatCurrency(expertResult.totalMaterialCost) }}</span>
+                          </div>
+                          <div class="d-flex justify-content-between small text-muted">
+                            <span>ㄴ 노무비/제조인건비</span>
+                            <span>{{ formatCurrency(expertResult.totalMfgLabor) }}</span>
+                          </div>
+                          <div class="d-flex justify-content-between small text-muted">
+                            <span>ㄴ 제조경비</span>
+                            <span>{{ formatCurrency(expertResult.totalMfgExp) }}</span>
+                          </div>
+                        </div>
+                        <div v-else class="ps-2 border-start ms-1 mb-2">
+                          <div class="d-flex justify-content-between small text-muted">
+                            <span>ㄴ 당기 재료비/상품매입액</span>
+                            <span>{{ formatCurrency(expertResult.totalMaterialCost) }}</span>
+                          </div>
+                        </div>
                       </div>
-                      <div class="col-4 border-end">
-                        <small class="text-muted d-block">재료비율</small>
-                        <strong class="fs-5"
-                          >{{ expertResult.materialRatio }}%</strong
-                        >
+                      <div class="col-md-3 border-end text-center">
+                        <small class="text-muted d-block">매출원가율</small>
+                        <strong class="fs-4">{{ expertResult.materialRatio }}%</strong>
                       </div>
-                      <div class="col-4">
-                        <small class="text-muted d-block"
-                          >1차년도 연 예상 재료비</small
-                        >
-                        <strong class="fs-5 text-danger"
-                          >{{ formatCurrency(expertResult.totalMaterialCost *
-                          12) }}</strong
-                        >
+                      <div class="col-md-4 text-center">
+                        <small class="text-muted d-block">1차년도 연 예상 매출원가</small>
+                        <strong class="fs-5 text-danger">{{ formatCurrency(expertResult.totalCOGS * 12) }}</strong>
                       </div>
                     </div>
                   </div>
@@ -5923,6 +5939,15 @@
               cogsYearly: cogsResult,
               yearlyPNL,
               totalFixedCost: Math.round((bepAnalysis[0]?.totalFC || 0) / 12),
+              Dash_Mfg_Labor: prodLaborSalaries,
+              Dash_Mfg_Exp: (data.expense.production || [])
+                .filter(
+                  (e) =>
+                    e.expenseTitle !== "급여" &&
+                    e.expenseTitle !== "감가상각비" &&
+                    e.expenseTitle !== "이자비용",
+                )
+                .reduce((sum, e) => sum + (e.expenseAmt?.[0] || 0), 0),
               ordAmtYear: yearlyPNL.map((p) => p.ord),
               assetAmtYear: bsAnalysis.map((b) => b.totalAsset),
               equityAmtYear: bsAnalysis.map((b) => b.totalEquity),
@@ -6112,22 +6137,47 @@
                 ? (((analysis.Dash_VC_Exp + analysis.Dash_FC_Exp) / analysis.S_mon) * 100).toFixed(1)
                 : "0.0";
 
+            const isMfg = expertData.basic.industryCd === "1";
+            const totalCOGS = isMfg
+              ? analysis.Dash_Material +
+                analysis.Dash_Mfg_Labor +
+                analysis.Dash_Mfg_Exp
+              : analysis.Dash_Material;
+            const totalLaborCost = isMfg
+              ? analysis.Dash_Labor - analysis.Dash_Mfg_Labor
+              : analysis.Dash_Labor;
+            const totalExpense = isMfg
+              ? analysis.Dash_VC_Exp + analysis.Dash_FC_Exp - analysis.Dash_Mfg_Exp
+              : analysis.Dash_VC_Exp + analysis.Dash_FC_Exp;
+
             return {
               totalRevenue: analysis.S_mon,
               yearlySales,
+              totalCOGS,
               totalMaterialCost: analysis.Dash_Material,
-              totalLaborCost: analysis.Dash_Labor,
+              totalMfgLabor: analysis.Dash_Mfg_Labor,
+              totalMfgExp: analysis.Dash_Mfg_Exp,
+              isMfg,
+              totalLaborCost,
               totalInterest: analysis.Interest_mon,
               totalDepreciation: analysis.Dash_Depr,
-              totalExpense: analysis.Dash_VC_Exp + analysis.Dash_FC_Exp, // Total SGA Overhead
+              totalExpense, // Total SGA Overhead
               opIncome: analysis.OP,
-              totalCOGS: analysis.Dash_Material,
               marginalProfitRate: analysis.marginalProfitRate,
 
               opMargin,
-              materialRatio,
-              laborRatio,
-              expenseRatio,
+              materialRatio:
+                analysis.S_mon > 0
+                  ? ((totalCOGS / analysis.S_mon) * 100).toFixed(1)
+                  : "0.0",
+              laborRatio:
+                analysis.S_mon > 0
+                  ? ((totalLaborCost / analysis.S_mon) * 100).toFixed(1)
+                  : "0.0",
+              expenseRatio:
+                analysis.S_mon > 0
+                  ? ((totalExpense / analysis.S_mon) * 100).toFixed(1)
+                  : "0.0",
 
               targetGap,
               revenueNeededForTarget:
