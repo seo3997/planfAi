@@ -4138,12 +4138,22 @@ body {
 
 .dash-row {
   display: flex;
+  flex-wrap: wrap;
   gap: 30px;
   margin-top: 20px;
 }
 
 .dash-section {
-  flex: 1;
+  flex: 1 1 450px;
+  min-width: 320px;
+}
+
+/* Tablet & Mobile Breakpoint */
+@media (max-width: 1200px) {
+  .dash-section {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+  }
 }
 
 .dash-title {
