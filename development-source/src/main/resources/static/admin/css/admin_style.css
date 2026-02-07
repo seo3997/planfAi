@@ -3860,7 +3860,8 @@ body {
 
 .filter-content .form-control,
 .filter-content .form-select {
-  width: 100% !important; /* Expansion to fill the 50% slot */
+  width: 100%;
+  flex: 1;
 }
 
 .search-filter-actions {
