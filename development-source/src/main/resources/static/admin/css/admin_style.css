@@ -3643,8 +3643,6 @@ body {
 
 /* Form & Info Tables (Detail/Form pages) */
 .form-section {
-  background: #fff;
-  border: 1px solid #dee2e6;
   padding: 0;
   margin-bottom: 30px;
 }
