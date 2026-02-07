@@ -3708,38 +3708,32 @@ body {
   border-color: #d44e2b !important;
 }
 
-/* Custom Standard Buttons - Forced Symmetry */
-button.btn-search,
-button.btn-reset {
-  width: 85px !important;
-  height: 32px !important;
-  padding: 0 !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 5px !important;
-  font-size: 13px !important;
-  font-weight: 500 !important;
-  border-radius: 4px !important;
-  border: none !important;
-  transition: all 0.2s !important;
-  line-height: normal !important;
-}
 
-button.btn-search {
-  background-color: var(--logo-bg) !important; /* Teal #49a7b0 */
-  color: white !important;
+/* Custom Theme Buttons - Used with .btn .btn-sm */
+.btn-search {
+  background-color: var(--logo-bg) !important;
+  border-color: var(--logo-bg) !important;
+  color: #fff !important;
+  min-width: 85px;
 }
-button.btn-search:hover {
+.btn-search:hover, 
+.btn-search:focus {
   background-color: #3d8c94 !important;
+  border-color: #3d8c94 !important;
+  color: #fff !important;
 }
 
-button.btn-reset {
+.btn-reset {
   background-color: #6c757d !important;
-  color: white !important;
+  border-color: #6c757d !important;
+  color: #fff !important;
+  min-width: 85px;
 }
-button.btn-reset:hover {
+.btn-reset:hover, 
+.btn-reset:focus {
   background-color: #5a6268 !important;
+  border-color: #5a6268 !important;
+  color: #fff !important;
 }
 
 /* Common Buttons Cleanup */
