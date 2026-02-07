@@ -39,7 +39,7 @@
             </div>
 
             <!-- Right: Management Forms -->
-            <div class="form-section form-section-card">
+            <b-card class="mgmt-card shadow-sm border-0 flex-grow-1">
                 <!-- Top: Edit Form -->
                 <div v-if="selectedId">
                     <table class="form-table">
@@ -85,10 +85,10 @@
                             <td colspan="3"><input type="text" v-model="editForm.url" class="form-control"></td>
                         </tr>
                     </table>
-                    <div class="btn-action-group">
-                        <button class="btn-update-major" @click="saveEdit"><i class="bi bi-pencil-square me-1"></i>수정</button>
-                        <button class="btn-delete-major" @click="deleteMenu(selectedId)"><i class="bi bi-trash me-1"></i>삭제</button>
-                        <button class="btn-new-major" @click="showNewForm"><i class="bi bi-plus-lg me-1"></i>신규등록</button>
+                    <div class="btn-action-group mt-3">
+                        <b-button variant="primary" @click="saveEdit"><i class="bi bi-pencil-square me-1"></i>수정</b-button>
+                        <b-button variant="danger" @click="deleteMenu(selectedId)"><i class="bi bi-trash me-1"></i>삭제</b-button>
+                        <b-button variant="success" @click="showNewForm"><i class="bi bi-plus-lg me-1"></i>신규등록</b-button>
                     </div>
                 </div>
                 <div v-else class="text-center py-5 text-muted">
@@ -97,16 +97,16 @@
 
                 <div v-if="isNewFormVisible" class="mt-4 pt-4 border-top">
                     <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-                        <div class="cardTitle" style="font-size: 16px;">
-                            <i class="bi bi-plus-square-fill color-blue me-2"></i>신규 메뉴 추가
-                        </div>
-                        <button class="btn btn-sm btn-outline-primary" @click="addNewMenuForm">
+                        <h4 class="mb-0" style="font-size: 16px; font-weight: 600; color: #3b5998;">
+                            <i class="bi bi-plus-square-fill me-2"></i>신규 메뉴 추가
+                        </h4>
+                        <b-button variant="outline-primary" size="sm" @click="addNewMenuForm">
                             <i class="bi bi-plus-lg me-1"></i>항목 추가
-                        </button>
+                        </b-button>
                     </div>
 
                     <div v-for="(form, index) in newMenus" :key="index" class="mb-5 p-3 position-relative" style="background: #fcfcfc; border: 1px dashed #ddd; border-radius: 8px;">
-                        <button v-if="newMenus.length > 1" class="btn btn-sm btn-danger position-absolute" style="top: 10px; right: 10px;" @click="removeMenuForm(index)">삭제</button>
+                        <b-button v-if="newMenus.length > 1" variant="danger" size="sm" class="position-absolute" style="top: 10px; right: 10px;" @click="removeMenuForm(index)">삭제</b-button>
                         
                         <table class="form-table">
                             <tr>
@@ -115,9 +115,9 @@
                                     <div class="d-flex gap-2 align-items-center">
                                         <input type="text" v-model="form.parentMenuId" class="form-control" readonly style="width: 250px; background-color: #f1f1f1;">
                                         <input type="text" v-model="form.subMenuId" class="form-control" placeholder="메뉴ID 4자리" maxlength="4" style="width: 150px;" @input="form.isIdChecked = false">
-                                        <button class="btn-dup-check" :class="{ 'is-checked': form.isIdChecked }" @click="checkIdDuplicate(index)">
+                                        <b-button variant="secondary" size="sm" :class="{ 'btn-success': form.isIdChecked }" @click="checkIdDuplicate(index)">
                                             {{ form.isIdChecked ? '확인완료' : '중복확인' }}
-                                        </button>
+                                        </b-button>
                                     </div>
                                 </td>
                             </tr>
@@ -155,11 +155,11 @@
                     </div>
 
                     <div class="d-flex justify-content-center gap-2 mt-4 pb-5">
-                        <button class="btn btn-secondary" @click="isNewFormVisible = false">취소</button>
-                        <button class="btn btn-primary px-5" @click="registerMenus">등록</button>
+                        <b-button variant="secondary" @click="isNewFormVisible = false">취소</b-button>
+                        <b-button variant="primary" class="px-5" @click="registerMenus">등록</b-button>
                     </div>
                 </div>
-            </div>
+            </b-card>
         </div>
     </div>
 

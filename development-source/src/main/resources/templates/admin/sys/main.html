@@ -12,31 +12,36 @@
             <div class="dash-section" style="max-width: 450px;">
                 <div class="dash-title">주요 현황</div>
                 
-                <div class="dash-card blue">
+                <b-card class="dash-card blue shadow-sm border-0 mb-3">
                     <div class="card-label">회원수</div>
                     <div class="card-value">
                         <span class="accrue">1</span>
                         <span class="accrue-unit">명</span>
                     </div>
-                </div>
+                </b-card>
 
-                <div class="dash-card green">
+                <b-card class="dash-card green shadow-sm border-0 mb-3">
                     <div class="card-label">소상공인 수익 분석 리포트 건수</div>
                     <div class="card-value">
                         <span class="accrue">1</span>
                         <span class="accrue-unit">건</span>
                     </div>
-                </div>
+                </b-card>
             </div>
 
             <!-- Right Section: Board -->
-            <div class="dash-section">
-                <div class="dash-title">
-                    게시판
-                    <button class="btn-plus"><i class="bi bi-plus"></i></button>
-                </div>
-                
-                <div class="data-table-wrapper" style="border-top: 2px solid #f0f0f0;">
+            <div class="dash-section flex-grow-1">
+                <b-card class="mgmt-card shadow-sm border-0 h-100">
+                    <template #header>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h3 class="section-title mb-0">공지사항</h3>
+                            <b-button variant="outline-primary" size="sm" class="rounded-circle p-0" style="width: 24px; height: 24px;">
+                                <i class="bi bi-plus"></i>
+                            </b-button>
+                        </div>
+                    </template>
+                    
+                    <div class="data-table-wrapper">
                     <table class="data-table">
                         <thead style="background-color: #f9f9f9;">
                             <tr>
@@ -55,7 +60,8 @@
                             </tr>
                         </tbody>
                     </table>
-                </div>
+                    </div>
+                </b-card>
             </div>
         </div>
     </div>

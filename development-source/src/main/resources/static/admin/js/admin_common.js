@@ -308,6 +308,10 @@ const AdminPagination = {
 
 const AdminLayout = {
     register(app) {
+        const bvn = window['bootstrap-vue-next'];
+        if (bvn) {
+            app.use(bvn.BootstrapVueNext || bvn.default || bvn);
+        }
         app.component('admin-header', AdminHeader);
         app.component('admin-sidebar', AdminSidebar);
         app.component('admin-footer', AdminFooter);

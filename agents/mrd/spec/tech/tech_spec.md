@@ -20,11 +20,13 @@
 
 ### Frontend (Vue.js)
 
-- **Framework**: Vue 3 (CDN 방식)
-- **UI Library**: Bootstrap 5 (CDN)
-- **Icons**: Bootstrap Icons (CDN)
-- **Charts**: Chart.js (CDN)
-- **HTTP Client**: Axios (CDN)
+Framework: Vue 3 (CDN 방식)
+UI Library (Admin): BootstrapVueNext (Bootstrap 5 기반 Vue 컴포넌트 라이브러리)
+UI Library (Front): Bootstrap 5 (Pure) (클래스 기반 커스텀 디자인용)
+Icons: Bootstrap Icons (CDN)
+Charts: Chart.js (CDN)
+HTTP Client: Axios (CDN)
+
 - **특이사항**: 별도의 빌드 과정(npm/vite) 없이 브라우저에서 직접 실행되는 Single File 구조 활용.
 
 ## 3. 프로젝트 구조 (Standard Directory Layout)

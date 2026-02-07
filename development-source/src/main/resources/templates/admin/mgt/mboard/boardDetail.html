@@ -13,8 +13,10 @@
             </div>
         </div>
 
-        <div class="form-section mgmt-card">
-            <h3 class="section-title">게시글 상세 정보</h3>
+        <b-card class="mgmt-card shadow-sm border-0">
+            <template #header>
+                <h3 class="section-title mb-0">게시글 상세 정보</h3>
+            </template>
             <table class="info-table">
                 <tr>
                     <th>게시판 구분</th>
@@ -59,12 +61,12 @@
                     </td>
                 </tr>
             </table>
-        </div>
+        </b-card>
 
         <div class="d-flex justify-content-center gap-2 mt-4 mb-5">
-            <button class="btn btn-list" @click="goList"><i class="bi bi-reply"></i> 목록</button>
-            <button class="btn btn-edit" @click="goUpdate"><i class="bi bi-pencil-square"></i> 수정</button>
-            <button class="btn btn-delete" @click="deleteBoard"><i class="bi bi-trash"></i> 삭제</button>
+            <b-button variant="outline-secondary" @click="goList"><i class="bi bi-reply me-1"></i>목록</b-button>
+            <b-button variant="primary" @click="goUpdate"><i class="bi bi-pencil-square me-1"></i>수정</b-button>
+            <b-button variant="danger" @click="deleteBoard"><i class="bi bi-trash me-1"></i>삭제</b-button>
         </div>
     </div>
 

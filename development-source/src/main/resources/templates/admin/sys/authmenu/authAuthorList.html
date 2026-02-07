@@ -15,7 +15,10 @@
             </div>
         </div>
 
-        <div class="mgmt-card">
+        <b-card class="mgmt-card shadow-sm border-0">
+            <template #header>
+                <h3 class="section-title mb-0">권한 목록</h3>
+            </template>
             <!-- 검색 영역 -->
             <table class="search-table mb-4">
                 <tr>
@@ -27,8 +30,8 @@
                 <tr class="search-actions-row">
                     <td colspan="2">
                         <div class="d-flex justify-content-end p-2 gap-2">
-                            <button class="btn-init d-flex align-items-center" @click="resetSearch"><i class="bi bi-arrow-counterclockwise me-1"></i> 초기화</button>
-                            <button class="btn-search-submit d-flex align-items-center" @click="fetchAuthors"><i class="bi bi-search me-1"></i> 검색</button>
+                            <b-button variant="outline-secondary" size="sm" @click="resetSearch"><i class="bi bi-arrow-counterclockwise me-1"></i>초기화</b-button>
+                            <b-button variant="primary" size="sm" @click="fetchAuthors"><i class="bi bi-search me-1"></i>검색</b-button>
                         </div>
                     </td>
                 </tr>
@@ -57,7 +60,7 @@
                     </tbody>
                 </table>
             </div>
-        </div>
+        </b-card>
     </div>
 
     <div id="admin-authmenu-script">

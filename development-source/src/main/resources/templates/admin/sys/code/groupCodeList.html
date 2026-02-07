@@ -15,7 +15,7 @@
             </div>
         </div>
 
-        <div class="mgmt-card">
+        <b-card class="mgmt-card shadow-sm border-0">
             <!-- 검색 영역 -->
             <table class="search-table mb-4">
                 <tr>
@@ -27,8 +27,8 @@
                 <tr class="search-actions-row">
                     <td colspan="2">
                         <div class="d-flex justify-content-end p-2 gap-2">
-                            <button class="btn-init d-flex align-items-center" @click="resetSearch"><i class="bi bi-arrow-counterclockwise me-1"></i> 초기화</button>
-                            <button class="btn-search-submit d-flex align-items-center" @click="fetchGroups"><i class="bi bi-search me-1"></i> 검색</button>
+                            <b-button variant="outline-secondary" size="sm" @click="resetSearch"><i class="bi bi-arrow-counterclockwise me-1"></i>초기화</b-button>
+                            <b-button variant="primary" size="sm" @click="fetchGroups"><i class="bi bi-search me-1"></i>검색</b-button>
                         </div>
                     </td>
                 </tr>
@@ -39,8 +39,8 @@
                     검색결과 <span class="text-primary fw-bold">{{ totCnt }}</span>개
                 </div>
                 <div class="d-flex gap-2">
-                    <button class="btn btn-delete" @click="deleteSelected"><i class="bi bi-trash"></i> 삭제</button>
-                    <button class="btn-regist" @click="goRegister"><i class="bi bi-pencil"></i> 등록</button>
+                    <b-button variant="danger" size="sm" @click="deleteSelected"><i class="bi bi-trash me-1"></i>삭제</b-button>
+                    <b-button variant="primary" size="sm" @click="goRegister"><i class="bi bi-pencil me-1"></i>등록</b-button>
                 </div>
             </div>
 
@@ -75,13 +75,16 @@
             </div>
 
             <!-- 페이징 컴포넌트 -->
-            <admin-pagination 
-                :total-count="totCnt" 
-                :current-page="page" 
-                :page-size="size"
-                @change-page="handlePageChange">
-            </admin-pagination>
-        </div>
+            <div class="mt-4 d-flex justify-content-center">
+                <b-pagination
+                    v-model="page"
+                    :total-rows="totCnt"
+                    :per-page="size"
+                    size="sm"
+                    @update:model-value="handlePageChange"
+                ></b-pagination>
+            </div>
+        </b-card>
     </div>
 
     <div id="admin-code-script">

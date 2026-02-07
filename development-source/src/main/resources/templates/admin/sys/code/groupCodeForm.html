@@ -15,8 +15,10 @@
             </div>
         </div>
 
-        <div class="form-section mgmt-card">
-            <h3 class="section-title">그룹코드 정보</h3>
+        <b-card class="mgmt-card shadow-sm border-0">
+            <template #header>
+                <h3 class="section-title mb-0">그룹코드 정보</h3>
+            </template>
             <table class="form-table">
                 <tr>
                     <th>그룹코드</th>
@@ -35,11 +37,11 @@
                     <td><textarea v-model="form.rm" class="form-control" rows="3" placeholder="기타 참고사항을 입력하세요"></textarea></td>
                 </tr>
             </table>
-        </div>
+        </b-card>
 
         <div class="d-flex justify-content-center gap-2 mt-4">
-            <button class="btn-list" @click="goBack"><i class="bi bi-list"></i> 목록</button>
-            <button class="btn-submit" @click="saveGroup"><i class="bi bi-check-lg"></i> 저장</button>
+            <b-button variant="outline-secondary" @click="goBack"><i class="bi bi-list me-1"></i>목록</b-button>
+            <b-button variant="primary" @click="saveGroup"><i class="bi bi-check-lg me-1"></i>저장</b-button>
         </div>
     </div>
 

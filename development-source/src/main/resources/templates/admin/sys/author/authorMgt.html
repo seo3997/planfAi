@@ -15,7 +15,7 @@
             </div>
         </div>
 
-        <div class="mgmt-card">
+        <b-card class="mgmt-card shadow-sm border-0">
             <!-- 검색 영역 -->
             <table class="search-table mb-4">
                 <tr>
@@ -27,16 +27,16 @@
                 <tr class="search-actions-row">
                     <td colspan="2">
                         <div class="d-flex justify-content-end p-2 gap-2">
-                            <button class="btn-init d-flex align-items-center" @click="resetSearch"><i class="bi bi-arrow-counterclockwise me-1"></i> 초기화</button>
-                            <button class="btn-search-submit d-flex align-items-center" @click="fetchAuthors"><i class="bi bi-search me-1"></i> 검색</button>
+                            <b-button variant="outline-secondary" size="sm" @click="resetSearch"><i class="bi bi-arrow-counterclockwise me-1"></i>초기화</b-button>
+                            <b-button variant="primary" size="sm" @click="fetchAuthors"><i class="bi bi-search me-1"></i>검색</b-button>
                         </div>
                     </td>
                 </tr>
             </table>
 
             <!-- Action Button -->
-            <div class="actions-area">
-                <button class="btn-action btn-register" @click="openModal()"><i class="bi bi-pencil-square"></i> 등록</button>
+            <div class="mb-3">
+                <b-button variant="primary" size="sm" @click="openModal"><i class="bi bi-pencil-square me-1"></i>등록</b-button>
             </div>
 
             <div class="data-table-wrapper">
@@ -56,9 +56,9 @@
                             <td class="text-start px-4">{{ author.authorNm }}</td>
                             <td>{{ author.registerNm }}</td>
                             <td>{{ author.registYmd }}</td>
-                            <td>
-                                <button class="btn btn-sm btn-table-edit me-1" @click="editAuthor(author)">수정</button>
-                                <button class="btn btn-sm btn-table-del" @click="deleteAuthor(author.authorId)">삭제</button>
+                             <td>
+                                <b-button variant="outline-primary" size="sm" class="me-1" @click="editAuthor(author)">수정</b-button>
+                                <b-button variant="outline-danger" size="sm" @click="deleteAuthor(author.authorId)">삭제</b-button>
                             </td>
                         </tr>
                         <tr v-if="authorList.length === 0">
@@ -69,35 +69,27 @@
             </div>
         </div>
 
+        </b-card>
+
         <!-- Author Modal -->
-        <div class="modal fade" id="authorModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">{{ modalTitle }}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label class="form-label">권한 ID</label>
-                            <input type="text" v-model="form.authorId" class="form-control" :readonly="isEdit" placeholder="예: ROLE_ADMIN">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">권한명</label>
-                            <input type="text" v-model="form.authorNm" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">비고</label>
-                            <textarea v-model="form.rm" class="form-control" rows="3"></textarea>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                        <button type="button" class="btn btn-primary" @click="saveAuthor">저장</button>
-                    </div>
-                </div>
+        <b-modal id="authorModal" v-model="showModal" :title="modalTitle" @ok="saveAuthor">
+            <div class="mb-3">
+                <label class="form-label">권한 ID</label>
+                <b-form-input v-model="form.authorId" :readonly="isEdit" placeholder="예: ROLE_ADMIN"></b-form-input>
             </div>
-        </div>
+            <div class="mb-3">
+                <label class="form-label">권한명</label>
+                <b-form-input v-model="form.authorNm" required></b-form-input>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">비고</label>
+                <b-form-textarea v-model="form.rm" rows="3"></b-form-textarea>
+            </div>
+            <template #footer="{ ok, cancel }">
+                <b-button variant="secondary" size="sm" @click="cancel">취소</b-button>
+                <b-button variant="primary" size="sm" @click="ok">저장</b-button>
+            </template>
+        </b-modal>
     </div>
 
     <div id="admin-author-script">
@@ -111,10 +103,10 @@
                     const totCnt = ref(0);
                     const schAuthNm = ref('');
                     const loading = ref(true);
+                    const showModal = ref(false);
                     const form = ref({ authorId: '', authorNm: '', rm: '' });
                     const modalTitle = ref('권한 등록');
                     const isEdit = ref(false);
-                    let modalObj = null;
 
                     const fetchAuthors = () => {
                         loading.value = true;
@@ -131,14 +123,14 @@
                         isEdit.value = false;
                         form.value = { authorId: '', authorNm: '', rm: '' };
                         modalTitle.value = '권한 등록';
-                        modalObj.show();
+                        showModal.value = true;
                     };
 
                     const editAuthor = (author) => {
                         isEdit.value = true;
                         form.value = { ...author };
                         modalTitle.value = '권한 수정';
-                        modalObj.show();
+                        showModal.value = true;
                     };
 
                     const saveAuthor = () => {
@@ -146,7 +138,7 @@
                             axios.put('/api/admin/author', form.value)
                                 .then(res => {
                                     alert(res.data);
-                                    modalObj.hide();
+                                    showModal.value = false;
                                     fetchAuthors();
                                 })
                                 .catch(err => AdminUtil.handleApiError(err, '저장 실패'));
@@ -154,7 +146,7 @@
                             axios.post('/api/admin/author', form.value)
                                 .then(res => {
                                     alert(res.data);
-                                    modalObj.hide();
+                                    showModal.value = false;
                                     fetchAuthors();
                                 })
                                 .catch(err => AdminUtil.handleApiError(err, '저장 실패'));
@@ -179,11 +171,10 @@
 
                     onMounted(() => {
                         AdminMenu.init();
-                        modalObj = new bootstrap.Modal(document.getElementById('authorModal'));
                         fetchAuthors();
                     });
 
-                    return { authorList, totCnt, schAuthNm, loading, form, modalTitle, isEdit, openModal, editAuthor, saveAuthor, deleteAuthor, fetchAuthors, resetSearch };
+                    return { authorList, totCnt, schAuthNm, loading, form, modalTitle, isEdit, showModal, openModal, editAuthor, saveAuthor, deleteAuthor, fetchAuthors, resetSearch };
                 }
             });
             AdminLayout.register(app);
