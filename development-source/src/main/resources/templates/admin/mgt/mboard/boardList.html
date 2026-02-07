@@ -54,27 +54,30 @@
             </div>
 
             <div class="data-table-wrapper">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 80px;">No</th>
-                            <th>자료제목</th>
-                            <th style="width: 150px;">작성자</th>
-                            <th style="width: 150px;">작성일</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(item, index) in boardList" :key="item.BBS_SEQ" @click="goDetail(item.BBS_SEQ)" style="cursor: pointer;">
-                            <td>{{ totalCount - ((currentPage - 1) * pageSize) - index }}</td>
-                            <td class="text-start px-3 text-dark">{{ item.SJ }}</td>
-                            <td>{{ item.REGISTER_NM }}</td>
-                            <td>{{ formatDate(item.REGIST_DT) }}</td>
-                        </tr>
-                        <tr v-if="boardList.length === 0">
-                            <td colspan="4" class="text-center py-5 text-muted">등록된 게시글이 없습니다.</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <b-table
+                    class="admin-b-table"
+                    :items="boardList"
+                    :fields="fields"
+                    hover
+                    @row-clicked="(item) => goDetail(item.BBS_SEQ)"
+                    show-empty
+                    empty-text="등록된 게시글이 없습니다."
+                >
+                    <!-- No (Index) -->
+                    <template #cell(no)="data">
+                        {{ totalCount - ((currentPage - 1) * pageSize) - data.index }}
+                    </template>
+
+                    <!-- 자료제목 -->
+                    <template #cell(SJ)="data">
+                        <span class="text-dark">{{ data.value }}</span>
+                    </template>
+
+                    <!-- 작성일 -->
+                    <template #cell(REGIST_DT)="data">
+                        {{ formatDate(data.value) }}
+                    </template>
+                </b-table>
             </div>
 
             <!-- 페이징 -->
@@ -153,8 +156,15 @@
                         fetchBoardList();
                     });
 
+                    const fields = [
+                        { key: 'no', label: 'No', thStyle: { width: '80px' } },
+                        { key: 'SJ', label: '자료제목', tdClass: 'text-start px-3' },
+                        { key: 'REGISTER_NM', label: '작성자', thStyle: { width: '150px' } },
+                        { key: 'REGIST_DT', label: '작성일', thStyle: { width: '150px' } }
+                    ];
+
                     return {
-                        boardList, totalCount, currentPage, pageSize,
+                        boardList, totalCount, currentPage, pageSize, fields,
                         searchDto, categoryCodes,
                         fetchBoardList, resetSearch, handlePageChange, goDetail, goForm, formatDate
                     };

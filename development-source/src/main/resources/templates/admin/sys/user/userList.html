@@ -94,39 +94,47 @@
             </div>
 
             <div class="data-table-wrapper">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 80px;">No</th>
-                            <th style="width: 120px;">사용자No</th>
-                            <th>사용자ID</th>
-                            <th style="width: 200px;">권한명</th>
-                            <th style="width: 150px;">지역</th>
-                            <th style="width: 150px;">가입일</th>
-                            <th style="width: 120px;">상태</th>
-                            <th style="width: 150px;">등록자</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(user, index) in userList" :key="user.userNo" @click="goDetail(user.userNo)" style="cursor: pointer;">
-                            <td>{{ totalCount - ((currentPage - 1) * pageSize) - index }}</td>
-                            <td>{{ user.userNo }}</td>
-                            <td class="text-start px-3 text-dark">{{ user.userId }}</td>
-                            <td>{{ user.authorNm }}</td>
-                            <td>{{ user.areaNm || '' }} {{ user.areaSeNm || '' }}</td>
-                            <td>{{ formatDate(user.registDt) }}</td>
-                            <td>
-                                <span class="status-badge" :class="user.userSttusNm === '활동' ? 'status-active' : ''">
-                                    {{ user.userSttusNm }}
-                                </span>
-                            </td>
-                            <td>{{ user.registerNm || '' }}</td>
-                        </tr>
-                        <tr v-if="userList.length === 0">
-                            <td colspan="7" class="text-center py-5 text-muted">결과가 없습니다.</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <b-table
+                    class="admin-b-table"
+                    :items="userList"
+                    :fields="fields"
+                    hover
+                    @row-clicked="(item) => goDetail(item.userNo)"
+                    show-empty
+                    empty-text="결과가 없습니다."
+                >
+                    <!-- No (Index) -->
+                    <template #cell(no)="data">
+                        {{ totalCount - ((currentPage - 1) * pageSize) - data.index }}
+                    </template>
+
+                    <!-- 사용자ID (Custom alignment and style) -->
+                    <template #cell(userId)="data">
+                        <span class="text-dark">{{ data.value }}</span>
+                    </template>
+
+                    <!-- 지역 (Combined area info) -->
+                    <template #cell(areaInfo)="data">
+                        {{ data.item.areaNm || '' }} {{ data.item.areaSeNm || '' }}
+                    </template>
+
+                    <!-- 가입일 (Date formatting) -->
+                    <template #cell(registDt)="data">
+                        {{ formatDate(data.value) }}
+                    </template>
+
+                    <!-- 상태 (Badge) -->
+                    <template #cell(userSttusNm)="data">
+                        <span class="status-badge" :class="data.value === '활동' ? 'status-active' : ''">
+                            {{ data.value }}
+                        </span>
+                    </template>
+
+                    <!-- 등록자 (Empty check) -->
+                    <template #cell(registerNm)="data">
+                        {{ data.value || '' }}
+                    </template>
+                </b-table>
             </div>
 
             <!-- Pagination -->
@@ -254,8 +262,19 @@
                         fetchUsers();
                     });
 
+                    const fields = [
+                        { key: 'no', label: 'No', thStyle: { width: '80px' } },
+                        { key: 'userNo', label: '사용자No', thStyle: { width: '120px' } },
+                        { key: 'userId', label: '사용자ID', tdClass: 'text-start px-3' },
+                        { key: 'authorNm', label: '권한명', thStyle: { width: '200px' } },
+                        { key: 'areaInfo', label: '지역', thStyle: { width: '150px' } },
+                        { key: 'registDt', label: '가입일', thStyle: { width: '150px' } },
+                        { key: 'userSttusNm', label: '상태', thStyle: { width: '120px' } },
+                        { key: 'registerNm', label: '등록자', thStyle: { width: '150px' } }
+                    ];
+
                     return { 
-                        userList, authors, statusCodes, totalCount, currentPage, pageSize, 
+                        userList, authors, statusCodes, totalCount, currentPage, pageSize, fields,
                         searchDto, dateType, fetchUsers, resetSearch, 
                         formatDate, handlePageChange, goDetail, goRegister 
                     };

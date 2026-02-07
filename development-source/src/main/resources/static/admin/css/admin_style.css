@@ -3664,6 +3664,36 @@ body {
   cursor: pointer;
 }
 
+/* BootstrapVueNext b-table Overrides */
+.admin-b-table {
+    margin-bottom: 0 !important;
+    border-collapse: collapse !important;
+}
+.admin-b-table thead th {
+    background-color: #f4f7f9 !important;
+    border: 1px solid #ddd !important;
+    padding: 12px !important;
+    font-size: 14px !important;
+    color: #333 !important;
+    text-align: center !important;
+    font-weight: 500 !important;
+    height: 42px !important;
+    vertical-align: middle !important;
+}
+.admin-b-table td {
+    border: 1px solid #ddd !important;
+    padding: 10px 12px !important;
+    text-align: center !important;
+    font-size: 13.5px !important;
+    height: 40px !important;
+    vertical-align: middle !important;
+}
+.admin-b-table tbody tr:hover {
+    background-color: #fcfcfc !important;
+    cursor: pointer;
+}
+/* Sort icons and other b-table specific elements can be styled here if needed */
+
 /* Form & Info Tables (Detail/Form pages) */
 .form-section {
   padding: 0;

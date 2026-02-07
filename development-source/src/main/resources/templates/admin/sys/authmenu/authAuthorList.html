@@ -39,27 +39,20 @@
             </div>
 
             <div class="data-table-wrapper">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 80px;">No</th>
-                            <th>권한명</th>
-                            <th style="width: 200px;">등록자</th>
-                            <th style="width: 200px;">등록일</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(author, index) in authorList" :key="author.AUTHOR_ID" class="cursor-pointer" @click="goToMapping(author.AUTHOR_ID)">
-                            <td>{{ totCnt - index }}</td>
-                            <td class="text-start px-4">{{ author.AUTHOR_NM }}</td>
-                            <td>{{ author.USER_NM }}</td>
-                            <td>{{ author.REGIST_YMD }}</td>
-                        </tr>
-                        <tr v-if="authorList.length === 0">
-                            <td colspan="4" class="text-center py-5 text-muted">조회된 권한이 없습니다.</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <b-table
+                    class="admin-b-table"
+                    :items="authorList"
+                    :fields="fields"
+                    hover
+                    @row-clicked="(item) => goToMapping(item.AUTHOR_ID)"
+                    show-empty
+                    empty-text="조회된 권한이 없습니다."
+                >
+                    <!-- No (Index) -->
+                    <template #cell(no)="data">
+                        {{ totCnt - data.index }}
+                    </template>
+                </b-table>
             </div>
         </div>
     </div>
@@ -97,7 +90,14 @@
                         fetchAuthors();
                     });
 
-                    return { authorList, totCnt, schAuthNm, fetchAuthors, goToMapping, resetSearch };
+                    const fields = [
+                        { key: 'no', label: 'No', thStyle: { width: '80px' } },
+                        { key: 'AUTHOR_NM', label: '권한명', tdClass: 'text-start px-4' },
+                        { key: 'USER_NM', label: '등록자', thStyle: { width: '200px' } },
+                        { key: 'REGIST_YMD', label: '등록일', thStyle: { width: '200px' } }
+                    ];
+
+                    return { authorList, totCnt, schAuthNm, fields, fetchAuthors, goToMapping, resetSearch };
                 }
             });
             AdminLayout.register(app);

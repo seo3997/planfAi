@@ -49,33 +49,30 @@
             </div>
 
             <div class="data-table-wrapper">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 50px;"><input type="checkbox" v-model="allSelected" @change="selectAll"></th>
-                            <th style="width: 60px;">No</th>
-                            <th style="width: 15%;">그룹코드</th>
-                            <th>그룹코드명</th>
-                            <th>영문그룹코드명</th>
-                            <th style="width: 120px;">등록자</th>
-                            <th style="width: 120px;">등록일</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(item, index) in groupList" :key="item.groupId" @click="goDetail(item.groupId)" style="cursor: pointer;">
-                            <td @click.stop><input type="checkbox" v-model="selectedIds" :value="item.groupId"></td>
-                            <td>{{ totCnt - ((page - 1) * size) - index }}</td>
-                            <td class="fw-medium text-dark">{{ item.groupId }}</td>
-                            <td class="text-start px-3 text-dark">{{ item.groupNm }}</td>
-                            <td class="text-start px-3 text-muted">{{ item.groupNmEng }}</td>
-                            <td>{{ item.registerNm }}</td>
-                            <td>{{ item.registYmd }}</td>
-                        </tr>
-                        <tr v-if="groupList.length === 0">
-                            <td colspan="7" class="text-center py-5 text-muted">검색 결과가 없습니다.</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <b-table
+                    class="admin-b-table"
+                    :items="groupList"
+                    :fields="fields"
+                    hover
+                    @row-clicked="(item) => goDetail(item.groupId)"
+                    show-empty
+                    empty-text="검색 결과가 없습니다."
+                >
+                    <!-- Checkbox Column -->
+                    <template #head(select)>
+                        <input type="checkbox" v-model="allSelected" @change="selectAll">
+                    </template>
+                    <template #cell(select)="data">
+                        <div @click.stop>
+                            <input type="checkbox" v-model="selectedIds" :value="data.item.groupId">
+                        </div>
+                    </template>
+
+                    <!-- No (Index) -->
+                    <template #cell(no)="data">
+                        {{ totCnt - ((page - 1) * size) - data.index }}
+                    </template>
+                </b-table>
             </div>
 
             <!-- 페이징 컴포넌트 -->
@@ -162,8 +159,18 @@
                         fetchGroups();
                     });
 
+                    const fields = [
+                        { key: 'select', label: '', thStyle: { width: '50px' } },
+                        { key: 'no', label: 'No', thStyle: { width: '60px' } },
+                        { key: 'groupId', label: '그룹코드', thStyle: { width: '15%' }, tdClass: 'fw-medium text-dark' },
+                        { key: 'groupNm', label: '그룹코드명', tdClass: 'text-start px-3 text-dark' },
+                        { key: 'groupNmEng', label: '영문그룹코드명', tdClass: 'text-start px-3 text-muted' },
+                        { key: 'registerNm', label: '등록자', thStyle: { width: '120px' } },
+                        { key: 'registYmd', label: '등록일', thStyle: { width: '120px' } }
+                    ];
+
                     return { 
-                        groupList, totCnt, page, size, schGroupNm, selectedIds, allSelected, 
+                        groupList, totCnt, page, size, schGroupNm, selectedIds, allSelected, fields,
                         fetchGroups, resetSearch, handlePageChange, selectAll, goRegister, goDetail, deleteSelected 
                     };
                 }
