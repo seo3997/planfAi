@@ -3751,7 +3751,7 @@ body {
 }
 
 .detail-label {
-  flex: 0 0 160px;
+  flex: 0 0 200px;
   background: #f8f9fa;
   padding: 12px 15px;
   font-weight: 500;
@@ -3762,26 +3762,32 @@ body {
   border-right: 1px solid #eee;
 }
 
+.detail-label.required::after {
+  content: "*";
+  color: #e74c3c;
+  margin-left: 4px;
+}
+
 .detail-content {
   flex: 1;
   padding: 10px 15px;
   font-size: 14px;
   color: #333;
-  min-width: 0; /* Prevents overflow in flex items */
+  min-width: 0;
   display: flex;
   align-items: center;
 }
 
 .detail-content.full-width {
-  flex: 0 0 calc(100% - 160px);
+  flex: 0 0 calc(100% - 200px);
 }
 
 @media (max-width: 991px) {
   .detail-label {
-    flex: 0 0 120px;
+    flex: 0 0 160px;
   }
   .detail-content.full-width {
-    flex: 0 0 calc(100% - 120px);
+    flex: 0 0 calc(100% - 160px);
   }
 }
 

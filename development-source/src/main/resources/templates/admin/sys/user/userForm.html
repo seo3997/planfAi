@@ -15,24 +15,24 @@
 
         <div class="form-section mgmt-card">
             <h3 class="section-title">기본정보</h3>
-            <table class="form-table">
-                <tr>
-                    <th class="required">사용자ID</th>
-                    <td>
+            <div class="detail-box">
+                <div class="detail-row">
+                    <div class="detail-label required">사용자ID</div>
+                    <div class="detail-content">
                         <input type="text" class="form-control" v-model="user.userId" placeholder="사용자ID" style="width: 350px;">
-                    </td>
-                    <th class="required">비밀번호</th>
-                    <td>
+                    </div>
+                    <div class="detail-label required">비밀번호</div>
+                    <div class="detail-content">
                         <input type="password" class="form-control" v-model="user.password" placeholder="비밀번호" style="width: 350px;">
-                    </td>
-                </tr>
-                <tr>
-                    <th class="required">이름</th>
-                    <td>
+                    </div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label required">이름</div>
+                    <div class="detail-content">
                         <input type="text" class="form-control" v-model="user.userNm" placeholder="이름" style="width: 350px;">
-                    </td>
-                    <th class="required">연락처</th>
-                    <td>
+                    </div>
+                    <div class="detail-label required">연락처</div>
+                    <div class="detail-content">
                         <div class="input-group-contact">
                             <input type="text" class="form-control text-center" v-model="contact.part1">
                             <span>-</span>
@@ -40,23 +40,23 @@
                             <span>-</span>
                             <input type="text" class="form-control text-center" v-model="contact.part3">
                         </div>
-                    </td>
-                </tr>
-                <tr>
-                    <th class="required">이메일</th>
-                    <td>
+                    </div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label required">이메일</div>
+                    <div class="detail-content">
                         <input type="email" class="form-control" v-model="user.email" placeholder="이메일" style="width: 350px;">
-                    </td>
-                    <th>사용자 상태</th>
-                    <td>
+                    </div>
+                    <div class="detail-label">사용자 상태</div>
+                    <div class="detail-content">
                         <select class="form-select" v-model="user.userSttusCode" style="width: 350px;">
                             <option v-for="st in statusCodes" :key="st.CODE" :value="st.CODE">{{ st.CODE_NM }}</option>
                         </select>
-                    </td>
-                </tr>
-                <tr>
-                    <th>지역</th>
-                    <td colspan="3">
+                    </div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">지역</div>
+                    <div class="detail-content full-width">
                         <div class="d-flex gap-2">
                             <select class="form-select" v-model="user.areaCode" @change="onAreaChange" style="width: 200px;">
                                 <option value="">중분류 선택</option>
@@ -67,9 +67,9 @@
                                 <option v-for="sub in subAreaCodes" :key="sub.CODE" :value="sub.CODE">{{ sub.CODE_NM }}</option>
                             </select>
                         </div>
-                    </td>
-                </tr>
-            </table>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="form-section mgmt-card">
