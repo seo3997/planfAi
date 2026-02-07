@@ -3727,13 +3727,6 @@ body {
   transition: opacity 0.2s;
 }
 
-.btn-search-submit {
-  background-color: var(--header-bg);
-  color: white;
-  border: none;
-  padding: 8px 25px;
-  border-radius: 4px;
-}
 
 .btn-table-edit {
   background: #fff;
