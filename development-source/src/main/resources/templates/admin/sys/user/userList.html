@@ -118,10 +118,6 @@
                         {{ data.item.areaNm || '' }} {{ data.item.areaSeNm || '' }}
                     </template>
 
-                    <!-- 가입일 (Date formatting) -->
-                    <template #cell(registDt)="data">
-                        {{ formatDate(data.value) }}
-                    </template>
 
                     <!-- 상태 (Badge) -->
                     <template #cell(userSttusNm)="data">
@@ -208,10 +204,6 @@
                         fetchUsers();
                     };
 
-                    const formatDate = (dt) => {
-                        if (!dt) return '';
-                        return dt.split(/[ T]/)[0].replace(/-/g, '.');
-                    };
 
                     const handlePageChange = (p) => {
                         currentPage.value = p;
@@ -268,7 +260,7 @@
                         { key: 'userId', label: '사용자ID', tdClass: 'text-start px-3' },
                         { key: 'authorNm', label: '권한명', thStyle: { width: '200px' } },
                         { key: 'areaInfo', label: '지역', thStyle: { width: '150px' } },
-                        { key: 'registDt', label: '가입일', thStyle: { width: '150px' } },
+                        { key: 'registDtStr', label: '가입일자', thStyle: { width: '120px' } },
                         { key: 'userSttusNm', label: '상태', thStyle: { width: '120px' } },
                         { key: 'registerNm', label: '등록자', thStyle: { width: '150px' } }
                     ];
@@ -276,7 +268,7 @@
                     return { 
                         userList, authors, statusCodes, totalCount, currentPage, pageSize, fields,
                         searchDto, dateType, fetchUsers, resetSearch, 
-                        formatDate, handlePageChange, goDetail, goRegister 
+                        handlePageChange, goDetail, goRegister 
                     };
                 }
             });

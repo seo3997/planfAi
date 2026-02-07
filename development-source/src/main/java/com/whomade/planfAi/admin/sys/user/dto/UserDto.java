@@ -34,6 +34,7 @@ public class UserDto {
     private LocalDateTime registDt;
     private Integer updusrNo;
     private LocalDateTime updtDt;
+    private String registDtStr;
 
     // Search fields
     private String searchStatus;

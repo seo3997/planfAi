@@ -15,6 +15,7 @@
             /* 사용자상태코드명 매핑 (GROUP_ID 우선) */
             (SELECT c.CODE_NM FROM op_code c WHERE c.GROUP_ID = 'R010050' AND c.CODE = u.USER_STTUS_CODE) as USER_STTUS_NM,
             u.REGIST_DT,
+            DATE_FORMAT(u.REGIST_DT, '%Y.%m.%d') as REGIST_DT_STR,
             u.REGISTER_NO,
             /* 등록자명 참조 */
             (SELECT r.USER_NM FROM op_user r WHERE r.USER_NO = u.REGISTER_NO) as REGISTER_NM,
