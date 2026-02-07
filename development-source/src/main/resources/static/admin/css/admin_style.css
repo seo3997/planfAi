@@ -3648,14 +3648,15 @@ body {
 }
 
 .section-title {
-  padding: 15px 20px;
-  font-size: 16px;
-  font-weight: 600;
-  color: #2b4c80;
-  border-bottom: 1px solid #eee;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  padding: 0 0 10px 12px;
+  margin-bottom: 20px;
+  font-size: 17px;
+  font-weight: 700;
+  color: #333;
+  border-bottom: none;
+  border-left: 4px solid #3b5998;
+  display: block;
+  line-height: 1.2;
 }
 
 .form-table,
