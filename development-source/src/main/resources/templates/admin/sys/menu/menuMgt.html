@@ -20,7 +20,7 @@
         <div class="menu-mgmt-container">
             <!-- Left: Menu Tree -->
             <div class="tree-section">
-                <div class="tree-header">
+                <div class="tree-header d-flex gap-2 mb-3">
                     <button class="btn-tree-ctrl" @click="toggleAll(false)"><i class="bi bi-folder me-1"></i>접기</button>
                     <button class="btn-tree-ctrl" @click="toggleAll(true)"><i class="bi bi-folder2-open me-1"></i>펼치기</button>
                 </div>
@@ -95,59 +95,68 @@
                     좌측 트리에서 메뉴를 선택해주세요.
                 </div>
 
-                <!-- Bottom: New Registration Form -->
                 <div v-if="isNewFormVisible" class="mt-4 pt-4 border-top">
-                    <div class="cardTitle mb-3" style="font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
-                        <i class="bi bi-plus-square-fill color-blue me-2"></i>신규 메뉴 추가
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                        <div class="cardTitle" style="font-size: 16px;">
+                            <i class="bi bi-plus-square-fill color-blue me-2"></i>신규 메뉴 추가
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary" @click="addNewMenuForm">
+                            <i class="bi bi-plus-lg me-1"></i>항목 추가
+                        </button>
                     </div>
-                    <table class="form-table">
-                        <tr>
-                            <th class="required">상위메뉴 ID</th>
-                            <td colspan="3">
-                                <div class="d-flex gap-2 align-items-center">
-                                    <input type="text" v-model="newForm.parentMenuId" class="form-control" readonly style="width: 250px;">
-                                    <input type="text" v-model="newForm.subMenuId" class="form-control" placeholder="메뉴ID 4자리" maxlength="4" style="width: 150px;" @input="isIdChecked = false">
-                                    <button class="btn-dup-check" :class="{ 'is-checked': isIdChecked }" @click="checkIdDuplicate">
-                                        {{ isIdChecked ? '확인완료' : '중복확인' }}
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th class="required">메뉴명</th>
-                            <td colspan="3"><input type="text" v-model="newForm.menuNm" class="form-control"></td>
-                        </tr>
-                        <tr>
-                            <th class="required">메뉴유형</th>
-                            <td>
-                                <select v-model="newForm.menuTyCode" class="form-select">
-                                    <option value="10">카테고리</option>
-                                    <option value="20">메뉴</option>
-                                    <option value="30">기능</option>
-                                </select>
-                            </td>
-                            <th class="required">정렬순서</th>
-                            <td><input type="number" v-model="newForm.sortOrdr" class="form-control"></td>
-                        </tr>
-                        <tr>
-                            <th>전시여부</th>
-                            <td colspan="3">
-                                <select v-model="newForm.useYn" class="form-select">
-                                    <option value="Y">예</option>
-                                    <option value="N">아니오</option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>URL</th>
-                            <td colspan="3"><input type="text" v-model="newForm.url" class="form-control"></td>
-                        </tr>
-                    </table>
-                    <div class="d-flex justify-content-end mt-2">
-                        <button class="btn-delete-major" style="padding: 5px 15px; font-size: 13px;" @click="isNewFormVisible = false">삭제</button>
+
+                    <div v-for="(form, index) in newMenus" :key="index" class="mb-5 p-3 position-relative" style="background: #fcfcfc; border: 1px dashed #ddd; border-radius: 8px;">
+                        <button v-if="newMenus.length > 1" class="btn btn-sm btn-danger position-absolute" style="top: 10px; right: 10px;" @click="removeMenuForm(index)">삭제</button>
+                        
+                        <table class="form-table">
+                            <tr>
+                                <th class="required">상위메뉴 ID</th>
+                                <td colspan="3">
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <input type="text" v-model="form.parentMenuId" class="form-control" readonly style="width: 250px; background-color: #f1f1f1;">
+                                        <input type="text" v-model="form.subMenuId" class="form-control" placeholder="메뉴ID 4자리" maxlength="4" style="width: 150px;" @input="form.isIdChecked = false">
+                                        <button class="btn-dup-check" :class="{ 'is-checked': form.isIdChecked }" @click="checkIdDuplicate(index)">
+                                            {{ form.isIdChecked ? '확인완료' : '중복확인' }}
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="required">메뉴명</th>
+                                <td colspan="3"><input type="text" v-model="form.menuNm" class="form-control"></td>
+                            </tr>
+                            <tr>
+                                <th class="required">메뉴유형</th>
+                                <td>
+                                    <select v-model="form.menuTyCode" class="form-select">
+                                        <option value="">선택하세요</option>
+                                        <option value="10">카테고리</option>
+                                        <option value="20">메뉴</option>
+                                        <option value="30">기능</option>
+                                    </select>
+                                </td>
+                                <th class="required">정렬순서</th>
+                                <td><input type="number" v-model="form.sortOrdr" class="form-control"></td>
+                            </tr>
+                            <tr>
+                                <th>전시여부</th>
+                                <td colspan="3">
+                                    <select v-model="form.useYn" class="form-select">
+                                        <option value="Y">예</option>
+                                        <option value="N">아니오</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>URL</th>
+                                <td colspan="3"><input type="text" v-model="form.url" class="form-control"></td>
+                            </tr>
+                        </table>
                     </div>
-                    <div class="text-center mt-4">
-                        <button class="btn-register-major" @click="registerMenu">등록</button>
+
+                    <div class="d-flex justify-content-center gap-2 mt-4 pb-5">
+                        <button class="btn btn-secondary" @click="isNewFormVisible = false">취소</button>
+                        <button class="btn btn-primary px-5" @click="registerMenus">등록</button>
                     </div>
                 </div>
             </div>
@@ -221,12 +230,7 @@
                         menuNm: '', menuTyCode: '20', sortOrdr: 1, useYn: 'Y', url: ''
                     });
 
-                    const newForm = reactive({
-                        parentMenuId: '', subMenuId: '',
-                        menuNm: '', menuTyCode: '20', sortOrdr: 1, useYn: 'Y', url: ''
-                    });
-
-                    const isIdChecked = ref(false);
+                    const newMenus = ref([]);
 
                     const buildTree = (data) => {
                         const list = JSON.parse(JSON.stringify(data));
@@ -295,29 +299,42 @@
 
                     const showNewForm = () => {
                         isNewFormVisible.value = true;
-                        isIdChecked.value = false;
-                        newForm.parentMenuId = selectedId.value;
-                        newForm.subMenuId = '';
-                        newForm.menuNm = '';
-                        newForm.menuTyCode = '20';
-                        newForm.sortOrdr = 1;
-                        newForm.useYn = 'Y';
-                        newForm.url = '';
-                        
+                        newMenus.value = [];
+                        addNewMenuForm();
+                    };
+
+                    const addNewMenuForm = () => {
+                        newMenus.value.push({
+                            parentMenuId: selectedId.value || '',
+                            subMenuId: '',
+                            menuNm: '',
+                            menuTyCode: '20',
+                            sortOrdr: (newMenus.value.length + 1) * 10,
+                            useYn: 'Y',
+                            url: '',
+                            isIdChecked: false
+                        });
                         setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 50);
                     };
 
-                    const checkIdDuplicate = () => {
-                        if (!/^\d{4}$/.test(newForm.subMenuId)) {
+                    const removeMenuForm = (index) => {
+                        if (newMenus.value.length > 1) {
+                            newMenus.value.splice(index, 1);
+                        }
+                    };
+
+                    const checkIdDuplicate = (index) => {
+                        const form = newMenus.value[index];
+                        if (!/^\d{4}$/.test(form.subMenuId)) {
                             return alert('메뉴 ID는 숫자 4자리여야 합니다.');
                         }
                         
-                        const fullId = newForm.parentMenuId + newForm.subMenuId;
+                        const fullId = form.parentMenuId + form.subMenuId;
                         if (flatMenus.value.some(m => m.menuId === fullId)) {
-                            isIdChecked.value = false;
+                            form.isIdChecked = false;
                             alert('이미 존재하는 메뉴 ID입니다.');
                         } else {
-                            isIdChecked.value = true;
+                            form.isIdChecked = true;
                             alert('사용 가능한 ID입니다.');
                         }
                     };
@@ -342,25 +359,34 @@
                         .catch(err => AdminUtil.handleApiError(err));
                     };
 
-                    const registerMenu = () => {
-                        if (!isIdChecked.value) return alert('먼저 중복확인을 해주세요.');
-                        if (!newForm.menuNm.trim()) return alert('메뉴명을 입력해주세요.');
+                    const registerMenus = async () => {
+                        for (let i = 0; i < newMenus.value.length; i++) {
+                            const form = newMenus.value[i];
+                            if (!form.isIdChecked) return alert(`[${i+1}번째 항목] 먼저 중복확인을 해주세요.`);
+                            if (!form.menuNm.trim()) return alert(`[${i+1}번째 항목] 메뉴명을 입력해주세요.`);
+                            if (!form.menuTyCode) return alert(`[${i+1}번째 항목] 메뉴유형을 선택해주세요.`);
+                        }
                         
-                        axios.post('/api/admin/menu', {
-                            parentMenuId: newForm.parentMenuId,
-                            subMenuId: newForm.subMenuId,
-                            menuNm: newForm.menuNm,
-                            menuTyCode: newForm.menuTyCode,
-                            sortOrdr: newForm.sortOrdr,
-                            useYn: newForm.useYn,
-                            url: newForm.url
-                        })
-                        .then(() => {
-                            alert('신규 메뉴가 등록되었습니다.');
+                        try {
+                            const promises = newMenus.value.map(form => {
+                                return axios.post('/api/admin/menu', {
+                                    parentMenuId: form.parentMenuId,
+                                    subMenuId: form.subMenuId,
+                                    menuNm: form.menuNm,
+                                    menuTyCode: form.menuTyCode,
+                                    sortOrdr: form.sortOrdr,
+                                    useYn: form.useYn,
+                                    url: form.url
+                                });
+                            });
+                            
+                            await Promise.all(promises);
+                            alert('모든 메뉴가 등록되었습니다.');
                             isNewFormVisible.value = false;
                             fetchMenus();
-                        })
-                        .catch(err => AdminUtil.handleApiError(err));
+                        } catch(err) {
+                            AdminUtil.handleApiError(err);
+                        }
                     };
 
                     const deleteMenu = (id) => {
@@ -435,8 +461,8 @@
                     });
 
                     return { 
-                        flatMenus, menuTree, selectedId, expandedIds, editForm, newForm, isNewFormVisible, isIdChecked,
-                        selectMenu, toggleNode, toggleAll, showNewForm, checkIdDuplicate, saveEdit, registerMenu, deleteMenu, saveAllOrders
+                        flatMenus, menuTree, selectedId, expandedIds, editForm, newMenus, isNewFormVisible,
+                        selectMenu, toggleNode, toggleAll, showNewForm, addNewMenuForm, removeMenuForm, checkIdDuplicate, saveEdit, registerMenus, deleteMenu, saveAllOrders
                     };
                 }
             });
