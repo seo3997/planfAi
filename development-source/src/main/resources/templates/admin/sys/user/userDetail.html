@@ -15,32 +15,32 @@
 
         <div class="form-section mgmt-card">
             <h3 class="section-title">회원기본정보</h3>
-            <table class="info-table">
-                <tr>
-                    <th>사용자ID</th>
-                    <td>{{ user.userId }}</td>
-                    <th>등록일</th>
-                    <td>{{ formatDate(user.registDt) }}</td>
-                </tr>
-                <tr>
-                    <th>사용자 권한</th>
-                    <td>{{ user.authorNm }}</td>
-                    <th>사용자 상태</th>
-                    <td>{{ user.userSttusNm }}</td>
-                </tr>
-                <tr>
-                    <th>이름</th>
-                    <td>{{ user.userNm }}</td>
-                    <th>연락처</th>
-                    <td>{{ user.cttpc }}</td>
-                </tr>
-                <tr>
-                    <th>이메일</th>
-                    <td>{{ user.email }}</td>
-                    <th>지역</th>
-                    <td>{{ user.areaNm }} {{ user.areaSeNm }}</td>
-                </tr>
-            </table>
+            <div class="detail-box">
+                <div class="detail-row">
+                    <div class="detail-label">사용자ID</div>
+                    <div class="detail-content">{{ user.userId }}</div>
+                    <div class="detail-label">등록일</div>
+                    <div class="detail-content">{{ formatDate(user.registDt) }}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">사용자 권한</div>
+                    <div class="detail-content">{{ user.authorNm }}</div>
+                    <div class="detail-label">사용자 상태</div>
+                    <div class="detail-content">{{ user.userSttusNm }}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">이름</div>
+                    <div class="detail-content">{{ user.userNm }}</div>
+                    <div class="detail-label">연락처</div>
+                    <div class="detail-content">{{ user.cttpc }}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">이메일</div>
+                    <div class="detail-content">{{ user.email }}</div>
+                    <div class="detail-label">지역</div>
+                    <div class="detail-content">{{ user.areaNm }} {{ user.areaSeNm }}</div>
+                </div>
+            </div>
         </div>
 
         <div class="d-flex justify-content-center gap-2 mt-4 mb-5">

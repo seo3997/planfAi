@@ -3738,6 +3738,72 @@ body {
   color: #333;
 }
 
+/* Detail Box (Div-based replacement for info-table) */
+.detail-box {
+  width: 100%;
+  border-top: 1px solid #eee;
+}
+
+.detail-row {
+  display: flex;
+  border-bottom: 1px solid #eee;
+  flex-wrap: wrap;
+}
+
+.detail-label {
+  flex: 0 0 160px;
+  background: #f8f9fa;
+  padding: 12px 15px;
+  font-weight: 500;
+  font-size: 14px;
+  color: #333;
+  display: flex;
+  align-items: center;
+  border-right: 1px solid #eee;
+}
+
+.detail-content {
+  flex: 1;
+  padding: 10px 15px;
+  font-size: 14px;
+  color: #333;
+  min-width: 0; /* Prevents overflow in flex items */
+  display: flex;
+  align-items: center;
+}
+
+.detail-content.full-width {
+  flex: 0 0 calc(100% - 160px);
+}
+
+@media (max-width: 991px) {
+  .detail-label {
+    flex: 0 0 120px;
+  }
+  .detail-content.full-width {
+    flex: 0 0 calc(100% - 120px);
+  }
+}
+
+@media (max-width: 767px) {
+  .detail-row {
+    flex-direction: column;
+  }
+  .detail-label {
+    flex: 0 0 100%;
+    border-right: none;
+    border-bottom: 1px solid #eee;
+    background: #fdfdfd;
+  }
+  .detail-content {
+    flex: 0 0 100%;
+    padding: 12px 15px;
+  }
+  .detail-content.full-width {
+     flex: 0 0 100%;
+  }
+}
+
 /* Bootstrap Button Overrides */
 .btn-primary {
   background-color: var(--header-bg) !important;

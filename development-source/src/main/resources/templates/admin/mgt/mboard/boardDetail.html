@@ -15,39 +15,39 @@
 
         <div class="form-section mgmt-card">
             <h3 class="section-title">게시글 상세 정보</h3>
-            <table class="info-table">
-                <tr>
-                    <th>게시판 구분</th>
-                    <td>{{ board.BBS_SE_NM }}</td>
-                    <th>등록일시</th>
-                    <td>{{ formatDate(board.REGIST_DT) }}</td>
-                </tr>
-                <tr>
-                    <th>제목</th>
-                    <td colspan="3">{{ board.SJ }}</td>
-                </tr>
-                <tr>
-                    <th>등록자명</th>
-                    <td>{{ board.REGISTER_NM }}</td>
-                    <th>등록자ID</th>
-                    <td>{{ board.REGISTER_ID }}</td>
-                </tr>
-                <tr>
-                    <th style="vertical-align: top;">내용</th>
-                    <td colspan="3">
-                        <div class="content-area">{{ board.CN }}</div>
+            <div class="detail-box">
+                <div class="detail-row">
+                    <div class="detail-label">게시판 구분</div>
+                    <div class="detail-content">{{ board.BBS_SE_NM }}</div>
+                    <div class="detail-label">등록일시</div>
+                    <div class="detail-content">{{ formatDate(board.REGIST_DT) }}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">제목</div>
+                    <div class="detail-content full-width">{{ board.SJ }}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">등록자명</div>
+                    <div class="detail-content">{{ board.REGISTER_NM }}</div>
+                    <div class="detail-label">등록자ID</div>
+                    <div class="detail-content">{{ board.REGISTER_ID }}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label" style="align-items: flex-start; padding-top: 15px;">내용</div>
+                    <div class="detail-content full-width" style="display: block; padding: 15px;">
+                        <div class="content-area" style="white-space: pre-wrap; line-height: 1.6;">{{ board.CN }}</div>
                         <!-- 화면표시 설정일 때 이미지만 본문에 노출 -->
                         <div v-if="board.ATCH_YN === 'N' && imageFiles.length > 0" class="mt-4 pt-3 border-top">
                             <div v-for="file in imageFiles" :key="file.FILE_ID">
                                 <img :src="getFileUrl(file)" style="max-width: 100%; margin-bottom: 15px; border: 1px solid #eee;" />
                             </div>
                         </div>
-                    </td>
-                </tr>
+                    </div>
+                </div>
                 <!-- 다운로드 설정일 때 파일 목록 노출 -->
-                <tr v-if="board.ATCH_YN === 'Y' && board.fileList && board.fileList.length > 0">
-                    <th>첨부파일</th>
-                    <td colspan="3">
+                <div v-if="board.ATCH_YN === 'Y' && board.fileList && board.fileList.length > 0" class="detail-row">
+                    <div class="detail-label">첨부파일</div>
+                    <div class="detail-content full-width" style="display: block;">
                         <div class="file-list">
                             <div v-for="file in board.fileList" :key="file.FILE_ID" class="mb-1">
                                 <a :href="getFileUrl(file)" :download="file.FILE_NM" class="text-decoration-none small">
@@ -56,9 +56,9 @@
                                 </a>
                             </div>
                         </div>
-                    </td>
-                </tr>
-            </table>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="d-flex justify-content-center gap-2 mt-4 mb-5">

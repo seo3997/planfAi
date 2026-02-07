@@ -42,12 +42,12 @@
             <div class="col-lg-6">
                 <b-card class="mgmt-card shadow-sm border-0 h-100">
                     <div class="tree-info-panel">
-                    <table class="info-table">
-                        <tr>
-                            <th>권한명</th>
-                            <td>{{ authorNm }}</td>
-                        </tr>
-                    </table>
+                    <div class="detail-box">
+                        <div class="detail-row">
+                            <div class="detail-label">권한명</div>
+                            <div class="detail-content full-width">{{ authorNm }}</div>
+                        </div>
+                    </div>
 
                     <div class="d-flex justify-content-center gap-2 mt-4">
                         <b-button variant="outline-secondary" class="px-4" @click="goBack"><i class="bi bi-reply-fill me-1"></i>목록</b-button>
