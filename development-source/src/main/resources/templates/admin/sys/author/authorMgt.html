@@ -36,7 +36,7 @@
 
             <!-- Action Button -->
             <div class="mb-3">
-                <b-button variant="primary" size="sm" @click="openModal"><i class="bi bi-pencil-square me-1"></i>등록</b-button>
+                <b-button href="/admin/author/insertFormAuthorMgt.do" variant="primary" size="sm"><i class="bi bi-pencil-square me-1"></i>등록</b-button>
             </div>
 
             <div class="data-table-wrapper">
@@ -47,22 +47,17 @@
                             <th>권한명</th>
                             <th style="width: 150px;">등록자</th>
                             <th style="width: 150px;">등록일</th>
-                            <th style="width: 150px;">액션</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(author, index) in authorList" :key="author.authorId">
+                        <tr v-for="(author, index) in authorList" :key="author.authorId" @click="goDetail(author.authorId)" style="cursor: pointer;">
                             <td>{{ totCnt - index }}</td>
                             <td class="text-start px-4">{{ author.authorNm }}</td>
                             <td>{{ author.registerNm }}</td>
                             <td>{{ author.registYmd }}</td>
-                             <td>
-                                <b-button variant="outline-primary" size="sm" class="me-1" @click="editAuthor(author)">수정</b-button>
-                                <b-button variant="outline-danger" size="sm" @click="deleteAuthor(author.authorId)">삭제</b-button>
-                            </td>
                         </tr>
                         <tr v-if="authorList.length === 0">
-                            <td colspan="5" class="text-center py-5 text-muted">등록된 권한이 없습니다.</td>
+                            <td colspan="4" class="text-center py-5 text-muted">등록된 권한이 없습니다.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -71,25 +66,7 @@
 
         </b-card>
 
-        <!-- Author Modal -->
-        <b-modal id="authorModal" v-model="showModal" :title="modalTitle" @ok="saveAuthor">
-            <div class="mb-3">
-                <label class="form-label">권한 ID</label>
-                <b-form-input v-model="form.authorId" :readonly="isEdit" placeholder="예: ROLE_ADMIN"></b-form-input>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">권한명</label>
-                <b-form-input v-model="form.authorNm" required></b-form-input>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">비고</label>
-                <b-form-textarea v-model="form.rm" rows="3"></b-form-textarea>
-            </div>
-            <template #footer="{ ok, cancel }">
-                <b-button variant="secondary" size="sm" @click="cancel">취소</b-button>
-                <b-button variant="primary" size="sm" @click="ok">저장</b-button>
-            </template>
-        </b-modal>
+        <!-- Modal Removed -->
     </div>
 
     <div id="admin-author-script">
@@ -119,49 +96,8 @@
                             .finally(() => loading.value = false);
                     };
 
-                    const openModal = () => {
-                        isEdit.value = false;
-                        form.value = { authorId: '', authorNm: '', rm: '' };
-                        modalTitle.value = '권한 등록';
-                        showModal.value = true;
-                    };
-
-                    const editAuthor = (author) => {
-                        isEdit.value = true;
-                        form.value = { ...author };
-                        modalTitle.value = '권한 수정';
-                        showModal.value = true;
-                    };
-
-                    const saveAuthor = () => {
-                        if (isEdit.value) {
-                            axios.put('/api/admin/author', form.value)
-                                .then(res => {
-                                    alert(res.data);
-                                    showModal.value = false;
-                                    fetchAuthors();
-                                })
-                                .catch(err => AdminUtil.handleApiError(err, '저장 실패'));
-                        } else {
-                            axios.post('/api/admin/author', form.value)
-                                .then(res => {
-                                    alert(res.data);
-                                    showModal.value = false;
-                                    fetchAuthors();
-                                })
-                                .catch(err => AdminUtil.handleApiError(err, '저장 실패'));
-                        }
-                    };
-
-                    const deleteAuthor = (authorId) => {
-                        if (confirm('삭제하시겠습니까?')) {
-                            axios.delete(`/api/admin/author/${authorId}`)
-                                .then(res => {
-                                    alert(res.data);
-                                    fetchAuthors();
-                                })
-                                .catch(err => alert('삭제 실패'));
-                        }
+                    const goDetail = (authorId) => {
+                        location.href = `/admin/author/updateFormAuthorMgt.do?authorId=${authorId}`;
                     };
 
                     const resetSearch = () => {
@@ -174,7 +110,7 @@
                         fetchAuthors();
                     });
 
-                    return { authorList, totCnt, schAuthNm, loading, form, modalTitle, isEdit, showModal, openModal, editAuthor, saveAuthor, deleteAuthor, fetchAuthors, resetSearch };
+                    return { authorList, totCnt, schAuthNm, loading, goDetail, fetchAuthors, resetSearch };
                 }
             });
             AdminLayout.register(app);
