@@ -15,71 +15,73 @@
             </div>
         </div>
 
-        <!-- 검색 영역 -->
-        <table class="search-table mb-4">
-            <tr>
-                <th>그룹명 검색</th>
-                <td>
-                    <input type="text" class="form-control form-control-sm" style="width: 400px;" v-model="schGroupNm" placeholder="그룹코드명 또는 그룹코드를 입력하세요" @keyup.enter="fetchGroups">
-                </td>
-            </tr>
-            <tr class="search-actions-row">
-                <td colspan="2">
-                    <div class="d-flex justify-content-end p-2 gap-2">
-                        <button class="btn-init d-flex align-items-center" @click="resetSearch"><i class="bi bi-arrow-counterclockwise me-1"></i> 초기화</button>
-                        <button class="btn-search-submit d-flex align-items-center" @click="fetchGroups"><i class="bi bi-search me-1"></i> 검색</button>
-                    </div>
-                </td>
-            </tr>
-        </table>
-
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <div class="text-muted fs-7">
-                검색결과 <span class="text-primary fw-bold">{{ totCnt }}</span>개
-            </div>
-            <div class="d-flex gap-2">
-                <button class="btn btn-delete" @click="deleteSelected"><i class="bi bi-trash"></i> 삭제</button>
-                <button class="btn-regist" @click="goRegister"><i class="bi bi-pencil"></i> 등록</button>
-            </div>
-        </div>
-
-        <div class="data-table-wrapper">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th style="width: 50px;"><input type="checkbox" v-model="allSelected" @change="selectAll"></th>
-                        <th style="width: 60px;">No</th>
-                        <th style="width: 15%;">그룹코드</th>
-                        <th>그룹코드명</th>
-                        <th>영문그룹코드명</th>
-                        <th style="width: 120px;">등록자</th>
-                        <th style="width: 120px;">등록일</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(item, index) in groupList" :key="item.groupId" @click="goDetail(item.groupId)" style="cursor: pointer;">
-                        <td @click.stop><input type="checkbox" v-model="selectedIds" :value="item.groupId"></td>
-                        <td>{{ totCnt - ((page - 1) * size) - index }}</td>
-                        <td class="fw-medium text-dark">{{ item.groupId }}</td>
-                        <td class="text-start px-3 text-dark">{{ item.groupNm }}</td>
-                        <td class="text-start px-3 text-muted">{{ item.groupNmEng }}</td>
-                        <td>{{ item.registerNm }}</td>
-                        <td>{{ item.registYmd }}</td>
-                    </tr>
-                    <tr v-if="groupList.length === 0">
-                        <td colspan="7" class="text-center py-5 text-muted">검색 결과가 없습니다.</td>
-                    </tr>
-                </tbody>
+        <div class="mgmt-card">
+            <!-- 검색 영역 -->
+            <table class="search-table mb-4">
+                <tr>
+                    <th>그룹명 검색</th>
+                    <td>
+                        <input type="text" class="form-control form-control-sm" style="width: 400px;" v-model="schGroupNm" placeholder="그룹코드명 또는 그룹코드를 입력하세요" @keyup.enter="fetchGroups">
+                    </td>
+                </tr>
+                <tr class="search-actions-row">
+                    <td colspan="2">
+                        <div class="d-flex justify-content-end p-2 gap-2">
+                            <button class="btn-init d-flex align-items-center" @click="resetSearch"><i class="bi bi-arrow-counterclockwise me-1"></i> 초기화</button>
+                            <button class="btn-search-submit d-flex align-items-center" @click="fetchGroups"><i class="bi bi-search me-1"></i> 검색</button>
+                        </div>
+                    </td>
+                </tr>
             </table>
-        </div>
 
-        <!-- 페이징 컴포넌트 -->
-        <admin-pagination 
-            :total-count="totCnt" 
-            :current-page="page" 
-            :page-size="size"
-            @change-page="handlePageChange">
-        </admin-pagination>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="text-muted fs-7">
+                    검색결과 <span class="text-primary fw-bold">{{ totCnt }}</span>개
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-delete" @click="deleteSelected"><i class="bi bi-trash"></i> 삭제</button>
+                    <button class="btn-regist" @click="goRegister"><i class="bi bi-pencil"></i> 등록</button>
+                </div>
+            </div>
+
+            <div class="data-table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;"><input type="checkbox" v-model="allSelected" @change="selectAll"></th>
+                            <th style="width: 60px;">No</th>
+                            <th style="width: 15%;">그룹코드</th>
+                            <th>그룹코드명</th>
+                            <th>영문그룹코드명</th>
+                            <th style="width: 120px;">등록자</th>
+                            <th style="width: 120px;">등록일</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(item, index) in groupList" :key="item.groupId" @click="goDetail(item.groupId)" style="cursor: pointer;">
+                            <td @click.stop><input type="checkbox" v-model="selectedIds" :value="item.groupId"></td>
+                            <td>{{ totCnt - ((page - 1) * size) - index }}</td>
+                            <td class="fw-medium text-dark">{{ item.groupId }}</td>
+                            <td class="text-start px-3 text-dark">{{ item.groupNm }}</td>
+                            <td class="text-start px-3 text-muted">{{ item.groupNmEng }}</td>
+                            <td>{{ item.registerNm }}</td>
+                            <td>{{ item.registYmd }}</td>
+                        </tr>
+                        <tr v-if="groupList.length === 0">
+                            <td colspan="7" class="text-center py-5 text-muted">검색 결과가 없습니다.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 페이징 컴포넌트 -->
+            <admin-pagination 
+                :total-count="totCnt" 
+                :current-page="page" 
+                :page-size="size"
+                @change-page="handlePageChange">
+            </admin-pagination>
+        </div>
     </div>
 
     <div id="admin-code-script">

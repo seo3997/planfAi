@@ -13,115 +13,117 @@
             </div>
         </div>
 
-        <!-- Search Area -->
-        <table class="search-table mb-4">
-            <tr>
-                <th>사용자 상태</th>
-                <td>
-                    <select class="form-select form-select-sm" style="width: 350px;" v-model="searchDto.searchStatus">
-                        <option value="전체">전체</option>
-                        <option v-for="st in statusCodes" :key="st.CODE" :value="st.CODE">{{ st.CODE_NM }}</option>
-                    </select>
-                </td>
-                <th>권한명</th>
-                <td>
-                    <select class="form-select form-select-sm" style="width: 350px;" v-model="searchDto.searchAuthor">
-                        <option value="전체">전체</option>
-                        <option v-for="auth in authors" :key="auth.AUTHOR_ID" :value="auth.AUTHOR_ID">{{ auth.AUTHOR_NM }}</option>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <th>상세검색</th>
-                <td colspan="3">
-                    <div class="d-flex gap-2">
-                        <select class="form-select form-select-sm" style="width: 120px;" v-model="searchDto.searchType">
-                            <option value="이름">이름</option>
-                            <option value="아이디">아이디</option>
+        <div class="mgmt-card">
+            <!-- Search Area -->
+            <table class="search-table mb-4">
+                <tr>
+                    <th>사용자 상태</th>
+                    <td>
+                        <select class="form-select form-select-sm" style="width: 350px;" v-model="searchDto.searchStatus">
+                            <option value="전체">전체</option>
+                            <option v-for="st in statusCodes" :key="st.CODE" :value="st.CODE">{{ st.CODE_NM }}</option>
                         </select>
-                        <input type="text" class="form-control form-control-sm" style="width: 350px;" v-model="searchDto.searchKeyword" @keyup.enter="fetchUsers">
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <th>가입일</th>
-                <td colspan="3">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="radio-group">
-                            <label><input type="radio" v-model="dateType" value="all"> 전체</label>
-                            <label><input type="radio" v-model="dateType" value="today"> 오늘</label>
-                            <label><input type="radio" v-model="dateType" value="7days"> 7일</label>
-                            <label><input type="radio" v-model="dateType" value="30days"> 30일</label>
-                            <label><input type="radio" v-model="dateType" value="6months"> 6개월</label>
+                    </td>
+                    <th>권한명</th>
+                    <td>
+                        <select class="form-select form-select-sm" style="width: 350px;" v-model="searchDto.searchAuthor">
+                            <option value="전체">전체</option>
+                            <option v-for="auth in authors" :key="auth.AUTHOR_ID" :value="auth.AUTHOR_ID">{{ auth.AUTHOR_NM }}</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th>상세검색</th>
+                    <td colspan="3">
+                        <div class="d-flex gap-2">
+                            <select class="form-select form-select-sm" style="width: 120px;" v-model="searchDto.searchType">
+                                <option value="이름">이름</option>
+                                <option value="아이디">아이디</option>
+                            </select>
+                            <input type="text" class="form-control form-control-sm" style="width: 350px;" v-model="searchDto.searchKeyword" @keyup.enter="fetchUsers">
                         </div>
-                        <div class="date-input-wrap">
-                            <input type="date" class="date-input" v-model="searchDto.startDate">
-                            <span>~</span>
-                            <input type="date" class="date-input" v-model="searchDto.endDate">
+                    </td>
+                </tr>
+                <tr>
+                    <th>가입일</th>
+                    <td colspan="3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="radio-group">
+                                <label><input type="radio" v-model="dateType" value="all"> 전체</label>
+                                <label><input type="radio" v-model="dateType" value="today"> 오늘</label>
+                                <label><input type="radio" v-model="dateType" value="7days"> 7일</label>
+                                <label><input type="radio" v-model="dateType" value="30days"> 30일</label>
+                                <label><input type="radio" v-model="dateType" value="6months"> 6개월</label>
+                            </div>
+                            <div class="date-input-wrap">
+                                <input type="date" class="date-input" v-model="searchDto.startDate">
+                                <span>~</span>
+                                <input type="date" class="date-input" v-model="searchDto.endDate">
+                            </div>
                         </div>
-                    </div>
-                </td>
-            </tr>
-            <tr class="search-actions-row">
-                <td colspan="4">
-                    <div class="d-flex justify-content-end p-2 gap-2">
-                        <button class="btn-init" @click="resetSearch"><i class="bi bi-arrow-counterclockwise"></i> 초기화</button>
-                        <button class="btn-search-submit" @click="fetchUsers"><i class="bi bi-search"></i> 검색</button>
-                    </div>
-                </td>
-            </tr>
-        </table>
-
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <div class="text-muted fs-7">
-                검색결과 <span class="text-primary fw-bold">{{ totalCount }}</span>개
-            </div>
-            <a href="/admin/user/insertFormUserMgt.do" class="btn-regist"><i class="bi bi-pencil"></i> 등록</a>
-        </div>
-
-        <div class="data-table-wrapper">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th style="width: 80px;">No</th>
-                        <th style="width: 120px;">사용자No</th>
-                        <th>사용자ID</th>
-                        <th style="width: 200px;">권한명</th>
-                        <th style="width: 150px;">지역</th>
-                        <th style="width: 150px;">가입일</th>
-                        <th style="width: 120px;">상태</th>
-                        <th style="width: 150px;">등록자</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(user, index) in userList" :key="user.userNo" @click="goDetail(user.userNo)" style="cursor: pointer;">
-                        <td>{{ totalCount - ((currentPage - 1) * pageSize) - index }}</td>
-                        <td>{{ user.userNo }}</td>
-                        <td class="text-start px-3 text-dark">{{ user.userId }}</td>
-                        <td>{{ user.authorNm }}</td>
-                        <td>{{ user.areaNm || '' }} {{ user.areaSeNm || '' }}</td>
-                        <td>{{ formatDate(user.registDt) }}</td>
-                        <td>
-                            <span class="status-badge" :class="user.userSttusNm === '활동' ? 'status-active' : ''">
-                                {{ user.userSttusNm }}
-                            </span>
-                        </td>
-                        <td>{{ user.registerNm || '' }}</td>
-                    </tr>
-                    <tr v-if="userList.length === 0">
-                        <td colspan="7" class="text-center py-5 text-muted">결과가 없습니다.</td>
-                    </tr>
-                </tbody>
+                    </td>
+                </tr>
+                <tr class="search-actions-row">
+                    <td colspan="4">
+                        <div class="d-flex justify-content-end p-2 gap-2">
+                            <button class="btn-init" @click="resetSearch"><i class="bi bi-arrow-counterclockwise"></i> 초기화</button>
+                            <button class="btn-search-submit" @click="fetchUsers"><i class="bi bi-search"></i> 검색</button>
+                        </div>
+                    </td>
+                </tr>
             </table>
-        </div>
 
-        <!-- Pagination -->
-        <admin-pagination 
-            :total-count="totalCount" 
-            :current-page="currentPage" 
-            :page-size="pageSize"
-            @change-page="handlePageChange">
-        </admin-pagination>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="text-muted fs-7">
+                    검색결과 <span class="text-primary fw-bold">{{ totalCount }}</span>개
+                </div>
+                <a href="/admin/user/insertFormUserMgt.do" class="btn-regist"><i class="bi bi-pencil"></i> 등록</a>
+            </div>
+
+            <div class="data-table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">No</th>
+                            <th style="width: 120px;">사용자No</th>
+                            <th>사용자ID</th>
+                            <th style="width: 200px;">권한명</th>
+                            <th style="width: 150px;">지역</th>
+                            <th style="width: 150px;">가입일</th>
+                            <th style="width: 120px;">상태</th>
+                            <th style="width: 150px;">등록자</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(user, index) in userList" :key="user.userNo" @click="goDetail(user.userNo)" style="cursor: pointer;">
+                            <td>{{ totalCount - ((currentPage - 1) * pageSize) - index }}</td>
+                            <td>{{ user.userNo }}</td>
+                            <td class="text-start px-3 text-dark">{{ user.userId }}</td>
+                            <td>{{ user.authorNm }}</td>
+                            <td>{{ user.areaNm || '' }} {{ user.areaSeNm || '' }}</td>
+                            <td>{{ formatDate(user.registDt) }}</td>
+                            <td>
+                                <span class="status-badge" :class="user.userSttusNm === '활동' ? 'status-active' : ''">
+                                    {{ user.userSttusNm }}
+                                </span>
+                            </td>
+                            <td>{{ user.registerNm || '' }}</td>
+                        </tr>
+                        <tr v-if="userList.length === 0">
+                            <td colspan="7" class="text-center py-5 text-muted">결과가 없습니다.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <admin-pagination 
+                :total-count="totalCount" 
+                :current-page="currentPage" 
+                :page-size="pageSize"
+                @change-page="handlePageChange">
+            </admin-pagination>
+        </div>
     </div>
 
     <div id="admin-user-script">
