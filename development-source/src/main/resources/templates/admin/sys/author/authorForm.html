@@ -4,48 +4,6 @@
 <head>
     <title>권한 관리 - PlanfAi 관리자</title>
     <th:block id="admin-author-form-head">
-        <style>
-            .form-table {
-                border-top: 2px solid #3b5998;
-                border-collapse: collapse;
-            }
-            .form-table th {
-                background-color: #f8f9fa;
-                width: 180px;
-                padding: 15px;
-                vertical-align: middle;
-                border: 1px solid #dee2e6;
-                font-weight: 500;
-                color: #333;
-            }
-            .form-table td {
-                padding: 10px 15px;
-                border: 1px solid #dee2e6;
-                background-color: #fff;
-            }
-            .btn-teal {
-                background-color: #1abc9c !important;
-                border-color: #1abc9c !important;
-                color: white !important;
-            }
-            .btn-teal:hover {
-                background-color: #16a085 !important;
-                border-color: #16a085 !important;
-            }
-            .btn-orange {
-                background-color: #e67e22 !important;
-                border-color: #e67e22 !important;
-                color: white !important;
-            }
-            .btn-orange:hover {
-                background-color: #d35400 !important;
-                border-color: #d35400 !important;
-            }
-            .readonly-input {
-                background-color: #eeeeee !important;
-                cursor: not-allowed;
-            }
-        </style>
     </th:block>
 </head>
 <body>
@@ -58,11 +16,11 @@
         </div>
 
         <b-card class="mgmt-card shadow-sm border-0 mt-3">
-            <table class="form-table w-100 mb-4">
+            <table class="form-table w-100">
                 <tr>
                     <th class="required">권한ID</th>
                     <td>
-                        <b-form-input v-model="form.authorId" :readonly="isEdit" :class="{ 'readonly-input': isEdit }" placeholder="예: ROLE_ADMIN"></b-form-input>
+                        <b-form-input v-model="form.authorId" :readonly="isEdit" placeholder="예: ROLE_ADMIN"></b-form-input>
                     </td>
                 </tr>
                 <tr>
@@ -78,20 +36,20 @@
                     </td>
                 </tr>
             </table>
-
-            <div class="d-flex justify-content-center gap-2 mt-4">
-                <b-button href="/admin/author/selectPageListAuthorMgt.do" variant="outline-secondary" class="px-4">
-                    <i class="bi bi-list me-1"></i>목록
-                </b-button>
-                <b-button @click="saveAuthor" variant="primary" class="px-4 btn-teal">
-                    <i :class="isEdit ? 'bi bi-pencil' : 'bi bi-check-lg'" class="me-1"></i>
-                    {{ isEdit ? '수정' : '저장' }}
-                </b-button>
-                <b-button @click="deleteAuthor" variant="danger" class="px-4 btn-orange" v-if="isEdit">
-                    <i class="bi bi-trash me-1"></i>삭제
-                </b-button>
-            </div>
         </b-card>
+
+        <div class="d-flex justify-content-center gap-2 mt-4 mb-5">
+            <b-button href="/admin/author/selectPageListAuthorMgt.do" variant="outline-secondary" class="px-4">
+                <i class="bi bi-list me-1"></i>목록
+            </b-button>
+            <b-button @click="saveAuthor" variant="primary" class="px-4">
+                <i :class="isEdit ? 'bi bi-pencil' : 'bi bi-check-lg'" class="me-1"></i>
+                {{ isEdit ? '수정' : '저장' }}
+            </b-button>
+            <b-button @click="deleteAuthor" variant="danger" class="px-4" v-if="isEdit">
+                <i class="bi bi-trash me-1"></i>삭제
+            </b-button>
+        </div>
     </div>
 
     <div id="admin-author-form-script">
