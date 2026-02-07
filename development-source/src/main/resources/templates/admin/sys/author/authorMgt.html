@@ -15,11 +15,23 @@
             </div>
         </div>
 
-        <!-- Search Area -->
-        <div class="search-box-wrapper">
-            <input type="text" v-model="schAuthNm" @keyup.enter="fetchAuthors" class="search-input" placeholder="권한명">
-            <button class="btn-search-icon" @click="fetchAuthors"><i class="bi bi-search"></i></button>
-        </div>
+        <!-- 검색 영역 -->
+        <table class="search-table mb-4">
+            <tr>
+                <th>권한명 검색</th>
+                <td>
+                    <input type="text" class="form-control form-control-sm" style="width: 400px;" v-model="schAuthNm" placeholder="권한명을 입력하세요" @keyup.enter="fetchAuthors">
+                </td>
+            </tr>
+            <tr class="search-actions-row">
+                <td colspan="2">
+                    <div class="d-flex justify-content-end p-2 gap-2">
+                        <button class="btn-init d-flex align-items-center" @click="resetSearch"><i class="bi bi-arrow-counterclockwise me-1"></i> 초기화</button>
+                        <button class="btn-search-submit d-flex align-items-center" @click="fetchAuthors"><i class="bi bi-search me-1"></i> 검색</button>
+                    </div>
+                </td>
+            </tr>
+        </table>
 
         <!-- Action Button -->
         <div class="actions-area">
@@ -158,13 +170,18 @@
                         }
                     };
 
+                    const resetSearch = () => {
+                        schAuthNm.value = '';
+                        fetchAuthors();
+                    };
+
                     onMounted(() => {
                         AdminMenu.init();
                         modalObj = new bootstrap.Modal(document.getElementById('authorModal'));
                         fetchAuthors();
                     });
 
-                    return { authorList, totCnt, schAuthNm, loading, form, modalTitle, isEdit, openModal, editAuthor, saveAuthor, deleteAuthor, fetchAuthors };
+                    return { authorList, totCnt, schAuthNm, loading, form, modalTitle, isEdit, openModal, editAuthor, saveAuthor, deleteAuthor, fetchAuthors, resetSearch };
                 }
             });
             AdminLayout.register(app);

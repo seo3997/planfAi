@@ -4542,3 +4542,41 @@ body {
   border-color: #213a63 !important;
   color: white !important;
 }
+
+/* ==========================================================================
+   Menu Management UI Components
+   ========================================================================== */
+.menu-mgmt-container { display: flex; gap: 20px; align-items: flex-start; margin-top: 20px; }
+.tree-section { flex: 0 0 350px; background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #ddd; min-height: 600px; }
+.form-section { flex: 1; min-width: 0; }
+
+.tree-header { display: flex; gap: 8px; margin-bottom: 15px; padding-bottom: 12px; border-bottom: 1px solid #eee; }
+.btn-tree-ctrl { padding: 5px 12px; font-size: 13px; border: 1px solid #ddd; background: #fff; border-radius: 4px; display: flex; align-items: center; cursor: pointer; }
+.btn-tree-ctrl:hover { background: #f8f9fa; }
+
+.tree-list { list-style: none; padding-left: 20px; margin: 0; }
+.tree-section > .tree-list { padding-left: 0; }
+
+.tree-label-row { display: flex; align-items: center; padding: 6px 10px; border-radius: 4px; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
+.tree-label-row:hover { background: #f5f8ff; }
+.tree-label-row.selected { background: #e7f0ff; color: #0056b3; font-weight: 600; }
+
+.tree-toggle { width: 22px; height: 22px; display: inline-flex; justify-content: center; align-items: center; color: #666; margin-right: 4px; cursor: pointer; font-size: 14px; }
+.tree-label { font-size: 14px; color: #333; }
+
+.mgmt-card { background: #fff; padding: 25px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 20px; }
+.form-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+.form-table th { width: 140px; background: #f8f9fa; padding: 12px 15px; border: 1px solid #eee; text-align: right; font-weight: 500; font-size: 14px; color: #555; }
+.form-table td { padding: 8px 15px; border: 1px solid #eee; }
+.form-table th.required::after { content: '*'; color: #e53e3e; margin-left: 4px; }
+
+.btn-action-group { display: flex; gap: 8px; justify-content: flex-end; margin-top: 15px; }
+.btn-update-major { background: #3b82f6; color: #fff; border: none; padding: 8px 18px; border-radius: 4px; font-size: 14px; }
+.btn-delete-major { background: #ef4444; color: #fff; border: none; padding: 8px 18px; border-radius: 4px; font-size: 14px; }
+.btn-new-major { background: #10b981; color: #fff; border: none; padding: 8px 18px; border-radius: 4px; font-size: 14px; }
+
+.btn-dup-check { background: #6b7280; color: #fff; border: none; padding: 6px 15px; border-radius: 4px; font-size: 13px; white-space: nowrap; }
+.btn-dup-check.is-checked { background: #10b981; }
+.btn-register-major { background: #2563eb; color: #fff; border: none; padding: 10px 40px; border-radius: 4px; font-weight: 500; }
+
+.ghost { opacity: 0.5; background: #c8ebfb; }

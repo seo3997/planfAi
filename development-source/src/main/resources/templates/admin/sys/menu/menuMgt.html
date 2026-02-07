@@ -6,43 +6,6 @@
     <th:block id="admin-menu-head">
         <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/vuedraggable@4.1.0/dist/vuedraggable.umd.min.js"></script>
-        <style>
-            .menu-mgmt-container { display: flex; gap: 20px; align-items: flex-start; margin-top: 20px; }
-            .tree-section { flex: 0 0 350px; background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #ddd; min-height: 600px; }
-            .form-section { flex: 1; min-width: 0; }
-            
-            .tree-header { display: flex; gap: 8px; margin-bottom: 15px; padding-bottom: 12px; border-bottom: 1px solid #eee; }
-            .btn-tree-ctrl { padding: 5px 12px; font-size: 13px; border: 1px solid #ddd; background: #fff; border-radius: 4px; display: flex; align-items: center; cursor: pointer; }
-            .btn-tree-ctrl:hover { background: #f8f9fa; }
-            
-            .tree-node { list-style: none; padding-left: 0; }
-            .tree-list { list-style: none; padding-left: 20px; margin: 0; }
-            .tree-section > .tree-list { padding-left: 0; }
-            
-            .tree-label-row { display: flex; align-items: center; padding: 6px 10px; border-radius: 4px; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
-            .tree-label-row:hover { background: #f5f8ff; }
-            .tree-label-row.selected { background: #e7f0ff; color: #0056b3; font-weight: 600; }
-            
-            .tree-toggle { width: 22px; height: 22px; display: inline-flex; justify-content: center; align-items: center; color: #666; margin-right: 4px; cursor: pointer; font-size: 14px; }
-            .tree-label { font-size: 14px; color: #333; }
-            
-            .mgmt-card { background: #fff; padding: 25px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 20px; }
-            .form-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
-            .form-table th { width: 140px; background: #f8f9fa; padding: 12px 15px; border: 1px solid #eee; text-align: right; font-weight: 500; font-size: 14px; color: #555; }
-            .form-table td { padding: 8px 15px; border: 1px solid #eee; }
-            .form-table th.required::after { content: '*'; color: #e53e3e; margin-left: 4px; }
-            
-            .btn-action-group { display: flex; gap: 8px; justify-content: flex-end; margin-top: 15px; }
-            .btn-update { background: #3b82f6; color: #fff; border: none; padding: 8px 18px; border-radius: 4px; font-size: 14px; }
-            .btn-delete-major { background: #ef4444; color: #fff; border: none; padding: 8px 18px; border-radius: 4px; font-size: 14px; }
-            .btn-new-major { background: #10b981; color: #fff; border: none; padding: 8px 18px; border-radius: 4px; font-size: 14px; }
-            
-            .btn-dup-check { background: #6b7280; color: #fff; border: none; padding: 6px 15px; border-radius: 4px; font-size: 13px; white-space: nowrap; }
-            .btn-dup-check.is-checked { background: #10b981; }
-            .btn-register { background: #2563eb; color: #fff; border: none; padding: 10px 40px; border-radius: 4px; font-weight: 500; }
-            
-            .ghost { opacity: 0.5; background: #c8ebfb; }
-        </style>
     </th:block>
 </head>
 <body>
@@ -123,7 +86,7 @@
                         </tr>
                     </table>
                     <div class="btn-action-group">
-                        <button class="btn-update" @click="saveEdit"><i class="bi bi-pencil-square me-1"></i>수정</button>
+                        <button class="btn-update-major" @click="saveEdit"><i class="bi bi-pencil-square me-1"></i>수정</button>
                         <button class="btn-delete-major" @click="deleteMenu(selectedId)"><i class="bi bi-trash me-1"></i>삭제</button>
                         <button class="btn-new-major" @click="showNewForm"><i class="bi bi-plus-lg me-1"></i>신규등록</button>
                     </div>
@@ -184,7 +147,7 @@
                         <button class="btn-delete-major" style="padding: 5px 15px; font-size: 13px;" @click="isNewFormVisible = false">삭제</button>
                     </div>
                     <div class="text-center mt-4">
-                        <button class="btn-register" @click="registerMenu">등록</button>
+                        <button class="btn-register-major" @click="registerMenu">등록</button>
                     </div>
                 </div>
             </div>
