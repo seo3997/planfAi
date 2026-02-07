@@ -3869,6 +3869,25 @@ body {
   cursor: pointer;
 }
 
+/* Contact Input Group */
+.input-group-contact {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+}
+
+.input-group-contact .form-control {
+  width: 100px !important;
+  text-align: center;
+  flex: none;
+}
+
+.input-group-contact span {
+  color: #adb5bd;
+  font-weight: 500;
+}
+
 /* Status & Badges */
 .status-badge {
   padding: 4px 10px;
