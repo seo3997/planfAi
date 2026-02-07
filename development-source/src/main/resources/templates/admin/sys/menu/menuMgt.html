@@ -21,8 +21,8 @@
             <!-- Left: Menu Tree -->
             <div class="tree-section">
                 <div class="tree-header d-flex gap-2 mb-3">
-                    <button class="btn-tree-ctrl" @click="toggleAll(false)"><i class="bi bi-folder me-1"></i>접기</button>
-                    <button class="btn-tree-ctrl" @click="toggleAll(true)"><i class="bi bi-folder2-open me-1"></i>펼치기</button>
+                    <button class="btn-tree-ctrl btn-collapse" @click="toggleAll(false)"><i class="bi bi-dash-square me-1"></i>접기</button>
+                    <button class="btn-tree-ctrl btn-expand" @click="toggleAll(true)"><i class="bi bi-plus-square me-1"></i>펼치기</button>
                 </div>
                 <ul class="tree-list">
                     <tree-item 
