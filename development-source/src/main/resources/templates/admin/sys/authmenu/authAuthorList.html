@@ -17,22 +17,26 @@
 
         <div class="mgmt-card">
             <!-- 검색 영역 -->
-            <table class="search-table mb-4">
-                <tr>
-                    <th>권한명 검색</th>
-                    <td>
-                        <input type="text" class="form-control form-control-sm" style="width: 400px;" v-model="schAuthNm" placeholder="권한명을 입력하세요" @keyup.enter="fetchAuthors">
-                    </td>
-                </tr>
-                <tr class="search-actions-row">
-                    <td colspan="2">
-                        <div class="d-flex justify-content-end p-2 gap-2">
-                            <button class="btn btn-sm btn-reset d-flex align-items-center justify-content-center gap-1" @click="resetSearch"><i class="bi bi-arrow-counterclockwise"></i>초기화</button>
-                            <button class="btn btn-sm btn-search d-flex align-items-center justify-content-center gap-1" @click="fetchAuthors"><i class="bi bi-search"></i>검색</button>
+            <!-- Search Area (Refactored to Div-based) -->
+            <div class="search-filter-box">
+                <div class="filter-row">
+                    <div class="filter-item" style="flex: 0 0 100%; max-width: 100%;">
+                        <div class="filter-label">권한명 검색</div>
+                        <div class="filter-content">
+                            <input type="text" class="form-control form-control-sm" v-model="schAuthNm" placeholder="권한명을 입력하세요" @keyup.enter="fetchAuthors">
                         </div>
-                    </td>
-                </tr>
-            </table>
+                    </div>
+                </div>
+                
+                <div class="search-filter-actions">
+                    <button class="btn btn-sm btn-reset d-flex align-items-center justify-content-center gap-1" @click="resetSearch">
+                        <i class="bi bi-arrow-counterclockwise"></i> 초기화
+                    </button>
+                    <button class="btn btn-sm btn-search d-flex align-items-center justify-content-center gap-1" @click="fetchAuthors">
+                        <i class="bi bi-search"></i> 검색
+                    </button>
+                </div>
+            </div>
 
             <div class="data-table-wrapper">
                 <table class="data-table">

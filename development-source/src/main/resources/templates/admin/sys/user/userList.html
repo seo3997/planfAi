@@ -15,40 +15,50 @@
 
         <div class="mgmt-card">
             <!-- Search Area -->
-            <table class="search-table mb-4">
-                <tr>
-                    <th>사용자 상태</th>
-                    <td>
-                        <select class="form-select form-select-sm" style="width: 350px;" v-model="searchDto.searchStatus">
-                            <option value="전체">전체</option>
-                            <option v-for="st in statusCodes" :key="st.CODE" :value="st.CODE">{{ st.CODE_NM }}</option>
-                        </select>
-                    </td>
-                    <th>권한명</th>
-                    <td>
-                        <select class="form-select form-select-sm" style="width: 350px;" v-model="searchDto.searchAuthor">
-                            <option value="전체">전체</option>
-                            <option v-for="auth in authors" :key="auth.AUTHOR_ID" :value="auth.AUTHOR_ID">{{ auth.AUTHOR_NM }}</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <th>상세검색</th>
-                    <td colspan="3">
-                        <div class="d-flex gap-2">
-                            <select class="form-select form-select-sm" style="width: 120px;" v-model="searchDto.searchType">
+            <!-- Search Area (Refactored to Div-based) -->
+            <div class="search-filter-box">
+                <div class="filter-row">
+                    <div class="filter-item">
+                        <div class="filter-label">사용자 상태</div>
+                        <div class="filter-content">
+                            <select class="form-select form-select-sm" v-model="searchDto.searchStatus">
+                                <option value="전체">전체</option>
+                                <option v-for="st in statusCodes" :key="st.CODE" :value="st.CODE">{{ st.CODE_NM }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="filter-item">
+                        <div class="filter-label">권한명</div>
+                        <div class="filter-content">
+                            <select class="form-select form-select-sm" v-model="searchDto.searchAuthor">
+                                <option value="전체">전체</option>
+                                <option v-for="auth in authors" :key="auth.AUTHOR_ID" :value="auth.AUTHOR_ID">{{ auth.AUTHOR_NM }}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filter-row">
+                    <div class="filter-item">
+                        <div class="filter-label">상세검색</div>
+                        <div class="filter-content">
+                            <select class="form-select form-select-sm" style="width: 120px; flex: none;" v-model="searchDto.searchType">
                                 <option value="이름">이름</option>
                                 <option value="아이디">아이디</option>
                             </select>
-                            <input type="text" class="form-control form-control-sm" style="width: 350px;" v-model="searchDto.searchKeyword" @keyup.enter="fetchUsers">
+                            <input type="text" class="form-control form-control-sm" v-model="searchDto.searchKeyword" @keyup.enter="fetchUsers" placeholder="검색어를 입력하세요">
                         </div>
-                    </td>
-                </tr>
-                <tr>
-                    <th>가입일</th>
-                    <td colspan="3">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="radio-group">
+                    </div>
+                    <div class="filter-item">
+                        <!-- Empty slot to maintain 50/50 alignment if needed, or just let it occupy half -->
+                    </div>
+                </div>
+
+                <div class="filter-row">
+                    <div class="filter-item" style="flex: 0 0 100%; max-width: 100%;">
+                        <div class="filter-label">가입일</div>
+                        <div class="filter-content flex-wrap">
+                            <div class="radio-group me-3">
                                 <label><input type="radio" v-model="dateType" value="all"> 전체</label>
                                 <label><input type="radio" v-model="dateType" value="today"> 오늘</label>
                                 <label><input type="radio" v-model="dateType" value="7days"> 7일</label>
@@ -57,21 +67,22 @@
                             </div>
                             <div class="date-input-wrap">
                                 <input type="date" class="date-input" v-model="searchDto.startDate">
-                                <span>~</span>
+                                <span class="mx-1">~</span>
                                 <input type="date" class="date-input" v-model="searchDto.endDate">
                             </div>
                         </div>
-                    </td>
-                </tr>
-                <tr class="search-actions-row">
-                    <td colspan="4">
-                        <div class="d-flex justify-content-end p-2 gap-2">
-                            <button class="btn btn-sm btn-reset d-flex align-items-center justify-content-center gap-1" @click="resetSearch"><i class="bi bi-arrow-counterclockwise"></i>초기화</button>
-                            <button class="btn btn-sm btn-search d-flex align-items-center justify-content-center gap-1" @click="fetchUsers"><i class="bi bi-search"></i>검색</button>
-                        </div>
-                    </td>
-                </tr>
-            </table>
+                    </div>
+                </div>
+
+                <div class="search-filter-actions">
+                    <button class="btn btn-sm btn-reset d-flex align-items-center justify-content-center gap-1" @click="resetSearch">
+                        <i class="bi bi-arrow-counterclockwise"></i>초기화
+                    </button>
+                    <button class="btn btn-sm btn-search d-flex align-items-center justify-content-center gap-1" @click="fetchUsers">
+                        <i class="bi bi-search"></i>검색
+                    </button>
+                </div>
+            </div>
 
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div class="text-muted fs-7">
