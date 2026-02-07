@@ -4523,6 +4523,9 @@ body {
    ========================================================================== */
 .menu-mgmt-container { display: flex; gap: 20px; align-items: flex-start; margin-top: 20px; }
 .form-section { flex: 1; min-width: 0; }
+.form-section-card {
+    background: #fff; padding: 25px; border-radius: 8px; border: 1px solid #ddd;
+}
 .tree-header { display: flex; gap: 8px; margin-bottom: 15px; padding-bottom: 12px; border-bottom: 1px solid #eee; }
 .btn-tree-ctrl { padding: 5px 12px; font-size: 13px; border: 1px solid #ddd; background: #fff; border-radius: 4px; display: flex; align-items: center; cursor: pointer; }
 .btn-tree-ctrl:hover { background: #f8f9fa; }

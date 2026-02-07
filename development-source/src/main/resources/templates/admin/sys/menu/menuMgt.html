@@ -39,9 +39,9 @@
             </div>
 
             <!-- Right: Management Forms -->
-            <div class="form-section">
+            <div class="form-section form-section-card">
                 <!-- Top: Edit Form -->
-                <div v-if="selectedId" class="mgmt-card">
+                <div v-if="selectedId">
                     <table class="form-table">
                         <tr>
                             <th class="required">상위메뉴 ID</th>
@@ -91,12 +91,12 @@
                         <button class="btn-new-major" @click="showNewForm"><i class="bi bi-plus-lg me-1"></i>신규등록</button>
                     </div>
                 </div>
-                <div v-else class="mgmt-card text-center py-5 text-muted">
+                <div v-else class="text-center py-5 text-muted">
                     좌측 트리에서 메뉴를 선택해주세요.
                 </div>
 
                 <!-- Bottom: New Registration Form -->
-                <div v-if="isNewFormVisible" class="mgmt-card">
+                <div v-if="isNewFormVisible" class="mt-4 pt-4 border-top">
                     <div class="cardTitle mb-3" style="font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
                         <i class="bi bi-plus-square-fill color-blue me-2"></i>신규 메뉴 추가
                     </div>
