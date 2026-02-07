@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.whomade.planfAi.admin.sys.user.mapper.UserMapper">
+
+    <select id="selectUserList" parameterType="com.whomade.planfAi.admin.sys.user.dto.UserDto" resultType="com.whomade.planfAi.admin.sys.user.dto.UserDto">
+        SELECT 
+            u.USER_NO,
+            u.USER_ID,
+            u.USER_NM,
+            u.EMAIL,
+            u.AUTHOR_ID,
+            /* 권한명 참조 */
+            (SELECT a.AUTHOR_NM FROM op_author a WHERE a.AUTHOR_ID = u.AUTHOR_ID) as AUTHOR_NM,
+            u.USER_STTUS_CODE,
+            /* 사용자상태코드명 매핑 (GROUP_ID 우선) */
+            (SELECT c.CODE_NM FROM op_code c WHERE c.GROUP_ID = 'R010050' AND c.CODE = u.USER_STTUS_CODE) as USER_STTUS_NM,
+            u.REGIST_DT,
+            u.REGISTER_NO,
+            /* 등록자명 참조 */
+            (SELECT r.USER_NM FROM op_user r WHERE r.USER_NO = u.REGISTER_NO) as REGISTER_NM,
+            /* 지역 중분류명 매핑 (GROUP_ID: R010070) */
+            (SELECT c1.CODE_NM FROM op_code c1 WHERE c1.GROUP_ID = 'R010070' AND c1.CODE = u.AREA_CODE) as AREA_NM,
+            /* 지역 소분류명 매핑 (op_sclas_code 필드명 반영) */
+            (SELECT c2.SCLAS_NM FROM op_sclas_code c2 
+             WHERE c2.GROUP_ID = 'R010070' 
+               AND c2.CODE = u.AREA_CODE 
+               AND c2.SCLAS_CODE = u.AREA_SE_CODE_S) as AREA_SE_NM
+        FROM op_user u
+        WHERE 1=1
+        <if test="searchStatus != null and searchStatus != '' and searchStatus != '전체'">
+            AND u.USER_STTUS_CODE = #{searchStatus}
+        </if>
+        <if test="searchAuthor != null and searchAuthor != '' and searchAuthor != '전체'">
+            AND u.AUTHOR_ID = #{searchAuthor}
+        </if>
+        <if test="searchKeyword != null and searchKeyword != ''">
+            <choose>
+                <when test="searchType == '이름'">
+                    AND u.USER_NM LIKE CONCAT('%', #{searchKeyword}, '%')
+                </when>
+                <when test="searchType == '아이디'">
+                    AND u.USER_ID LIKE CONCAT('%', #{searchKeyword}, '%')
+                </when>
+                <otherwise>
+                    AND (u.USER_NM LIKE CONCAT('%', #{searchKeyword}, '%') OR u.USER_ID LIKE CONCAT('%', #{searchKeyword}, '%'))
+                </otherwise>
+            </choose>
+        </if>
+        <if test="startDate != null and startDate != ''">
+            AND u.REGIST_DT >= STR_TO_DATE(#{startDate}, '%Y-%m-%d')
+        </if>
+        <if test="endDate != null and endDate != ''">
+            AND u.REGIST_DT &lt; DATE_ADD(STR_TO_DATE(#{endDate}, '%Y-%m-%d'), INTERVAL 1 DAY)
+        </if>
+        ORDER BY u.USER_NO DESC
+    </select>
+
+    <select id="selectUserListCount" parameterType="com.whomade.planfAi.admin.sys.user.dto.UserDto" resultType="int">
+        SELECT COUNT(*)
+        FROM op_user u
+        WHERE 1=1
+        <if test="searchStatus != null and searchStatus != '' and searchStatus != '전체'">
+            AND u.USER_STTUS_CODE = #{searchStatus}
+        </if>
+        <if test="searchAuthor != null and searchAuthor != '' and searchAuthor != '전체'">
+            AND u.AUTHOR_ID = #{searchAuthor}
+        </if>
+        <if test="searchKeyword != null and searchKeyword != ''">
+            <choose>
+                <when test="searchType == '이름'">
+                    AND u.USER_NM LIKE CONCAT('%', #{searchKeyword}, '%')
+                </when>
+                <when test="searchType == '아이디'">
+                    AND u.USER_ID LIKE CONCAT('%', #{searchKeyword}, '%')
+                </when>
+                <otherwise>
+                    AND (u.USER_NM LIKE CONCAT('%', #{searchKeyword}, '%') OR u.USER_ID LIKE CONCAT('%', #{searchKeyword}, '%'))
+                </otherwise>
+            </choose>
+        </if>
+        <if test="startDate != null and startDate != ''">
+            AND u.REGIST_DT >= STR_TO_DATE(#{startDate}, '%Y-%m-%d')
+        </if>
+        <if test="endDate != null and endDate != ''">
+            AND u.REGIST_DT &lt; DATE_ADD(STR_TO_DATE(#{endDate}, '%Y-%m-%d'), INTERVAL 1 DAY)
+        </if>
+    </select>
+
+    <select id="selectUserDetail" parameterType="long" resultType="com.whomade.planfAi.admin.sys.user.dto.UserDto">
+        SELECT 
+            u.*,
+            (SELECT a.AUTHOR_NM FROM op_author a WHERE a.AUTHOR_ID = u.AUTHOR_ID) as AUTHOR_NM,
+            (SELECT c.CODE_NM FROM op_code c WHERE c.GROUP_ID = 'R010050' AND c.CODE = u.USER_STTUS_CODE) as USER_STTUS_NM,
+            (SELECT c1.CODE_NM FROM op_code c1 WHERE c1.GROUP_ID = 'R010070' AND c1.CODE = u.AREA_CODE) as AREA_NM,
+            (SELECT c2.SCLAS_NM FROM op_sclas_code c2 
+             WHERE c2.GROUP_ID = 'R010070' 
+               AND c2.CODE = u.AREA_CODE 
+               AND c2.SCLAS_CODE = u.AREA_SE_CODE_S) as AREA_SE_NM
+        FROM op_user u
+        WHERE u.USER_NO = #{userNo}
+    </select>
+
+    <insert id="insertUser" parameterType="com.whomade.planfAi.admin.sys.user.dto.UserDto">
+        INSERT INTO op_user (
+            USER_ID, PASSWORD, USER_NM, CTTPC, EMAIL, 
+            AREA_CODE, AREA_SE_CODE_S, AREA_SE_CODE_D, USER_STTUS_CODE,
+            AUTHOR_ID, REGISTER_NO, REGIST_DT
+        ) VALUES (
+            #{userId}, #{password}, #{userNm}, #{cttpc}, #{email},
+            #{areaCode}, #{areaSeCodeS}, #{areaSeCodeD}, #{userSttusCode},
+            #{authorId}, #{registerNo}, NOW()
+        )
+    </insert>
+
+    <update id="updateUser" parameterType="com.whomade.planfAi.admin.sys.user.dto.UserDto">
+        UPDATE op_user
+        SET 
+            USER_NM = #{userNm},
+            CTTPC = #{cttpc},
+            EMAIL = #{email},
+            AREA_CODE = #{areaCode},
+            AREA_SE_CODE_S = #{areaSeCodeS},
+            AREA_SE_CODE_D = #{areaSeCodeD},
+            USER_STTUS_CODE = #{userSttusCode},
+            AUTHOR_ID = #{authorId},
+            UPDUSR_NO = #{updusrNo},
+            UPDT_DT = NOW()
+            <if test="password != null and password != ''">
+                , PASSWORD = #{password}
+            </if>
+        WHERE USER_NO = #{userNo}
+    </update>
+
+    <delete id="deleteUser" parameterType="long">
+        DELETE FROM op_user WHERE USER_NO = #{userNo}
+    </delete>
+
+    <select id="selectAuthorList" resultType="map">
+        SELECT AUTHOR_ID, AUTHOR_NM FROM op_author ORDER BY AUTHOR_ID ASC
+    </select>
+
+    <select id="selectCommonCodes" parameterType="string" resultType="map">
+        SELECT CODE, CODE_NM 
+        FROM op_code 
+        WHERE GROUP_ID = #{groupId} 
+          AND USE_YN = 'Y' 
+        ORDER BY SORT_ORDR ASC
+    </select>
+
+    <select id="selectSclasCodes" parameterType="string" resultType="map">
+        SELECT SCLAS_CODE as CODE, SCLAS_NM as CODE_NM
+        FROM op_sclas_code
+        WHERE UPPER_CODE_ID = #{areaCode}
+        ORDER BY SORT_ORDR ASC
+    </select>
+
+</mapper>

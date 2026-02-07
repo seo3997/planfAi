@@ -1,6 +1,6 @@
 package com.whomade.planfAi.admin.mgt.board.controller;
 
-import com.whomade.planfAi.admin.common.vo.UserInfoVo;
+import com.whomade.planfAi.admin.sys.common.vo.UserInfoVo;
 import com.whomade.planfAi.admin.mgt.board.service.BoardService;
 import com.whomade.planfAi.common.util.RequestUtil;
 import com.whomade.planfAi.common.vo.DataMap;

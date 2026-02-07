@@ -33,43 +33,52 @@
 
 ```text
 src/main/java/com/whomade/planfAi/
-├── PlanfAiApplication.java
-├── global/                        # 공통 설정 (Security, Config, Util)
-├── front/                         # [사용자] 도메인 영역
-│   └── profitReport/              # 수익 리포트 (Controller, Service, VO)
-└── admin/                         # [관리자] 도메인 영역
-    ├── sys/                       # 1. 시스템 관리 (System)
-    │   ├── user/                  # 관리자 계정 관리
-    │   ├── auth/                  # 권한 및 메뉴 관리
-    │   └── code/                  # 공통 코드 관리
-    └── mgt/                       # 2. 운영 관리 (Management)
-        └── board/                 # 게시판 운영 관리 (Controller, Service, VO)
+├── global/                        # 전역 설정 및 유틸리티
+│   ├── config/ | interceptor/ | util/
+├── front/                         # [사용자 서비스 도메인]
+│   └── profitReport/
+│       └── controller/ | service/ | mapper/ | vo/
+└── admin/                         # [관리자 프레임워크 도메인]
+    ├── sys/                       # 1. 시스템 관리 (Admin Core)
+    │   ├── login/
+    │   │   └── controller/ | service/ | mapper/ | vo/
+    │   ├── user/
+    │   │   └── controller/ | service/ | mapper/ | vo/
+    │   ├── author/
+    │   │   └── controller/ | service/ | mapper/ | vo/
+    │   ├── menu/
+    │   │   └── controller/ | service/ | mapper/ | vo/
+    │   ├── authmenu/
+    │   │   └── controller/ | service/ | mapper/ | vo/
+    │   ├── code/
+    │   │   └── controller/ | service/ | mapper/ | vo/
+    │   └── common/                # 관리자 전용 공통 컴포넌트
+    └── mgt/                       # 2. 운영 업무 (Operations)
+        └── board/
+            └── controller/ | service/ | mapper/ | vo/
 
 src/main/resources/
-├── mappers/                       # MyBatis SQL (Java 패키지와 동일 구조)
-│   ├── front/
-│   │   └── profitReport/
-│   └── admin/
-│       ├── sys/                   # user_sql.xml, code_sql.xml
-│       └── mgt/                   # board_sql.xml
-├── templates/                     # Thymeleaf 뷰 (URL 경로와 동일 구조)
-│   ├── front/                     # 사용자 웹 화면
-│   └── admin/                     # 관리자 웹 화면
-│       ├── layout/                # 공통 레이아웃 (header, side, footer)
-│       ├── sys/                   # 시스템 관리 HTML (userList.html 등)
-│       └── mgt/                   # 운영 관리 HTML (boardList.html 등)
-├── static/                        # 정적 자원 (브라우저 직접 접근)
-│   ├── common/                    # 공통 JS/CSS/Lib
-│   ├── admin/                     # 관리자 전용 에셋
-│   ├── front/                     # 사용자 전용 에셋
-│   └── index.html                 # 랜딩 페이지 (필요 시)
-├── schema/                        # AI 참조용 DDL (문서화 역할)
+├── schema/                        # [DDL] AI 참조용 DB 설계도
 │   ├── admin/
-│   │   ├── sys/                   # tb_admin_user.sql, tb_menu.sql
-│   │   └── mgt/                   # tb_board.sql, tb_file.sql
-│   └── front/
-├── application-dev.yml            # 설정 (Mapper 경로, DB 정보 등)
-└── pom.xml                        # Maven 의존성 관리
+│   │   ├── sys/                   # login, user, author, menu, authmenu, code 각 폴더 내 schema.sql
+│   │   └── mgt/                   # board/schema.sql
+│   └── front/                     # profitReport/schema.sql
+├── mappers/                       # [SQL] MyBatis XML (Java mapper 패키지와 매핑)
+│   ├── admin/
+│   │   ├── sys/                   # login, user, author, menu, authmenu, code 각 폴더 내 *_sql.xml
+│   │   └── mgt/                   # board/board_sql.xml
+│   └── front/                     # profitReport/profit_sql.xml
+├── templates/                     # [View] Thymeleaf HTML
+│   ├── admin/
+│   │   ├── layout/                # 공통 레이아웃 (header, side, footer)
+│   │   ├── sys/                   # user/, menu/, code/ 등 각 화면 HTML
+│   │   └── mgt/                   # board/boardList.html 등
+│   └── front/                     # profitReport/ 관련 HTML
+├── static/                        # [Assets] 정적 자원
+│   ├── common/ | admin/ | front/
+│   └── index.html
+├── application-dev.yml            # 설정 (mybatis.mapper-locations 설정 포함)
+└── pom.xml                        # 의존성 관리
 ```
 
 ## 4. 상세 요구사항
