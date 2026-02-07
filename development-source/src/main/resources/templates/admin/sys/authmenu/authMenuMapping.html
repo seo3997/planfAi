@@ -1,210 +1,196 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/layout/base :: layout(~{::title}, ~{::#admin-authmenu-content}, ~{::#admin-authmenu-script}, ~{::#admin-authmenu-head})}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>권한별 메뉴리스트 - PlanfAi 관리자</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="/admin/js/admin_common.js"></script>
-    <link href="/admin/css/admin_style.css" rel="stylesheet">
+    <th:block id="admin-authmenu-head">
+    </th:block>
 </head>
 <body>
-    <div id="app">
-        <admin-header></admin-header>
+    <div id="admin-authmenu-content">
+        <div class="page-title-box">
+            <h2 class="page-title">권한별 메뉴리스트</h2>
+            <div class="breadcrumb-area">
+                <i class="bi bi-house-door"></i> > 시스템 > <span class="text-dark fw-medium">권한별 메뉴관리</span>
+            </div>
+        </div>
 
-        <div class="main-container">
-            <admin-sidebar></admin-sidebar>
+        <div class="row">
+            <!-- Left: Menu Tree -->
+            <div class="col-lg-6">
+                <div class="tree-container position-relative">
+                    <!-- No Data Message -->
+                    <div v-if="menuTree.length === 0" class="d-flex justify-content-center align-items-center h-100 text-muted">
+                        등록된 메뉴가 없습니다.
+                    </div>
 
-            <!-- Main Content -->
-            <main class="content">
-                <!-- ... page title and mapping content ... -->
-                <div class="page-title-box">
-                    <h2 class="page-title">권한별 메뉴리스트</h2>
-                    <div class="breadcrumb-area">
-                        <i class="bi bi-house-door"></i> > 시스템 > <span class="text-dark fw-medium">권한별 메뉴관리</span>
+                    <!-- Tree Content -->
+                    <ul v-else class="ps-0">
+                        <tree-node 
+                            v-for="node in menuTree" 
+                            :key="node.menuId" 
+                            :node="node"
+                            @toggle-check="handleCheck"
+                        ></tree-node>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Right: Info Panel -->
+            <div class="col-lg-6">
+                <div class="tree-info-panel">
+                    <table class="info-table">
+                        <tr>
+                            <th>권한명</th>
+                            <td>{{ authorNm }}</td>
+                        </tr>
+                    </table>
+
+                    <div class="d-flex justify-content-center gap-2">
+                        <button class="btn btn-outline-secondary px-4" @click="goBack"><i class="bi bi-reply-fill"></i> 목록</button>
+                        <button class="btn btn-primary px-4" style="background-color: #2b4b8a;" @click="saveMapping"><i class="bi bi-check-lg"></i> 확인</button>
                     </div>
                 </div>
-
-                <div class="row">
-                    <!-- Left: Menu Tree -->
-                    <div class="col-lg-6">
-                        <div class="tree-container position-relative">
-                            <!-- No Data Message -->
-                            <div v-if="menuTree.length === 0" class="d-flex justify-content-center align-items-center h-100 text-muted">
-                                등록된 메뉴가 없습니다.
-                            </div>
-
-                            <!-- Tree Content -->
-                            <ul v-else class="ps-0">
-                                <tree-node 
-                                    v-for="node in menuTree" 
-                                    :key="node.menuId" 
-                                    :node="node"
-                                    @toggle-check="handleCheck"
-                                ></tree-node>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- Right: Info Panel -->
-                    <div class="col-lg-6">
-                        <div class="tree-info-panel">
-                            <table class="info-table">
-                                <tr>
-                                    <th>권한명</th>
-                                    <td>{{ authorNm }}</td>
-                                </tr>
-                            </table>
-
-                            <div class="d-flex justify-content-center gap-2">
-                                <button class="btn btn-outline-secondary px-4" @click="goBack"><i class="bi bi-reply-fill"></i> 목록</button>
-                                <button class="btn btn-primary px-4" style="background-color: #2b4b8a;" @click="saveMapping"><i class="bi bi-check-lg"></i> 확인</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <admin-footer></admin-footer>
-            </main>
+            </div>
         </div>
     </div>
 
-    <!-- Recursive Tree Node Component Template -->
-    <script type="text/x-template" id="tree-node-template">
-        <li class="tree-node">
-            <div class="d-flex align-items-center">
-                <span v-if="node.children && node.children.length > 0" @click="isOpen = !isOpen" class="tree-toggle">
-                    <i :class="isOpen ? 'bi bi-dash-square' : 'bi bi-plus-square'"></i>
-                </span>
-                <span v-else class="tree-placeholder"></span>
-                <input type="checkbox" 
-                    class="auth-yn-checkbox" 
-                    :checked="node.authYn === 'Y'" 
-                    @change="$emit('toggle-check', node, $event.target.checked)">
-                <span class="menu-label">{{ node.menuNm }}</span>
-            </div>
-            <ul v-if="isOpen && node.children && node.children.length > 0">
-                <tree-node 
-                    v-for="child in node.children" 
-                    :key="child.menuId" 
-                    :node="child"
-                    @toggle-check="(n, c) => $emit('toggle-check', n, c)"
-                ></tree-node>
-            </ul>
-        </li>
-    </script>
+    <div id="admin-authmenu-script">
+        <!-- Recursive Tree Node Component Template -->
+        <script type="text/x-template" id="tree-node-template">
+            <li class="tree-node">
+                <div class="d-flex align-items-center">
+                    <span v-if="node.children && node.children.length > 0" @click="isOpen = !isOpen" class="tree-toggle">
+                        <i :class="isOpen ? 'bi bi-dash-square' : 'bi bi-plus-square'"></i>
+                    </span>
+                    <span v-else class="tree-placeholder"></span>
+                    <input type="checkbox" 
+                        class="auth-yn-checkbox" 
+                        :checked="node.authYn === 'Y'" 
+                        @change="$emit('toggle-check', node, $event.target.checked)">
+                    <span class="menu-label">{{ node.menuNm }}</span>
+                </div>
+                <ul v-if="isOpen && node.children && node.children.length > 0">
+                    <tree-node 
+                        v-for="child in node.children" 
+                        :key="child.menuId" 
+                        :node="child"
+                        @toggle-check="(n, c) => $emit('toggle-check', n, c)"
+                    ></tree-node>
+                </ul>
+            </li>
+        </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        const { createApp, ref, onMounted } = Vue;
+        <script>
+            const initVueApp = true;
+            const { createApp, ref, onMounted } = Vue;
 
-        const TreeNode = {
-            name: 'tree-node',
-            template: '#tree-node-template',
-            props: ['node'],
-            emits: ['toggle-check'],
-            setup() {
-                const isOpen = ref(true);
-                return { isOpen };
-            }
-        };
+            const TreeNode = {
+                name: 'tree-node',
+                template: '#tree-node-template',
+                props: ['node'],
+                emits: ['toggle-check'],
+                setup() {
+                    const isOpen = ref(true);
+                    return { isOpen };
+                }
+            };
 
-        const app = createApp({
-            components: { TreeNode },
-            setup() {
-                const authorId = new URLSearchParams(window.location.search).get('authorId');
-                const authorNm = ref('');
-                const menuTree = ref([]);
-                const flatMenuList = ref([]);
-                const loading = ref(true);
+            const app = createApp({
+                components: { TreeNode },
+                setup() {
+                    const authorId = new URLSearchParams(window.location.search).get('authorId');
+                    const authorNm = ref('');
+                    const menuTree = ref([]);
+                    const flatMenuList = ref([]);
+                    const loading = ref(true);
 
-                const fetchAuthorInfo = async () => {
-                    try {
-                        const res = await axios.get('/api/admin/author/' + authorId);
-                        authorNm.value = res.data.authorNm;
-                    } catch (err) {
-                        alert('권한 정보 로드 실패');
-                    }
-                };
+                    const fetchAuthorInfo = async () => {
+                        try {
+                            const res = await axios.get('/api/admin/author/' + authorId);
+                            authorNm.value = res.data.authorNm;
+                        } catch (err) {
+                            alert('권한 정보 로드 실패');
+                        }
+                    };
 
-                const fetchAuthMenus = async () => {
-                    loading.value = true;
-                    try {
-                        const res = await axios.get(`/api/admin/authmenu/menus/${authorId}`);
-                        flatMenuList.value = res.data;
-                        menuTree.value = buildTree(res.data);
-                    } catch (err) {
-                        alert('메뉴 정보 로드 실패');
-                    } finally {
-                        loading.value = false;
-                    }
-                };
+                    const fetchAuthMenus = async () => {
+                        loading.value = true;
+                        try {
+                            const res = await axios.get(`/api/admin/authmenu/menus/${authorId}`);
+                            flatMenuList.value = res.data;
+                            menuTree.value = buildTree(res.data);
+                        } catch (err) {
+                            alert('메뉴 정보 로드 실패');
+                        } finally {
+                            loading.value = false;
+                        }
+                    };
 
-                const buildTree = (list) => {
-                    const map = {};
-                    const roots = [];
-                    list.forEach(m => {
-                        m.children = [];
-                        map[m.menuId] = m;
-                    });
-                    list.forEach(m => {
-                        const pid = m.menuId.length > 4 ? m.menuId.substring(0, m.menuId.length - 4) : null;
-                        if (pid && map[pid]) {
-                            map[pid].children.push(m);
+                    const buildTree = (list) => {
+                        const map = {};
+                        const roots = [];
+                        list.forEach(m => {
+                            m.children = [];
+                            map[m.menuId] = m;
+                        });
+                        list.forEach(m => {
+                            const pid = m.menuId.length > 4 ? m.menuId.substring(0, m.menuId.length - 4) : null;
+                            if (pid && map[pid]) {
+                                map[pid].children.push(m);
+                            } else {
+                                roots.push(m);
+                            }
+                        });
+                        return roots;
+                    };
+
+                    const handleCheck = (node, isChecked) => {
+                        node.authYn = isChecked ? 'Y' : 'N';
+                        if (node.children) setChildrenCheck(node.children, isChecked);
+                    };
+
+                    const setChildrenCheck = (children, isChecked) => {
+                        children.forEach(c => {
+                            c.authYn = isChecked ? 'Y' : 'N';
+                            if (c.children) setChildrenCheck(c.children, isChecked);
+                        });
+                    };
+
+                    const saveMapping = () => {
+                        const selectedMenuIds = flatMenuList.value
+                            .filter(m => m.authYn === 'Y')
+                            .map(m => m.menuId);
+
+                        axios.post('/api/admin/authmenu/save', {
+                            authorId: authorId,
+                            menuIds: selectedMenuIds
+                        }).then(res => {
+                            alert(res.data);
+                        }).catch(() => alert('저장 실패'));
+                    };
+
+                    const goBack = () => {
+                        location.href = '/admin/authmenu/selectPageListAuthMenuMgt.do';
+                    };
+
+                    onMounted(() => {
+                        AdminMenu.init();
+                        if (authorId) {
+                            fetchAuthorInfo();
+                            fetchAuthMenus();
                         } else {
-                            roots.push(m);
+                            alert('권한 ID가 없습니다.');
+                            goBack();
                         }
                     });
-                    return roots;
-                };
 
-                const handleCheck = (node, isChecked) => {
-                    node.authYn = isChecked ? 'Y' : 'N';
-                    if (node.children) setChildrenCheck(node.children, isChecked);
-                };
-
-                const setChildrenCheck = (children, isChecked) => {
-                    children.forEach(c => {
-                        c.authYn = isChecked ? 'Y' : 'N';
-                        if (c.children) setChildrenCheck(c.children, isChecked);
-                    });
-                };
-
-                const saveMapping = () => {
-                    const selectedMenuIds = flatMenuList.value
-                        .filter(m => m.authYn === 'Y')
-                        .map(m => m.menuId);
-
-                    axios.post('/api/admin/authmenu/save', {
-                        authorId: authorId,
-                        menuIds: selectedMenuIds
-                    }).then(res => {
-                        alert(res.data);
-                    }).catch(() => alert('저장 실패'));
-                };
-
-                const goBack = () => {
-                    location.href = '/admin/authmenu/selectPageListAuthMenuMgt.do';
-                };
-
-                onMounted(() => {
-                    AdminMenu.init();
-                    if (authorId) {
-                        fetchAuthorInfo();
-                        fetchAuthMenus();
-                    } else {
-                        alert('권한 ID가 없습니다.');
-                        goBack();
-                    }
-                });
-
-                return { authorNm, menuTree, loading, handleCheck, saveMapping, goBack };
-            }
-        });
-        AdminLayout.register(app);
-        app.mount('#app');
-    </script>
+                    return { authorNm, menuTree, loading, handleCheck, saveMapping, goBack };
+                }
+            });
+            AdminLayout.register(app);
+            app.mount('#app');
+        </script>
+    </div>
 </body>
 </html>

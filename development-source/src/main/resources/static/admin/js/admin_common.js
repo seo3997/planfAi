@@ -198,28 +198,7 @@ const AdminProfileModal = {
 };
 
 const AdminHeader = {
-    template: `
-        <div>
-            <header class="admin-header">
-                <div class="logo-area" @click="goHome" style="cursor:pointer">planF</div>
-                <nav class="nav-area">
-                    <div v-for="menu in menuState.topMenus" 
-                         :key="menu.menuId" 
-                         class="nav-item" 
-                         :class="{ active: menuState.activeTopId === menu.menuId }"
-                         @click="changeTop(menu.menuId)">
-                        {{ menu.menuNm }}
-                    </div>
-                </nav>
-                <div class="user-info">
-                    <i class="bi bi-person-fill me-1"></i> 
-                    <span @click="showProfileModal = true" style="cursor:pointer;">{{ loginId }}</span>
-                    <a href="/admin/logout.do" class="ms-3"><i class="bi bi-unlock-fill me-1"></i> Logout</a>
-                </div>
-            </header>
-            <admin-profile-modal v-if="showProfileModal" @close="showProfileModal = false"></admin-profile-modal>
-        </div>
-    `,
+    template: '#admin-header-template',
     setup() {
         const menuState = AdminMenu.state;
         const showProfileModal = Vue.ref(false);
@@ -248,22 +227,7 @@ const AdminHeader = {
 };
 
 const AdminSidebar = {
-    template: `
-        <aside class="sidebar">
-            <div v-for="menu in menuState.leftMenus" :key="menu.menuId">
-                <div v-if="menu.menuTyCode === '10'" class="nav-link category" @click="menu.isExpanded = !menu.isExpanded">
-                    <i class="bi" :class="menu.isExpanded ? 'bi-chevron-down' : 'bi-chevron-right'"></i>
-                    {{ menu.menuNm }}
-                </div>
-                <a v-else-if="menu.menuTyCode === '20'" 
-                   :href="menu.url" 
-                   class="nav-link" 
-                   :class="{ active: currentPath === menu.url }">
-                    {{ menu.menuNm }}
-                </a>
-            </div>
-        </aside>
-    `,
+    template: '#admin-sidebar-template',
     setup() {
         const menuState = AdminMenu.state;
         const currentPath = window.location.pathname;
@@ -272,11 +236,10 @@ const AdminSidebar = {
 };
 
 const AdminFooter = {
-    template: `
-        <footer class="admin-footer">
-            Copyright 2026. <strong>planF</strong>. All rights reserved.
-        </footer>
-    `
+    template: '#admin-footer-template',
+    setup() {
+        return {};
+    }
 };
 
 const AdminCode = {

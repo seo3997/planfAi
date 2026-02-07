@@ -1,179 +1,165 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/layout/base :: layout(~{::title}, ~{::#admin-board-content}, ~{::#admin-board-script}, ~{})}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>게시판 관리 - planF</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="/admin/js/admin_common.js"></script>
-    <link href="/admin/css/admin_style.css" rel="stylesheet">
 </head>
 <body>
-    <div id="app">
-        <admin-header></admin-header>
-
-        <div class="main-container">
-            <admin-sidebar></admin-sidebar>
-
-            <main class="content">
-                <div class="page-title-box">
-                    <h2 class="page-title">게시판</h2>
-                    <div class="breadcrumb-area">
-                        <i class="bi bi-house-door text-muted"></i> > 게시판 > <span class="text-primary fw-medium">게시판</span>
-                    </div>
-                </div>
-
-                <!-- 검색 영역 -->
-                <table class="search-table mb-4">
-                    <tr>
-                        <th>게시판 구분</th>
-                        <td>
-                            <select class="form-select form-select-sm" style="width: 350px;" v-model="searchDto.sch_bbs_se_code">
-                                <option value="">전체</option>
-                                <option v-for="item in categoryCodes" :key="item.CODE" :value="item.CODE">
-                                    {{ item.CODE_NM }}
-                                </option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>상세 검색</th>
-                        <td>
-                            <div class="d-flex gap-2">
-                                <input type="text" class="form-control form-control-sm" style="width: 478px;" v-model="searchDto.sch_text" placeholder="검색어를 입력하세요" @keyup.enter="fetchBoardList">
-                            </div>
-                        </td>
-                    </tr>
-                    <tr class="search-actions-row">
-                        <td colspan="2">
-                            <div class="d-flex justify-content-end p-2 gap-2">
-                                <button class="btn-init d-flex align-items-center" @click="resetSearch"><i class="bi bi-arrow-counterclockwise me-1"></i> 초기화</button>
-                                <button class="btn-search-submit d-flex align-items-center" @click="fetchBoardList"><i class="bi bi-search me-1"></i> 검색</button>
-                            </div>
-                        </td>
-                    </tr>
-                </table>
-
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div class="text-muted fs-7">
-                        검색결과 <span class="text-primary fw-bold">{{ totalCount }}</span>개
-                    </div>
-                    <button class="btn-regist" @click="goForm"><i class="bi bi-pencil"></i> 등록</button>
-                </div>
-
-                <div class="data-table-wrapper">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 80px;">No</th>
-                                <th>자료제목</th>
-                                <th style="width: 150px;">작성자</th>
-                                <th style="width: 150px;">작성일</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(item, index) in boardList" :key="item.BBS_SEQ" @click="goDetail(item.BBS_SEQ)" style="cursor: pointer;">
-                                <td>{{ totalCount - ((currentPage - 1) * pageSize) - index }}</td>
-                                <td class="text-start px-3 text-dark">{{ item.SJ }}</td>
-                                <td>{{ item.REGISTER_NM }}</td>
-                                <td>{{ formatDate(item.REGIST_DT) }}</td>
-                            </tr>
-                            <tr v-if="boardList.length === 0">
-                                <td colspan="4" class="text-center py-5 text-muted">등록된 게시글이 없습니다.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- 페이징 -->
-                <admin-pagination 
-                    :total-count="totalCount" 
-                    :current-page="currentPage" 
-                    :page-size="pageSize"
-                    @change-page="handlePageChange">
-                </admin-pagination>
-
-                <admin-footer></admin-footer>
-            </main>
+    <div id="admin-board-content">
+        <div class="page-title-box">
+            <h2 class="page-title">게시판</h2>
+            <div class="breadcrumb-area">
+                <i class="bi bi-house-door text-muted"></i> > 게시판 > <span class="text-primary fw-medium">게시판</span>
+            </div>
         </div>
+
+        <!-- 검색 영역 -->
+        <table class="search-table mb-4">
+            <tr>
+                <th>게시판 구분</th>
+                <td>
+                    <select class="form-select form-select-sm" style="width: 350px;" v-model="searchDto.sch_bbs_se_code">
+                        <option value="">전체</option>
+                        <option v-for="item in categoryCodes" :key="item.CODE" :value="item.CODE">
+                            {{ item.CODE_NM }}
+                        </option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>상세 검색</th>
+                <td>
+                    <div class="d-flex gap-2">
+                        <input type="text" class="form-control form-control-sm" style="width: 478px;" v-model="searchDto.sch_text" placeholder="검색어를 입력하세요" @keyup.enter="fetchBoardList">
+                    </div>
+                </td>
+            </tr>
+            <tr class="search-actions-row">
+                <td colspan="2">
+                    <div class="d-flex justify-content-end p-2 gap-2">
+                        <button class="btn-init d-flex align-items-center" @click="resetSearch"><i class="bi bi-arrow-counterclockwise me-1"></i> 초기화</button>
+                        <button class="btn-search-submit d-flex align-items-center" @click="fetchBoardList"><i class="bi bi-search me-1"></i> 검색</button>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="text-muted fs-7">
+                검색결과 <span class="text-primary fw-bold">{{ totalCount }}</span>개
+            </div>
+            <button class="btn-regist" @click="goForm"><i class="bi bi-pencil"></i> 등록</button>
+        </div>
+
+        <div class="data-table-wrapper">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">No</th>
+                        <th>자료제목</th>
+                        <th style="width: 150px;">작성자</th>
+                        <th style="width: 150px;">작성일</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(item, index) in boardList" :key="item.BBS_SEQ" @click="goDetail(item.BBS_SEQ)" style="cursor: pointer;">
+                        <td>{{ totalCount - ((currentPage - 1) * pageSize) - index }}</td>
+                        <td class="text-start px-3 text-dark">{{ item.SJ }}</td>
+                        <td>{{ item.REGISTER_NM }}</td>
+                        <td>{{ formatDate(item.REGIST_DT) }}</td>
+                    </tr>
+                    <tr v-if="boardList.length === 0">
+                        <td colspan="4" class="text-center py-5 text-muted">등록된 게시글이 없습니다.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 페이징 -->
+        <admin-pagination 
+            :total-count="totalCount" 
+            :current-page="currentPage" 
+            :page-size="pageSize"
+            @change-page="handlePageChange">
+        </admin-pagination>
     </div>
 
-    <script>
-        const { createApp, ref, onMounted, computed } = Vue;
+    <div id="admin-board-script">
+        <script>
+            const initVueApp = true;
+            const { createApp, ref, onMounted, computed } = Vue;
 
-        const app = createApp({
-            setup() {
-                const boardList = ref([]);
-                const totalCount = ref(0);
-                const currentPage = ref(1);
-                const pageSize = 10;
-                const categoryCodes = ref([]);
+            const app = createApp({
+                setup() {
+                    const boardList = ref([]);
+                    const totalCount = ref(0);
+                    const currentPage = ref(1);
+                    const pageSize = 10;
+                    const categoryCodes = ref([]);
 
-                const searchDto = ref({
-                    sch_bbs_se_code: '',
-                    sch_text: ''
-                });
-
-                const fetchCategories = async () => {
-                    categoryCodes.value = await AdminCode.getCodes('R010170');
-                };
-
-                const fetchBoardList = () => {
-                    axios.get('/api/admin/mgt/board/list', {
-                        params: { ...searchDto.value, page: currentPage.value, size: pageSize }
-                    }).then(res => {
-                        boardList.value = res.data.list;
-                        totalCount.value = res.data.totalCount;
-                    }).catch(err => {
-                        console.error('Error fetching board list:', err);
-                    });
-                };
-
-                const resetSearch = () => {
-                    searchDto.value = {
+                    const searchDto = ref({
                         sch_bbs_se_code: '',
                         sch_text: ''
+                    });
+
+                    const fetchCategories = async () => {
+                        categoryCodes.value = await AdminCode.getCodes('R010170');
                     };
-                    currentPage.value = 1;
-                    fetchBoardList();
-                };
 
-                const formatDate = (dt) => {
-                    if (!dt) return '';
-                    return dt.split(' ')[0].replace(/-/g, '.');
-                };
+                    const fetchBoardList = () => {
+                        axios.get('/api/admin/mgt/board/list', {
+                            params: { ...searchDto.value, page: currentPage.value, size: pageSize }
+                        }).then(res => {
+                            boardList.value = res.data.list;
+                            totalCount.value = res.data.totalCount;
+                        }).catch(err => {
+                            console.error('Error fetching board list:', err);
+                        });
+                    };
 
-                const handlePageChange = (p) => {
-                    currentPage.value = p;
-                    fetchBoardList();
-                };
+                    const resetSearch = () => {
+                        searchDto.value = {
+                            sch_bbs_se_code: '',
+                            sch_text: ''
+                        };
+                        currentPage.value = 1;
+                        fetchBoardList();
+                    };
 
-                const goDetail = (seq) => {
-                    location.href = `/admin/mgt/mboard/selectBoard.do?bbs_seq=${seq}`;
-                };
+                    const formatDate = (dt) => {
+                        if (!dt) return '';
+                        return dt.split(' ')[0].replace(/-/g, '.');
+                    };
 
-                const goForm = () => {
-                    location.href = '/admin/mgt/mboard/insertFormBoard.do';
-                };
+                    const handlePageChange = (p) => {
+                        currentPage.value = p;
+                        fetchBoardList();
+                    };
 
-                onMounted(() => {
-                    AdminMenu.init();
-                    fetchCategories();
-                    fetchBoardList();
-                });
+                    const goDetail = (seq) => {
+                        location.href = `/admin/mgt/mboard/selectBoard.do?bbs_seq=${seq}`;
+                    };
 
-                return {
-                    boardList, totalCount, currentPage, pageSize,
-                    searchDto, categoryCodes,
-                    fetchBoardList, resetSearch, handlePageChange, goDetail, goForm, formatDate
-                };
-            }
-        });
-        AdminLayout.register(app);
-        app.mount('#app');
-    </script>
+                    const goForm = () => {
+                        location.href = '/admin/mgt/mboard/insertFormBoard.do';
+                    };
+
+                    onMounted(() => {
+                        AdminMenu.init();
+                        fetchCategories();
+                        fetchBoardList();
+                    });
+
+                    return {
+                        boardList, totalCount, currentPage, pageSize,
+                        searchDto, categoryCodes,
+                        fetchBoardList, resetSearch, handlePageChange, goDetail, goForm, formatDate
+                    };
+                }
+            });
+            AdminLayout.register(app);
+            app.mount('#app');
+        </script>
+    </div>
 </body>
 </html>

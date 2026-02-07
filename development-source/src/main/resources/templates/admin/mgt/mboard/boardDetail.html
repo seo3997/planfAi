@@ -1,166 +1,152 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/layout/base :: layout(~{::title}, ~{::#admin-board-content}, ~{::#admin-board-script}, ~{})}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>게시글 상세 - planF</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="/admin/js/admin_common.js"></script>
-    <link href="/admin/css/admin_style.css" rel="stylesheet">
 </head>
 <body>
-    <div id="app">
-        <admin-header></admin-header>
+    <div id="admin-board-content">
+        <div class="page-title-box">
+            <h2 class="page-title">게시판 상세</h2>
+            <div class="breadcrumb-area">
+                <i class="bi bi-house-door text-muted"></i> > 게시판 > <span class="text-primary fw-medium">게시판</span>
+            </div>
+        </div>
 
-        <div class="main-container">
-            <admin-sidebar></admin-sidebar>
+        <div class="form-section">
+            <div class="section-title">
+                <i class="bi bi-caret-right-fill text-primary"></i> 게시글 상세 정보
+            </div>
+            <table class="info-table">
+                <tr>
+                    <th>게시판 구분</th>
+                    <td>{{ board.BBS_SE_NM }}</td>
+                    <th>등록일시</th>
+                    <td>{{ formatDate(board.REGIST_DT) }}</td>
+                </tr>
+                <tr>
+                    <th>제목</th>
+                    <td colspan="3">{{ board.SJ }}</td>
+                </tr>
+                <tr>
+                    <th>등록자명</th>
+                    <td>{{ board.REGISTER_NM }}</td>
+                    <th>등록자ID</th>
+                    <td>{{ board.REGISTER_ID }}</td>
+                </tr>
+                <tr>
+                    <th style="vertical-align: top;">내용</th>
+                    <td colspan="3">
+                        <div class="content-area">{{ board.CN }}</div>
+                        <!-- 화면표시 설정일 때 이미지만 본문에 노출 -->
+                        <div v-if="board.ATCH_YN === 'N' && imageFiles.length > 0" class="mt-4 pt-3 border-top">
+                            <div v-for="file in imageFiles" :key="file.FILE_ID">
+                                <img :src="getFileUrl(file)" style="max-width: 100%; margin-bottom: 15px; border: 1px solid #eee;" />
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <!-- 다운로드 설정일 때 파일 목록 노출 -->
+                <tr v-if="board.ATCH_YN === 'Y' && board.fileList && board.fileList.length > 0">
+                    <th>첨부파일</th>
+                    <td colspan="3">
+                        <div class="file-list">
+                            <div v-for="file in board.fileList" :key="file.FILE_ID" class="mb-1">
+                                <a :href="getFileUrl(file)" :download="file.FILE_NM" class="text-decoration-none small">
+                                    <i class="bi bi-download me-1"></i> {{ file.FILE_NM }}
+                                    <span class="text-muted">({{ formatSize(file.FILE_SIZE) }})</span>
+                                </a>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
 
-            <main class="content">
-                <div class="page-title-box">
-                    <h2 class="page-title">게시판 상세</h2>
-                    <div class="breadcrumb-area">
-                        <i class="bi bi-house-door text-muted"></i> > 게시판 > <span class="text-primary fw-medium">게시판</span>
-                    </div>
-                </div>
-
-                <div class="form-section">
-                    <div class="section-title">
-                        <i class="bi bi-caret-right-fill text-primary"></i> 게시글 상세 정보
-                    </div>
-                    <table class="info-table">
-                        <tr>
-                            <th>게시판 구분</th>
-                            <td>{{ board.BBS_SE_NM }}</td>
-                            <th>등록일시</th>
-                            <td>{{ formatDate(board.REGIST_DT) }}</td>
-                        </tr>
-                        <tr>
-                            <th>제목</th>
-                            <td colspan="3">{{ board.SJ }}</td>
-                        </tr>
-                        <tr>
-                            <th>등록자명</th>
-                            <td>{{ board.REGISTER_NM }}</td>
-                            <th>등록자ID</th>
-                            <td>{{ board.REGISTER_ID }}</td>
-                        </tr>
-                        <tr>
-                            <th style="vertical-align: top;">내용</th>
-                            <td colspan="3">
-                                <div class="content-area">{{ board.CN }}</div>
-                                <!-- 화면표시 설정일 때 이미지만 본문에 노출 -->
-                                <div v-if="board.ATCH_YN === 'N' && imageFiles.length > 0" class="mt-4 pt-3 border-top">
-                                    <div v-for="file in imageFiles" :key="file.FILE_ID">
-                                        <img :src="getFileUrl(file)" style="max-width: 100%; margin-bottom: 15px; border: 1px solid #eee;" />
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <!-- 다운로드 설정일 때 파일 목록 노출 -->
-                        <tr v-if="board.ATCH_YN === 'Y' && board.fileList && board.fileList.length > 0">
-                            <th>첨부파일</th>
-                            <td colspan="3">
-                                <div class="file-list">
-                                    <div v-for="file in board.fileList" :key="file.FILE_ID" class="mb-1">
-                                        <a :href="getFileUrl(file)" :download="file.FILE_NM" class="text-decoration-none small">
-                                            <i class="bi bi-download me-1"></i> {{ file.FILE_NM }}
-                                            <span class="text-muted">({{ formatSize(file.FILE_SIZE) }})</span>
-                                        </a>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-
-                <div class="d-flex justify-content-center gap-2 mt-4 mb-5">
-                    <button class="btn btn-list" @click="goList"><i class="bi bi-reply"></i> 목록</button>
-                    <button class="btn btn-edit" @click="goUpdate"><i class="bi bi-pencil-square"></i> 수정</button>
-                    <button class="btn btn-delete" @click="deleteBoard"><i class="bi bi-trash"></i> 삭제</button>
-                </div>
-
-                <admin-footer></admin-footer>
-            </main>
+        <div class="d-flex justify-content-center gap-2 mt-4 mb-5">
+            <button class="btn btn-list" @click="goList"><i class="bi bi-reply"></i> 목록</button>
+            <button class="btn btn-edit" @click="goUpdate"><i class="bi bi-pencil-square"></i> 수정</button>
+            <button class="btn btn-delete" @click="deleteBoard"><i class="bi bi-trash"></i> 삭제</button>
         </div>
     </div>
 
-    <script>
-        const { createApp, ref, onMounted, computed } = Vue;
+    <div id="admin-board-script">
+        <script>
+            const initVueApp = true;
+            const { createApp, ref, onMounted, computed } = Vue;
 
-        const app = createApp({
-            setup() {
-                const board = ref({
-                    fileList: []
-                });
-                const params = new URLSearchParams(window.location.search);
-                const bbsSeq = params.get('bbs_seq');
-
-                const fetchBoardDetail = () => {
-                    if(!bbsSeq) return;
-                    axios.get(`/api/admin/mgt/board/${bbsSeq}`)
-                        .then(res => board.value = res.data);
-                };
-
-                const imageFiles = computed(() => {
-                    if (!board.value.fileList) return [];
-                    const imgExts = ['jpg', 'jpeg', 'png', 'gif', 'bmp'];
-                    return board.value.fileList.filter(f => {
-                        const ext = f.FILE_EXTSN_NM ? f.FILE_EXTSN_NM.toLowerCase() : '';
-                        return imgExts.includes(ext);
+            const app = createApp({
+                setup() {
+                    const board = ref({
+                        fileList: []
                     });
-                });
+                    const params = new URLSearchParams(window.location.search);
+                    const bbsSeq = params.get('bbs_seq');
 
-                const getFileUrl = (file) => {
-                    if (!file) return '';
-                    // FILE_PARTN_COURS already contains the path (saved in DB)
-                    const extsn = file.FILE_EXTSN_NM ? '.' + file.FILE_EXTSN_NM : '';
-                    return `${file.FILE_PARTN_COURS}${file.FILE_ID}${extsn}`;
-                };
+                    const fetchBoardDetail = () => {
+                        if(!bbsSeq) return;
+                        axios.get(`/api/admin/mgt/board/${bbsSeq}`)
+                            .then(res => board.value = res.data);
+                    };
 
-                const formatSize = (bytes) => {
-                    if (!bytes || bytes === 0) return '0 B';
-                    const k = 1024;
-                    const sizes = ['B', 'KB', 'MB', 'GB'];
-                    const i = Math.floor(Math.log(bytes) / Math.log(k));
-                    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-                };
+                    const imageFiles = computed(() => {
+                        if (!board.value.fileList) return [];
+                        const imgExts = ['jpg', 'jpeg', 'png', 'gif', 'bmp'];
+                        return board.value.fileList.filter(f => {
+                            const ext = f.FILE_EXTSN_NM ? f.FILE_EXTSN_NM.toLowerCase() : '';
+                            return imgExts.includes(ext);
+                        });
+                    });
 
-                const formatDate = (dt) => {
-                    if (!dt) return '';
-                    return dt.split(' ')[0].replace(/-/g, '.');
-                };
+                    const getFileUrl = (file) => {
+                        if (!file) return '';
+                        // FILE_PARTN_COURS already contains the path (saved in DB)
+                        const extsn = file.FILE_EXTSN_NM ? '.' + file.FILE_EXTSN_NM : '';
+                        return `${file.FILE_PARTN_COURS}${file.FILE_ID}${extsn}`;
+                    };
 
-                const goList = () => {
-                    location.href = '/admin/mgt/mboard/selectPageListBoard.do';
-                };
+                    const formatSize = (bytes) => {
+                        if (!bytes || bytes === 0) return '0 B';
+                        const k = 1024;
+                        const sizes = ['B', 'KB', 'MB', 'GB'];
+                        const i = Math.floor(Math.log(bytes) / Math.log(k));
+                        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+                    };
 
-                const goUpdate = () => {
-                    location.href = `/admin/mgt/mboard/updateFormBoard.do?bbs_seq=${bbsSeq}`;
-                };
+                    const formatDate = (dt) => {
+                        if (!dt) return '';
+                        return dt.split(' ')[0].replace(/-/g, '.');
+                    };
 
-                const deleteBoard = () => {
-                    if (confirm('정말 삭제하시겠습니까?')) {
-                        axios.delete(`/api/admin/mgt/board/${bbsSeq}`)
-                            .then(() => {
-                                alert('삭제되었습니다.');
-                                goList();
-                            });
-                    }
-                };
+                    const goList = () => {
+                        location.href = '/admin/mgt/mboard/selectPageListBoard.do';
+                    };
 
-                onMounted(() => {
-                    AdminMenu.init();
-                    fetchBoardDetail();
-                });
+                    const goUpdate = () => {
+                        location.href = `/admin/mgt/mboard/updateFormBoard.do?bbs_seq=${bbsSeq}`;
+                    };
 
-                return { board, imageFiles, goList, goUpdate, deleteBoard, formatDate, getFileUrl, formatSize };
-            }
-        });
-        AdminLayout.register(app);
-        app.mount('#app');
-    </script>
+                    const deleteBoard = () => {
+                        if (confirm('정말 삭제하시겠습니까?')) {
+                            axios.delete(`/api/admin/mgt/board/${bbsSeq}`)
+                                .then(() => {
+                                    alert('삭제되었습니다.');
+                                    goList();
+                                });
+                        }
+                    };
+
+                    onMounted(() => {
+                        AdminMenu.init();
+                        fetchBoardDetail();
+                    });
+
+                    return { board, imageFiles, goList, goUpdate, deleteBoard, formatDate, getFileUrl, formatSize };
+                }
+            });
+            AdminLayout.register(app);
+            app.mount('#app');
+        </script>
+    </div>
 </body>
 </html>

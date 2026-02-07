@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div th:fragment="sideTemplate">
+        <script type="text/x-template" id="admin-sidebar-template">
+            <aside class="sidebar">
+                <div v-for="menu in menuState.leftMenus" :key="menu.menuId">
+                    <div v-if="menu.menuTyCode === '10'" class="nav-link category" @click="menu.isExpanded = !menu.isExpanded">
+                        <i class="bi" :class="menu.isExpanded ? 'bi-chevron-down' : 'bi-chevron-right'"></i>
+                        {{ menu.menuNm }}
+                    </div>
+                    <a v-else-if="menu.menuTyCode === '20'" 
+                       :href="menu.url" 
+                       class="nav-link" 
+                       :class="{ active: currentPath === menu.url }">
+                        {{ menu.menuNm }}
+                    </a>
+                </div>
+            </aside>
+        </script>
+    </div>
+</body>
+</html>

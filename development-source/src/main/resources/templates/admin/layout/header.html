@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div th:fragment="headerTemplate">
+        <script type="text/x-template" id="admin-header-template">
+            <header class="admin-header">
+                <div class="logo-area" @click="goHome" style="cursor:pointer">planF</div>
+                <nav class="nav-area">
+                    <div v-for="menu in menuState.topMenus" 
+                         :key="menu.menuId" 
+                         class="nav-item" 
+                         :class="{ active: menuState.activeTopId === menu.menuId }"
+                         @click="changeTop(menu.menuId)">
+                        {{ menu.menuNm }}
+                    </div>
+                </nav>
+                <div class="user-info">
+                    <i class="bi bi-person-fill me-1"></i> 
+                    <span @click="showProfileModal = true" style="cursor:pointer;">{{ loginId }}</span>
+                    <a href="/admin/logout.do" class="ms-3"><i class="bi bi-unlock-fill me-1"></i> Logout</a>
+                </div>
+            </header>
+            <admin-profile-modal v-if="showProfileModal" @close="showProfileModal = false"></admin-profile-modal>
+        </script>
+    </div>
+</body>
+</html>
