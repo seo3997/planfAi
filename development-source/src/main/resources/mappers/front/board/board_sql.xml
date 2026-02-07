@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.whomade.planfAi.front.board.mapper.FrontBoardMapper">
+
+	<select id="selectListBoard"  parameterType="dataMap" resultType="FrontBoardVo">
+        SELECT A.BBS_SEQ
+             , A.SJ
+             , A.CN
+             , A.ATCH_DOC_ID
+             , A.ATCH_YN
+             , A.REGISTER_NO
+        FROM tb_board A
+        WHERE 1=1
+        <if test="edTitle != null and edTitle != ''">
+            <choose>
+                <when test="seChoice">
+                    AND A.SJ LIKE CONCAT(#{edTitle}, '%')
+                </when>
+              <when test="seChoice == '2'">
+                    AND A.CN LIKE CONCAT(#{edTitle}, '%')
+                </when>
+                <otherwise>
+                    AND (A.SJ LIKE CONCAT(#{edTitle}, '%') OR A.CN LIKE CONCAT(#{edTitle}, '%'))
+                </otherwise>
+            </choose>
+        </if>
+    </select>
+
+
+
+</mapper>

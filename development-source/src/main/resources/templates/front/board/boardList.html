@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>게시판 리스트</title>
+</head>
+<body>
+<h1>게시판 목록</h1>
+<form name="aform" method="post" action="/front/board/selectPageListBoard.do">
+<div>
+    <select id="seChoice" name="seChoice">
+        <option value="99" th:selected="${paramMap['seChoice'] == '99'}">전체</option>
+        <option value="1" th:selected="${paramMap['seChoice'] == '1'}">제목</option>
+        <option value="2" th:selected="${paramMap['seChoice'] == '2'}">내용</option>
+    </select>
+    <input type="text"  id='edTitle' name="edTitle" th:value="${paramMap['edTitle']}" placeholder="검색어를 입력하세요">
+    <button onclick="searchBoard()"> 검색</button>
+</div>
+</form>
+<table>
+    <thead>
+    <tr>
+        <th>제목</th>
+        <th>내용</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="board : ${list}">
+        <td th:text="${board.sj}">제목이 들어갈 자리</td>
+        <td th:text="${board.cn}">내용이 들어갈 자리</td>
+    </tr>
+    </tbody>
+</table>
+</body>
+<script>
+    function searchBoard() {
+        // 3. 폼을 명확하게 찾아서 전송
+        const form = document.aform;
+
+        // 검색 로직 추가 가능 (예: 빈 값 체크)
+        if(document.getElementById('edTitle').value.trim() === "") {
+            alert("검색어를 입력해주세요.");
+            return;
+        }
+
+        form.submit();
+    }
+</script>
+</html>
