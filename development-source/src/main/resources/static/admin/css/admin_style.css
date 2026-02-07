@@ -3696,10 +3696,6 @@ body {
   background-color: #213a6b !important;
   border-color: #213a6b !important;
 }
-.btn-primary:active {
-  background-color: #1a2d54 !important;
-  border-color: #1a2d54 !important;
-}
 
 .btn-danger {
   background-color: var(--delete-red) !important;
@@ -3711,12 +3707,42 @@ body {
   background-color: #d44e2b !important;
   border-color: #d44e2b !important;
 }
-.btn-danger:active {
-  background-color: #b84325 !important;
-  border-color: #b84325 !important;
+
+/* Custom Standard Buttons - Forced Symmetry */
+button.btn-search,
+button.btn-reset {
+  width: 85px !important;
+  height: 32px !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  border-radius: 4px !important;
+  border: none !important;
+  transition: all 0.2s !important;
+  line-height: normal !important;
 }
 
-/* Common Buttons Cleanup (Standardized to Bootstrap) */
+button.btn-search {
+  background-color: var(--logo-bg) !important; /* Teal #49a7b0 */
+  color: white !important;
+}
+button.btn-search:hover {
+  background-color: #3d8c94 !important;
+}
+
+button.btn-reset {
+  background-color: #6c757d !important;
+  color: white !important;
+}
+button.btn-reset:hover {
+  background-color: #5a6268 !important;
+}
+
+/* Common Buttons Cleanup */
 .btn-list {
   background-color: #6c757d;
   color: white;
