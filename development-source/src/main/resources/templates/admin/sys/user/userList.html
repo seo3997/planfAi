@@ -66,8 +66,8 @@
                 <tr class="search-actions-row">
                     <td colspan="4">
                         <div class="d-flex justify-content-end p-2 gap-2">
-                            <b-button variant="outline-secondary" size="sm" @click="resetSearch"><i class="bi bi-arrow-counterclockwise me-1"></i>초기화</b-button>
-                            <b-button variant="primary" size="sm" @click="fetchUsers"><i class="bi bi-search me-1"></i>검색</b-button>
+                            <button class="btn btn-sm btn-outline-secondary" @click="resetSearch"><i class="bi bi-arrow-counterclockwise me-1"></i>초기화</button>
+                            <button class="btn btn-sm btn-primary" @click="fetchUsers"><i class="bi bi-search me-1"></i>검색</button>
                         </div>
                     </td>
                 </tr>
@@ -77,9 +77,9 @@
                 <div class="text-muted fs-7">
                     검색결과 <span class="text-primary fw-bold">{{ totalCount }}</span>개
                 </div>
-                <b-button href="/admin/user/insertFormUserMgt.do" variant="primary" size="sm">
+                <button class="btn btn-sm btn-primary" @click="location.href='/admin/user/insertFormUserMgt.do'">
                     <i class="bi bi-pencil me-1"></i>등록
-                </b-button>
+                </button>
             </div>
 
             <div class="data-table-wrapper">
