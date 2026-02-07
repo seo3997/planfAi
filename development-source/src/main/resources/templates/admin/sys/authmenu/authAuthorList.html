@@ -27,8 +27,8 @@
                 <tr class="search-actions-row">
                     <td colspan="2">
                         <div class="d-flex justify-content-end p-2 gap-2">
-                            <b-button variant="outline-secondary" size="sm" @click="resetSearch"><i class="bi bi-arrow-counterclockwise me-1"></i>초기화</b-button>
-                            <b-button variant="primary" size="sm" @click="fetchAuthors"><i class="bi bi-search me-1"></i>검색</b-button>
+                            <button class="btn-reset" @click="resetSearch"><i class="bi bi-arrow-counterclockwise"></i>초기화</button>
+                            <button class="btn-search" @click="fetchAuthors"><i class="bi bi-search"></i>검색</button>
                         </div>
                     </td>
                 </tr>

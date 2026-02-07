@@ -27,8 +27,8 @@
                 <tr class="search-actions-row">
                     <td colspan="2">
                         <div class="d-flex justify-content-end p-2 gap-2">
-                            <b-button variant="outline-secondary" size="sm" @click="resetSearch"><i class="bi bi-arrow-counterclockwise me-1"></i>초기화</b-button>
-                            <b-button variant="primary" size="sm" @click="fetchAuthors"><i class="bi bi-search me-1"></i>검색</b-button>
+                            <button class="btn-reset" @click="resetSearch"><i class="bi bi-arrow-counterclockwise"></i>초기화</button>
+                            <button class="btn-search" @click="fetchAuthors"><i class="bi bi-search"></i>검색</button>
                         </div>
                     </td>
                 </tr>
@@ -39,9 +39,9 @@
                 <div class="text-muted fs-7">
                     검색결과 <span class="text-primary fw-bold">{{ totCnt }}</span>개
                 </div>
-                <b-button href="/admin/author/insertFormAuthorMgt.do" variant="primary" size="sm">
-                    <i class="bi bi-pencil-square me-1"></i>등록
-                </b-button>
+                <button class="btn btn-sm btn-primary" @click="location.href='/admin/author/insertFormAuthorMgt.do'">
+                    <i class="bi bi-pencil-square"></i> 등록
+                </button>
             </div>
 
             <div class="data-table-wrapper">
