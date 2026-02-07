@@ -59,16 +59,16 @@
         <!-- Recursive Tree Node Component Template -->
         <script type="text/x-template" id="tree-node-template">
             <li class="tree-node">
-                <div class="d-flex align-items-center">
+                <div class="tree-row">
                     <span v-if="node.children && node.children.length > 0" @click="isOpen = !isOpen" class="tree-toggle">
                         <i :class="isOpen ? 'bi bi-dash-square' : 'bi bi-plus-square'"></i>
                     </span>
                     <span v-else class="tree-placeholder"></span>
                     <input type="checkbox" 
-                        class="auth-yn-checkbox" 
+                        class="tree-checkbox" 
                         :checked="node.authYn === 'Y'" 
                         @change="$emit('toggle-check', node, $event.target.checked)">
-                    <span class="menu-label">{{ node.menuNm }}</span>
+                    <span class="tree-text">{{ node.menuNm }}</span>
                 </div>
                 <ul v-if="isOpen && node.children && node.children.length > 0">
                     <tree-node 

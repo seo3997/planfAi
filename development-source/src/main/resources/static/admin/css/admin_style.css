@@ -3847,37 +3847,6 @@ body {
 }
 
 /* Tree & Menu Mapping View */
-.tree-container {
-  background: #fff;
-  padding: 20px;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-  min-height: 600px;
-  max-height: 800px;
-  overflow-y: auto;
-}
-
-.tree-node {
-  list-style: none;
-  padding-left: 0;
-  margin-top: 2px;
-}
-
-.tree-node ul {
-  padding-left: 20px;
-}
-
-.tree-toggle {
-  cursor: pointer;
-  margin-right: 2px;
-  color: #999;
-  font-size: 14px;
-  line-height: 1;
-  display: inline-flex;
-  width: 16px;
-  align-items: center;
-  justify-content: center;
-}
 
 .tree-info-panel {
   background: #fff;
@@ -3891,45 +3860,6 @@ body {
   margin-top: 25px;
 }
 
-.auth-yn-checkbox {
-  appearance: none;
-  width: 16px;
-  height: 16px;
-  border: 1px solid #aaa;
-  border-radius: 2px;
-  cursor: pointer;
-  position: relative;
-  vertical-align: middle;
-  margin-right: 4px;
-  background: #fff;
-}
-
-.auth-yn-checkbox:checked {
-  background-color: #3b5998;
-  border-color: #3b5998;
-}
-
-.auth-yn-checkbox:checked::after {
-  content: "\F633";
-  font-family: "bootstrap-icons";
-  color: white;
-  font-size: 13px;
-  position: absolute;
-  top: -1px;
-  left: 0px;
-  font-weight: bold;
-}
-
-.menu-label {
-  font-size: 13px;
-  color: #333;
-  margin-left: 2px;
-}
-
-.tree-placeholder {
-  display: inline-block;
-  width: 18px;
-}
 
 .btn-list:hover,
 .btn-submit:hover,
@@ -4544,25 +4474,60 @@ body {
 }
 
 /* ==========================================================================
+   Standard Tree Component
+   ========================================================================== */
+.tree-container, .tree-section { 
+    background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #ddd; 
+    min-height: 500px; max-height: 800px; overflow-y: auto;
+}
+.tree-section { flex: 0 0 350px; }
+.tree-list { list-style: none; padding-left: 20px; margin: 0; }
+.tree-section > .tree-list, .tree-container > .ps-0 { padding-left: 0 !important; }
+.tree-node { list-style: none; padding-left: 0; margin-top: 2px; }
+
+.tree-row { 
+    display: flex; align-items: center; padding: 6px 10px; border-radius: 4px; 
+    cursor: pointer; transition: background 0.2s; white-space: nowrap; 
+}
+.tree-row:hover { background: #f5f8ff; }
+
+.tree-toggle { 
+    width: 22px; height: 22px; display: inline-flex; justify-content: center; 
+    align-items: center; color: #666; cursor: pointer; font-size: 14px; margin-right: 4px;
+}
+.tree-label, .tree-text, .menu-label { font-size: 14px; color: #333; }
+.tree-placeholder { display: inline-block; width: 22px; }
+
+.tree-checkbox {
+    appearance: none; width: 17px; height: 17px; border: 1px solid #aaa; 
+    border-radius: 3px; cursor: pointer; position: relative; vertical-align: middle; 
+    margin-right: 8px; background: #fff; transition: all 0.2s;
+}
+.tree-checkbox:checked { background-color: #3b5998; border-color: #3b5998; }
+.tree-checkbox:checked::after {
+    content: "\F633"; font-family: "bootstrap-icons"; color: white; 
+    font-size: 12px; position: absolute; top: 50%; left: 50%; 
+    transform: translate(-50%, -50%); font-weight: bold;
+}
+
+/* Selected state overrides - placed after defaults for cascade priority */
+.tree-row.selected { background: #eef2ff; color: #3b5998 !important; font-weight: 600; }
+.tree-row.selected .tree-text,
+.tree-row.selected .tree-label,
+.tree-row.selected .menu-label,
+.tree-row.selected .tree-toggle,
+.tree-row.selected .tree-toggle i {
+    color: #3b5998 !important;
+}
+
+/* ==========================================================================
    Menu Management UI Components
    ========================================================================== */
 .menu-mgmt-container { display: flex; gap: 20px; align-items: flex-start; margin-top: 20px; }
-.tree-section { flex: 0 0 350px; background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #ddd; min-height: 600px; }
 .form-section { flex: 1; min-width: 0; }
-
 .tree-header { display: flex; gap: 8px; margin-bottom: 15px; padding-bottom: 12px; border-bottom: 1px solid #eee; }
 .btn-tree-ctrl { padding: 5px 12px; font-size: 13px; border: 1px solid #ddd; background: #fff; border-radius: 4px; display: flex; align-items: center; cursor: pointer; }
 .btn-tree-ctrl:hover { background: #f8f9fa; }
-
-.tree-list { list-style: none; padding-left: 20px; margin: 0; }
-.tree-section > .tree-list { padding-left: 0; }
-
-.tree-label-row { display: flex; align-items: center; padding: 6px 10px; border-radius: 4px; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
-.tree-label-row:hover { background: #f5f8ff; }
-.tree-label-row.selected { background: #e7f0ff; color: #0056b3; font-weight: 600; }
-
-.tree-toggle { width: 22px; height: 22px; display: inline-flex; justify-content: center; align-items: center; color: #666; margin-right: 4px; cursor: pointer; font-size: 14px; }
-.tree-label { font-size: 14px; color: #333; }
 
 .mgmt-card { background: #fff; padding: 25px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 20px; }
 .form-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
