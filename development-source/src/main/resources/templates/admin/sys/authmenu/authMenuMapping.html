@@ -19,9 +19,6 @@
             <!-- Left: Menu Tree -->
             <div class="col-lg-6">
                 <b-card class="mgmt-card shadow-sm border-0 h-100">
-                    <template #header>
-                        <h3 class="section-title mb-0">메뉴 목록</h3>
-                    </template>
                     <div class="tree-container position-relative">
                     <!-- No Data Message -->
                     <div v-if="menuTree.length === 0" class="d-flex justify-content-center align-items-center h-100 text-muted">
@@ -44,9 +41,6 @@
             <!-- Right: Info Panel -->
             <div class="col-lg-6">
                 <b-card class="mgmt-card shadow-sm border-0 h-100">
-                    <template #header>
-                        <h3 class="section-title mb-0">권한 정보</h3>
-                    </template>
                     <div class="tree-info-panel">
                     <table class="info-table">
                         <tr>
