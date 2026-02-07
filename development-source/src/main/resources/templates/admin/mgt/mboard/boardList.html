@@ -134,7 +134,7 @@
 
                     const formatDate = (dt) => {
                         if (!dt) return '';
-                        return dt.split(' ')[0].replace(/-/g, '.');
+                        return dt.split(/[ T]/)[0].replace(/-/g, '.');
                     };
 
                     const handlePageChange = (p) => {
