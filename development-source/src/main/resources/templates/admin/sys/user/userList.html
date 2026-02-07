@@ -77,7 +77,7 @@
                 <div class="text-muted fs-7">
                     검색결과 <span class="text-primary fw-bold">{{ totalCount }}</span>개
                 </div>
-                <button class="btn btn-sm btn-primary" @click="location.href='/admin/user/insertFormUserMgt.do'">
+                <button class="btn btn-sm btn-primary" @click="goRegister">
                     <i class="bi bi-pencil me-1"></i>등록
                 </button>
             </div>
@@ -199,8 +199,12 @@
                         fetchUsers();
                     };
 
+                    const goRegister = () => {
+                        window.location.href = '/admin/user/insertFormUserMgt.do';
+                    };
+
                     const goDetail = (no) => {
-                        location.href = `/admin/user/selectUserMgt.do?userNo=${no}`;
+                        window.location.href = `/admin/user/selectUserMgt.do?userNo=${no}`;
                     };
 
                     watch(dateType, (val) => {
@@ -242,7 +246,7 @@
                     return { 
                         userList, authors, statusCodes, totalCount, currentPage, pageSize, 
                         searchDto, dateType, fetchUsers, resetSearch, 
-                        formatDate, handlePageChange, goDetail 
+                        formatDate, handlePageChange, goDetail, goRegister 
                     };
                 }
             });

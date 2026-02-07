@@ -39,7 +39,7 @@
                 <div class="text-muted fs-7">
                     검색결과 <span class="text-primary fw-bold">{{ totCnt }}</span>개
                 </div>
-                <button class="btn btn-sm btn-primary" @click="location.href='/admin/author/insertFormAuthorMgt.do'">
+                <button class="btn btn-sm btn-primary" @click="goRegister">
                     <i class="bi bi-pencil-square"></i> 등록
                 </button>
             </div>
@@ -98,8 +98,12 @@
                             .finally(() => loading.value = false);
                     };
 
+                    const goRegister = () => {
+                        window.location.href = '/admin/author/insertFormAuthorMgt.do';
+                    };
+
                     const goDetail = (authorId) => {
-                        location.href = `/admin/author/updateFormAuthorMgt.do?authorId=${authorId}`;
+                        window.location.href = `/admin/author/updateFormAuthorMgt.do?authorId=${authorId}`;
                     };
 
                     const resetSearch = () => {
@@ -112,7 +116,7 @@
                         fetchAuthors();
                     });
 
-                    return { authorList, totCnt, schAuthNm, loading, goDetail, fetchAuthors, resetSearch };
+                    return { authorList, totCnt, schAuthNm, loading, goDetail, goRegister, fetchAuthors, resetSearch };
                 }
             });
             AdminLayout.register(app);
