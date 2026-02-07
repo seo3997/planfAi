@@ -12,21 +12,21 @@ public class CodeController {
     public String groupCodeList(HttpServletRequest request) {
         if (!isAuthenticated(request))
             return "redirect:/admin/login.do";
-        return "forward:/admin/code/groupCodeList.html";
+        return "admin/code/groupCodeList";
     }
 
     @GetMapping("/admin/code/insertFormGroupCodeMgt.do")
     public String groupCodeForm(HttpServletRequest request) {
         if (!isAuthenticated(request))
             return "redirect:/admin/login.do";
-        return "forward:/admin/code/groupCodeForm.html";
+        return "admin/code/groupCodeForm";
     }
 
     @GetMapping("/admin/code/selectListCodeMgt.do")
     public String codeMgt(HttpServletRequest request) {
         if (!isAuthenticated(request))
             return "redirect:/admin/login.do";
-        return "forward:/admin/code/codeMgt.html";
+        return "admin/code/codeMgt";
     }
 
     private boolean isAuthenticated(HttpServletRequest request) {

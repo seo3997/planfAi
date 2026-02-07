@@ -14,28 +14,28 @@ public class BoardController {
     public String boardList(HttpServletRequest request) {
         if (!isAuthenticated(request))
             return "redirect:/admin/login.do";
-        return "forward:/admin/mgt/mboard/boardList.html";
+        return "admin/mgt/mboard/boardList";
     }
 
     @GetMapping("/insertFormBoard.do")
     public String boardInsertForm(HttpServletRequest request) {
         if (!isAuthenticated(request))
             return "redirect:/admin/login.do";
-        return "forward:/admin/mgt/mboard/boardForm.html";
+        return "admin/mgt/mboard/boardForm";
     }
 
     @GetMapping("/selectBoard.do")
     public String boardDetail(HttpServletRequest request) {
         if (!isAuthenticated(request))
             return "redirect:/admin/login.do";
-        return "forward:/admin/mgt/mboard/boardDetail.html";
+        return "admin/mgt/mboard/boardDetail";
     }
 
     @GetMapping("/updateFormBoard.do")
     public String boardUpdateForm(HttpServletRequest request) {
         if (!isAuthenticated(request))
             return "redirect:/admin/login.do";
-        return "forward:/admin/mgt/mboard/boardUpdate.html";
+        return "admin/mgt/mboard/boardUpdate";
     }
 
     private boolean isAuthenticated(HttpServletRequest request) {

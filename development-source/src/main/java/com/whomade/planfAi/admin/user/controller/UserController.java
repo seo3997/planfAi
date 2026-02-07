@@ -12,28 +12,28 @@ public class UserController {
     public String userList(HttpServletRequest request) {
         if (!isAuthenticated(request))
             return "redirect:/admin/login.do";
-        return "forward:/admin/user/userList.html";
+        return "admin/user/userList";
     }
 
     @GetMapping("/admin/user/insertFormUserMgt.do")
     public String userInsertForm(HttpServletRequest request) {
         if (!isAuthenticated(request))
             return "redirect:/admin/login.do";
-        return "forward:/admin/user/userForm.html";
+        return "admin/user/userForm";
     }
 
     @GetMapping("/admin/user/selectUserMgt.do")
     public String userDetail(HttpServletRequest request) {
         if (!isAuthenticated(request))
             return "redirect:/admin/login.do";
-        return "forward:/admin/user/userDetail.html";
+        return "admin/user/userDetail";
     }
 
     @GetMapping("/admin/user/updateFormUserMgt.do")
     public String userUpdateForm(HttpServletRequest request) {
         if (!isAuthenticated(request))
             return "redirect:/admin/login.do";
-        return "forward:/admin/user/userUpdate.html";
+        return "admin/user/userUpdate";
     }
 
     private boolean isAuthenticated(HttpServletRequest request) {

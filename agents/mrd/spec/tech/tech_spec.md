@@ -52,9 +52,17 @@ src/main/resources/
 │       ├── user/ | code/ ...
 │       └── mgt/
 │           └── board/             # board_sql.xml (MyBatis SQL)
+├── template/
+│   ├── front/                     # [이동] 사용자 서비스 매퍼
+│   │   └── profitReport/
+│   └── admin/                     # 관리자 전용 매퍼
+│       ├── user/ | code/ ...
+│       └── mgt/
+│           └── board/             # board_sql.xml (MyBatis SQL)
 ├── static/
 │   ├── common/                    # 공통 에셋
 │   ├── admin/                     # 관리자 전용 에셋
+│   ├── front/                     # 관리자 전용 에셋
 │   └── index.html
 ├── schema/                        # SQL DDL (AI 참조용)
 │   ├── front/

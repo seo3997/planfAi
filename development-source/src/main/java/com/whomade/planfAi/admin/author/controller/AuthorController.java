@@ -12,6 +12,6 @@ public class AuthorController {
         if (session == null || session.getAttribute("adminUser") == null) {
             return "redirect:/admin/login.do";
         }
-        return "forward:/admin/author/authorMgt.html";
+        return "admin/author/authorMgt";
     }
 }

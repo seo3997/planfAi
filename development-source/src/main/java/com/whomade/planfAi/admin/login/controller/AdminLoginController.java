@@ -25,7 +25,7 @@ public class AdminLoginController {
      */
     @GetMapping("/admin/login.do")
     public String adminLogin() {
-        return "forward:/admin/login.html";
+        return "admin/login";
     }
 
     /**
@@ -74,6 +74,6 @@ public class AdminLoginController {
         if (session == null || session.getAttribute("adminUser") == null) {
             return "redirect:/admin/login.do";
         }
-        return "forward:/admin/main.html";
+        return "admin/main";
     }
 }

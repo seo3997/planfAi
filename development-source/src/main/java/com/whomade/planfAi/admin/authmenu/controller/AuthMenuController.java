@@ -15,7 +15,7 @@ public class AuthMenuController {
         if (session == null || session.getAttribute("adminUser") == null) {
             return "redirect:/admin/login.do";
         }
-        return "forward:/admin/authmenu/authAuthorList.html";
+        return "admin/authmenu/authAuthorList";
     }
 
     /**
@@ -27,6 +27,6 @@ public class AuthMenuController {
         if (session == null || session.getAttribute("adminUser") == null) {
             return "redirect:/admin/login.do";
         }
-        return "forward:/admin/authmenu/authMenuMapping.html";
+        return "admin/authmenu/authMenuMapping";
     }
 }
