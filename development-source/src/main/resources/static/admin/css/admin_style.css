@@ -3815,6 +3815,63 @@ body {
   border: none;
 }
 
+/* Modern Search Filter Box (Div-based) */
+.search-filter-box {
+  background: #fff;
+  border: 2px solid #3a5a9a;
+  padding: 15px 20px;
+  margin-bottom: 25px;
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 30px;
+  margin-bottom: 15px;
+}
+
+.filter-row:last-child {
+  margin-bottom: 0;
+}
+
+.filter-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex: 1; /* Equal distribution for multi-column rows */
+  min-width: 300px;
+}
+
+.filter-label {
+  font-weight: 500;
+  font-size: 13px;
+  color: #333;
+  width: 100px; /* Fixed label width */
+  flex: none;
+}
+
+.filter-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-content .form-control,
+.filter-content .form-select {
+  width: 100% !important; /* Expansion to fill the 50% slot */
+}
+
+.search-filter-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 15px;
+  border-top: 1px solid #f0f0f0;
+  margin-top: 5px;
+}
+
 .search-actions-row {
   background: #fff;
   border-top: 1px solid #f0f0f0;

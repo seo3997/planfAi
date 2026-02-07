@@ -14,36 +14,37 @@
         </div>
 
         <div class="mgmt-card">
-            <!-- 검색 영역 -->
-            <table class="search-table mb-4">
-                <tr>
-                    <th>게시판 구분</th>
-                    <td>
-                        <select class="form-select form-select-sm" style="width: 350px;" v-model="searchDto.sch_bbs_se_code">
-                            <option value="">전체</option>
-                            <option v-for="item in categoryCodes" :key="item.CODE" :value="item.CODE">
-                                {{ item.CODE_NM }}
-                            </option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <th>상세 검색</th>
-                    <td>
-                        <div class="d-flex gap-2">
-                            <input type="text" class="form-control form-control-sm" style="width: 478px;" v-model="searchDto.sch_text" placeholder="검색어를 입력하세요" @keyup.enter="fetchBoardList">
+            <!-- 검색 영역 (Refactored to Div-based) -->
+            <div class="search-filter-box">
+                <div class="filter-row">
+                    <div class="filter-item">
+                        <div class="filter-label">게시판 구분</div>
+                        <div class="filter-content">
+                            <select class="form-select form-select-sm" v-model="searchDto.sch_bbs_se_code">
+                                <option value="">전체</option>
+                                <option v-for="item in categoryCodes" :key="item.CODE" :value="item.CODE">
+                                    {{ item.CODE_NM }}
+                                </option>
+                            </select>
                         </div>
-                    </td>
-                </tr>
-                <tr class="search-actions-row">
-                    <td colspan="2">
-                        <div class="d-flex justify-content-end p-2 gap-2">
-                            <button class="btn btn-sm btn-reset d-flex align-items-center justify-content-center gap-1" @click="resetSearch"><i class="bi bi-arrow-counterclockwise"></i> 초기화</button>
-                            <button class="btn btn-sm btn-search d-flex align-items-center justify-content-center gap-1" @click="fetchBoardList"><i class="bi bi-search"></i> 검색</button>
+                    </div>
+                    <div class="filter-item">
+                        <div class="filter-label">상세 검색</div>
+                        <div class="filter-content">
+                            <input type="text" class="form-control form-control-sm" v-model="searchDto.sch_text" placeholder="검색어를 입력하세요" @keyup.enter="fetchBoardList">
                         </div>
-                    </td>
-                </tr>
-            </table>
+                    </div>
+                </div>
+                
+                <div class="search-filter-actions">
+                    <button class="btn btn-sm btn-reset d-flex align-items-center justify-content-center gap-1" @click="resetSearch">
+                        <i class="bi bi-arrow-counterclockwise"></i> 초기화
+                    </button>
+                    <button class="btn btn-sm btn-search d-flex align-items-center justify-content-center gap-1" @click="fetchBoardList">
+                        <i class="bi bi-search"></i> 검색
+                    </button>
+                </div>
+            </div>
 
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div class="text-muted fs-7">
