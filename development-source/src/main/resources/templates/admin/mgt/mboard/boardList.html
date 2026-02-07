@@ -13,75 +13,77 @@
             </div>
         </div>
 
-        <!-- 검색 영역 -->
-        <table class="search-table mb-4">
-            <tr>
-                <th>게시판 구분</th>
-                <td>
-                    <select class="form-select form-select-sm" style="width: 350px;" v-model="searchDto.sch_bbs_se_code">
-                        <option value="">전체</option>
-                        <option v-for="item in categoryCodes" :key="item.CODE" :value="item.CODE">
-                            {{ item.CODE_NM }}
-                        </option>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <th>상세 검색</th>
-                <td>
-                    <div class="d-flex gap-2">
-                        <input type="text" class="form-control form-control-sm" style="width: 478px;" v-model="searchDto.sch_text" placeholder="검색어를 입력하세요" @keyup.enter="fetchBoardList">
-                    </div>
-                </td>
-            </tr>
-            <tr class="search-actions-row">
-                <td colspan="2">
-                    <div class="d-flex justify-content-end p-2 gap-2">
-                        <button class="btn-init d-flex align-items-center" @click="resetSearch"><i class="bi bi-arrow-counterclockwise me-1"></i> 초기화</button>
-                        <button class="btn-search-submit d-flex align-items-center" @click="fetchBoardList"><i class="bi bi-search me-1"></i> 검색</button>
-                    </div>
-                </td>
-            </tr>
-        </table>
-
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <div class="text-muted fs-7">
-                검색결과 <span class="text-primary fw-bold">{{ totalCount }}</span>개
-            </div>
-            <button class="btn-regist" @click="goForm"><i class="bi bi-pencil"></i> 등록</button>
-        </div>
-
-        <div class="data-table-wrapper">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th style="width: 80px;">No</th>
-                        <th>자료제목</th>
-                        <th style="width: 150px;">작성자</th>
-                        <th style="width: 150px;">작성일</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(item, index) in boardList" :key="item.BBS_SEQ" @click="goDetail(item.BBS_SEQ)" style="cursor: pointer;">
-                        <td>{{ totalCount - ((currentPage - 1) * pageSize) - index }}</td>
-                        <td class="text-start px-3 text-dark">{{ item.SJ }}</td>
-                        <td>{{ item.REGISTER_NM }}</td>
-                        <td>{{ formatDate(item.REGIST_DT) }}</td>
-                    </tr>
-                    <tr v-if="boardList.length === 0">
-                        <td colspan="4" class="text-center py-5 text-muted">등록된 게시글이 없습니다.</td>
-                    </tr>
-                </tbody>
+        <div class="mgmt-card">
+            <!-- 검색 영역 -->
+            <table class="search-table mb-4">
+                <tr>
+                    <th>게시판 구분</th>
+                    <td>
+                        <select class="form-select form-select-sm" style="width: 350px;" v-model="searchDto.sch_bbs_se_code">
+                            <option value="">전체</option>
+                            <option v-for="item in categoryCodes" :key="item.CODE" :value="item.CODE">
+                                {{ item.CODE_NM }}
+                            </option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th>상세 검색</th>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <input type="text" class="form-control form-control-sm" style="width: 478px;" v-model="searchDto.sch_text" placeholder="검색어를 입력하세요" @keyup.enter="fetchBoardList">
+                        </div>
+                    </td>
+                </tr>
+                <tr class="search-actions-row">
+                    <td colspan="2">
+                        <div class="d-flex justify-content-end p-2 gap-2">
+                            <button class="btn-init d-flex align-items-center" @click="resetSearch"><i class="bi bi-arrow-counterclockwise me-1"></i> 초기화</button>
+                            <button class="btn-search-submit d-flex align-items-center" @click="fetchBoardList"><i class="bi bi-search me-1"></i> 검색</button>
+                        </div>
+                    </td>
+                </tr>
             </table>
-        </div>
 
-        <!-- 페이징 -->
-        <admin-pagination 
-            :total-count="totalCount" 
-            :current-page="currentPage" 
-            :page-size="pageSize"
-            @change-page="handlePageChange">
-        </admin-pagination>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="text-muted fs-7">
+                    검색결과 <span class="text-primary fw-bold">{{ totalCount }}</span>개
+                </div>
+                <button class="btn-regist" @click="goForm"><i class="bi bi-pencil"></i> 등록</button>
+            </div>
+
+            <div class="data-table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">No</th>
+                            <th>자료제목</th>
+                            <th style="width: 150px;">작성자</th>
+                            <th style="width: 150px;">작성일</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(item, index) in boardList" :key="item.BBS_SEQ" @click="goDetail(item.BBS_SEQ)" style="cursor: pointer;">
+                            <td>{{ totalCount - ((currentPage - 1) * pageSize) - index }}</td>
+                            <td class="text-start px-3 text-dark">{{ item.SJ }}</td>
+                            <td>{{ item.REGISTER_NM }}</td>
+                            <td>{{ formatDate(item.REGIST_DT) }}</td>
+                        </tr>
+                        <tr v-if="boardList.length === 0">
+                            <td colspan="4" class="text-center py-5 text-muted">등록된 게시글이 없습니다.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 페이징 -->
+            <admin-pagination 
+                :total-count="totalCount" 
+                :current-page="currentPage" 
+                :page-size="pageSize"
+                @change-page="handlePageChange">
+            </admin-pagination>
+        </div>
     </div>
 
     <div id="admin-board-script">

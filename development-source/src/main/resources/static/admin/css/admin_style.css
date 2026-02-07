@@ -3670,7 +3670,7 @@ body {
 .info-table th {
   width: 200px;
   background: #f8f9fa;
-  padding: 12px 25px;
+  padding: 12px 12px;
   font-weight: 500;
   font-size: 14px;
   text-align: left;
@@ -3680,7 +3680,7 @@ body {
 
 .form-table td,
 .info-table td {
-  padding: 10px 25px;
+  padding: 10px 12px;
   border-bottom: 1px solid #eee;
   font-size: 14px;
   color: #333;
