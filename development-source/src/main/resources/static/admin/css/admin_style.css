@@ -3685,7 +3685,38 @@ body {
   color: #333;
 }
 
-/* Common Buttons */
+/* Bootstrap Button Overrides */
+.btn-primary {
+  background-color: var(--header-bg) !important;
+  border-color: var(--header-bg) !important;
+  color: #fff !important;
+}
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: #213a6b !important;
+  border-color: #213a6b !important;
+}
+.btn-primary:active {
+  background-color: #1a2d54 !important;
+  border-color: #1a2d54 !important;
+}
+
+.btn-danger {
+  background-color: var(--delete-red) !important;
+  border-color: var(--delete-red) !important;
+  color: #fff !important;
+}
+.btn-danger:hover,
+.btn-danger:focus {
+  background-color: #d44e2b !important;
+  border-color: #d44e2b !important;
+}
+.btn-danger:active {
+  background-color: #b84325 !important;
+  border-color: #b84325 !important;
+}
+
+/* Common Buttons Cleanup (Standardized to Bootstrap) */
 .btn-list {
   background-color: #6c757d;
   color: white;
@@ -3696,31 +3727,8 @@ body {
   transition: opacity 0.2s;
 }
 
-.btn-submit,
-.btn-regist {
-  background-color: #2b4c80;
-  color: white;
-  border: none;
-  padding: 8px 25px;
-  border-radius: 4px;
-  font-size: 14px;
-  text-decoration: none;
-  display: inline-block;
-  transition: opacity 0.2s;
-}
-
-.btn-delete {
-  background-color: #ed5f39;
-  color: white;
-  border: none;
-  padding: 8px 20px;
-  border-radius: 4px;
-  font-size: 14px;
-  transition: opacity 0.2s;
-}
-
 .btn-search-submit {
-  background-color: #2b4c80;
+  background-color: var(--header-bg);
   color: white;
   border: none;
   padding: 8px 25px;
