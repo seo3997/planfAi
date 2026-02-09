@@ -51,5 +51,23 @@ public class FrontBoardontroller {
         return "front/board/boardList";
     }
 
+    @RequestMapping(value = "/insertBoardForm.do", method = {RequestMethod.GET, RequestMethod.POST})
+    public String insertBoardForm(HttpServletRequest request, Model model){ // Model 객체 추가
+        return "front/board/boardForm";
+    }
+    // 게시글 저장 로직
+    @RequestMapping(value = "/insertBoard.do", method = {RequestMethod.POST})
+    public String insertBoard(HttpServletRequest request, Model model) {
+        // 1. 파라미터 받기 (DataMap 활용)
+        String sj = request.getParameter("sj");
+        System.out.println("**********sj["+sj+"]************");
+        DataMap paramMap = RequestUtil.getDataMap(request);
 
+        // 2. DB 저장 수행
+        // boardMapper.insertBoard(paramMap); // 매퍼에 insert 문이 있다고 가정
+
+        // 3. 저장 후 리스트 페이지로 강제 이동 (Redirect)
+        // 이렇게 하면 브라우저의 주소창이 /selectPageListBoard.do로 바뀌면서 목록을 다시 조회합니다.
+        return "redirect:/front/board/selectPageListBoard.do";
+    }
 }

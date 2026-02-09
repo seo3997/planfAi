@@ -2,48 +2,84 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>게시판 리스트</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-<h1>게시판 목록</h1>
-<form name="aform" method="post" action="/front/board/selectPageListBoard.do">
-<div>
-    <select id="seChoice" name="seChoice">
-        <option value="99" th:selected="${paramMap['seChoice'] == '99'}">전체</option>
-        <option value="1" th:selected="${paramMap['seChoice'] == '1'}">제목</option>
-        <option value="2" th:selected="${paramMap['seChoice'] == '2'}">내용</option>
-    </select>
-    <input type="text"  id='edTitle' name="edTitle" th:value="${paramMap['edTitle']}" placeholder="검색어를 입력하세요">
-    <button onclick="searchBoard()"> 검색</button>
+<body class="bg-light">
+
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="card-title mb-0">게시판 목록</h3>
+        </div>
+
+        <div class="card-body">
+            <form name="aform" method="post" action="/front/board/selectPageListBoard.do" class="mb-4">
+                <div class="row g-2 justify-content-end">
+                    <div class="col-auto">
+                        <select id="seChoice" name="seChoice" class="form-select">
+                            <option value="99" th:selected="${paramMap['seChoice'] == '99'}">전체</option>
+                            <option value="1" th:selected="${paramMap['seChoice'] == '1'}">제목</option>
+                            <option value="2" th:selected="${paramMap['seChoice'] == '2'}">내용</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" id="edTitle" name="edTitle" th:value="${paramMap['edTitle']}"
+                               class="form-control" placeholder="검색어를 입력하세요">
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-primary" onclick="searchBoard()">
+                            <i class="bi bi-search"></i> 검색
+                        </button>
+                        <button type="button" class="btn btn-success" onclick="registBoard()">
+                        <i class="bi bi-receipt"></i> 글쓰기
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered align-middle">
+                    <thead class="table-dark">
+                    <tr>
+                        <th scope="col" style="width: 30%;">제목</th>
+                        <th scope="col">내용</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(list)}">
+                        <td colspan="2" class="text-center text-muted py-4">게시글이 존재하지 않습니다.</td>
+                    </tr>
+                    <tr th:each="board : ${list}">
+                        <td class="fw-bold" th:text="${board.sj}">제목이 들어갈 자리</td>
+                        <td th:text="${board.cn}">내용이 들어갈 자리</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
-</form>
-<table>
-    <thead>
-    <tr>
-        <th>제목</th>
-        <th>내용</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="board : ${list}">
-        <td th:text="${board.sj}">제목이 들어갈 자리</td>
-        <td th:text="${board.cn}">내용이 들어갈 자리</td>
-    </tr>
-    </tbody>
-</table>
-</body>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
     function searchBoard() {
-        // 3. 폼을 명확하게 찾아서 전송
         const form = document.aform;
+        const searchInput = document.getElementById('edTitle');
 
-        // 검색 로직 추가 가능 (예: 빈 값 체크)
-        if(document.getElementById('edTitle').value.trim() === "") {
+        if(searchInput.value.trim() === "") {
             alert("검색어를 입력해주세요.");
+            searchInput.focus();
             return;
         }
 
         form.submit();
     }
+    function registBoard() {
+          location.href="/front/board/insertBoardForm.do"
+    }
 </script>
+</body>
 </html>
