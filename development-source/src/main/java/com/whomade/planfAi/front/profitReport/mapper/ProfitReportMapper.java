@@ -14,6 +14,8 @@ public interface ProfitReportMapper {
 
     void deleteReport(Long reportId);
 
+    ProfitVo selectReportById(Long id);
+
     // Simple user check for demo purposes (usually UserMapper lies separately)
     Long selectUserNoByEmail(String email);
 

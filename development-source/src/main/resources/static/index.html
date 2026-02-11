@@ -2920,6 +2920,26 @@
                           <strong class="text-danger fs-5">{{ Math.ceil(expertResult.revenueNeededForTarget / ((expertData.sale.menu[0].menuPrice || 1) * (expertData.basic.workDay || 25))) }}개</strong> 
                           만 더 판매하면 달성 가능합니다!
                         </p>
+                        
+                      <!-- AI Diagnosis Button -->
+                      <div class="mt-3 border-top pt-3">
+                        <button 
+                          class="btn btn-premium w-100 d-flex align-items-center justify-content-center gap-2"
+                          @click="diagnoseReport"
+                          :disabled="isDiagnosing"
+                        >
+                          <span v-if="isDiagnosing" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                          <span v-else>🤖 AI 전문가 심층 진단 받기</span>
+                        </button>
+                        
+                        <!-- AI Analysis Result Area -->
+                        <div v-if="aiDiagnosisResult" class="mt-3">
+                          <h6 class="fw-bold text-primary mb-2">📋 AI 진단 결과</h6>
+                          <div class="p-3 bg-white border rounded shadow-sm" style="min-height: 100px; line-height: 1.6;">
+                            <div v-html="aiDiagnosisResult"></div>
+                          </div>
+                        </div>
+                      </div>
                         <div
                           class="p-2 bg-white rounded-3 border border-primary border-opacity-25"
                         >
@@ -5549,15 +5569,30 @@
             const sumDepr = (sec) => {
               let total = 0;
               if (!sec) return 0;
-              Object.values(sec).forEach((list) => {
+              Object.keys(sec).forEach((key) => {
+                const list = sec[key] || [];
+                const catNum = parseInt(key.slice(-1)); // 1, 2, 3, 4
+                
                 if (Array.isArray(list))
                   list.forEach((inv) => {
-                    if (inv.investYn === "Y") total += inv.investAmtYear || 0;
+                    // Filter non-depreciable like updateProjections
+                    const isLand = catNum === 1 && inv.investTitleCd === "10";
+                    const isPremium = catNum === 2 && inv.investTitleCd === "10";
+                    const isCat34 = catNum >= 3;
+
+                    if (inv.investYn === "Y" && !isLand && !isPremium && !isCat34) {
+                        let amt = inv.investAmtYear || 0;
+                        // If amt is 0 but price/year exists, calculate on the fly
+                        if (amt === 0 && (inv.investPrice || 0) > 0 && (inv.investYear || 0) > 0) {
+                            amt = Math.round(inv.investPrice / (inv.investYear * 12));
+                        }
+                        total += amt;
+                    }
                   });
               });
               return total;
             };
-            // Dash_Depr is already MONTHLY in the source calculation
+            // Dash_Depr is already MONTHLY
             const Dash_Depr = Math.round(sumDepr(data.invest.production) + sumDepr(data.invest.sales));
 
             const TotalInvestment =
@@ -6066,14 +6101,6 @@
               const mode = data.mode || "lite";
 
               if (mode === "expert") {
-                if (data.summary) {
-                  return {
-                    mode: "expert",
-                    revenue: data.summary.totalRevenue || 0,
-                    netProfit: data.summary.opIncome || 0,
-                    bep: data.summary.bepRevenue || 0,
-                  };
-                } else {
                   if (!data.basic) data.basic = {};
                   if (!data.sale) data.sale = { menu: [], menuY: [] };
                   if (!data.sale.menuY) data.sale.menuY = [];
@@ -6098,7 +6125,6 @@
                     netProfit: analysis.opIncome || 0,
                     bep: analysis.bepRevenue || 0,
                   };
-                }
               }
 
               // Lite Mode Calculation
@@ -6876,6 +6902,58 @@
             showSgaFixedModal.value = true;
           };
 
+          // AI Diagnosis
+          const aiDiagnosisResult = ref("");
+          const isDiagnosing = ref(false);
+
+          const diagnoseReport = async () => {
+            if (!currentReportId.value) {
+              alert("먼저 리포트를 저장하거나 불러와주세요.");
+              return;
+            }
+            
+            isDiagnosing.value = true;
+            aiDiagnosisResult.value = ""; // 초기화
+            
+            try {
+              const response = await fetch("/api/ai/chat-model-stream", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams({
+                  // 리포트 ID 전송
+                  id: currentReportId.value, 
+                }),
+              });
+
+              if (!response.ok) {
+                throw new Error("Network response was not ok");
+              }
+
+              const reader = response.body.getReader();
+              const decoder = new TextDecoder();
+
+              while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                
+                // 스트리밍 텍스트 누적
+                // Markdown -> HTML 변환이 필요하다면 여기서 처리해야 하지만, 
+                // 간단히 텍스트를 누적하거나, 리턴되는 형식이 HTML이라면 그대로 v-html 사용 가능
+                // 현재 백엔드 프롬프트가 HTML 구조를 요청하고 있음.
+                const chunk = decoder.decode(value, { stream: true });
+                aiDiagnosisResult.value += chunk;
+              }
+
+            } catch (e) {
+              console.error("AI Diagnosis error:", e);
+              aiDiagnosisResult.value = "<p class='text-danger'>진단 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.</p>";
+            } finally {
+              isDiagnosing.value = false;
+            }
+          };
+
           return {
             mode,
             userEmail,
@@ -6957,6 +7035,13 @@
                 return true;
               });
             },
+
+            
+            // AI Related
+            aiDiagnosisResult,
+            isDiagnosing,
+            diagnoseReport,
+
             filterFixedExpenses: () => {
               const all = [
                 ...(expertData.expense.production || []),

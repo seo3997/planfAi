@@ -27,6 +27,12 @@
         DELETE FROM profit_reports WHERE id = #{reportId}
     </delete>
 
+    <select id="selectReportById" parameterType="long" resultType="ProfitVo">
+        SELECT id, user_no, report_data, created_at
+        FROM profit_reports
+        WHERE id = #{id}
+    </select>
+
     <select id="selectUserNoByEmail" parameterType="string" resultType="long">
         SELECT user_no FROM tb_user WHERE email = #{email}
     </select>
