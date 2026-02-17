@@ -6,51 +6,54 @@
 </head>
 <body>
     <div id="admin-survey-form">
-        <div class="page-title-box">
-            <h2 class="page-title">설문 양식 등록</h2>
-            <div class="breadcrumb-area">
-                <i class="bi bi-house-door text-muted"></i> > 운영 업무 > 설문 관리 > <span class="text-primary fw-medium">양식 등록</span>
+        <!-- Workspace Header -->
+        <div class="d-flex justify-content-between align-items-center mb-3 mt-3">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-link text-dark p-0 text-decoration-none" @click="goList">
+                    <i class="bi bi-arrow-left fs-4"></i>
+                </button>
+                <div class="d-flex flex-column">
+                     <input type="text" class="form-control form-control-lg border-0 bg-transparent fw-bold px-0 py-0" 
+                            v-model="survey.surveyTitle" placeholder="설문 제목" style="font-size: 1.5rem; width: 400px;">
+                     <span class="text-muted small">{{ survey.surveyId }}</span>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                 <button type="button" class="btn btn-outline-secondary" @click="goPreview">
+                    <i class="bi bi-eye me-1"></i> 미리보기
+                </button>
+                <button type="button" class="btn btn-primary" @click="saveSurvey" :disabled="isSaving">
+                    <span v-if="isSaving" class="spinner-border spinner-border-sm me-1"></span>
+                    저장
+                </button>
             </div>
         </div>
 
-        <div class="mgmt-card">
+        <!-- Workspace Tabs -->
+        <ul class="nav nav-tabs nav-fill mb-4 border-bottom-0">
+            <li class="nav-item">
+                <a class="nav-link text-muted" :href="'/mgt/survey/manageSurveyMenu.do?surveyId=' + survey.surveyId">
+                    설정 (Settings)
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active fw-bold border-bottom border-primary border-3 text-primary" href="javascript:void(0);">
+                    질문 (Questions)
+                </a>
+            </li>
+             <li class="nav-item">
+                <a class="nav-link disabled text-muted" href="#">
+                    응답 (Responses)
+                </a>
+            </li>
+        </ul>
+
+        <div class="mgmt-card border-top-0 pt-0">
             <!-- Form Start -->
             <form @submit.prevent="saveSurvey">
                 
-                <!-- 1. 기본 정보 -->
-                <h5 class="mb-3 border-bottom pb-2">기본 정보</h5>
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label class="form-label">설문 제목 <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" v-model="survey.surveyTitle" required>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">상태</label>
-                        <select class="form-select" v-model="survey.opened">
-                            <option value="OPENED">진행중 (OPENED)</option>
-                            <option value="CLOSED">마감 (CLOSED)</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">마감일</label>
-                        <input type="date" class="form-control" v-model="survey.closed">
-                    </div>
-                </div>
-
-                <div class="row mb-4">
-                    <div class="col-md-4">
-                        <label class="form-label">담당자 이메일</label>
-                        <input type="email" class="form-control" v-model="survey.adminEmail">
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label">배경색</label>
-                        <input type="color" class="form-control form-control-color w-100" v-model="survey.bgColor" title="배경색 선택">
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label">글자색</label>
-                        <input type="color" class="form-control form-control-color w-100" v-model="survey.textColor" title="글자색 선택">
-                    </div>
-                </div>
+                <!-- 2. 섹션 및 문항 관리 -->
+                <!-- Removed Basic Info Section from View (Data persists in Vue model) -->
 
                 <!-- 2. 섹션 및 문항 관리 -->
                 <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
@@ -84,11 +87,57 @@
                                             <option value="inputCheckbox">다중 선택 (Checkbox)</option>
                                             <option value="inputTextline">단답형 (Text)</option>
                                             <option value="inputTextarea">서술형 (Textarea)</option>
+                                            <option value="inputLocation">위치 정보 (Location)</option>
+                                            <option value="inputImage">이미지 업로드 (Image)</option>
                                             <option value="inputComment">안내 문구 (Comment)</option>
                                         </select>
                                     </div>
                                     <div class="col-md-8">
                                         <input type="text" class="form-control form-control-sm" v-model="question.questionText" placeholder="질문 내용을 입력하세요">
+                                        
+                                        <!-- Detail Settings per Type -->
+                                        <div class="mt-2 d-flex flex-wrap gap-4 align-items-start bg-light p-2 rounded">
+                                            <!-- Textarea Rows -->
+                                            <div v-if="question.questionType === 'inputTextarea'" class="d-flex align-items-center gap-2">
+                                                <label class="small text-muted mb-0">줄 수(Rows):</label>
+                                                <input type="number" class="form-control form-control-sm" style="width: 80px;" v-model="question.textRows" placeholder="4">
+                                            </div>
+                                            
+                                            <!-- Checkbox/Radio Options -->
+                                            <div v-if="['inputRadio', 'inputCheckbox'].includes(question.questionType)" class="d-flex flex-column gap-2">
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <span class="small fw-bold text-muted">기타(Other) 필드:</span>
+                                                    <div class="form-check form-check-inline mb-0">
+                                                        <input class="form-check-input" type="radio" :name="'other_yn_' + sIdx + '_' + qIdx" :id="'other_y_' + sIdx + '_' + qIdx" value="Y" v-model="question.otherAnswer">
+                                                        <label class="form-check-label small" :for="'other_y_' + sIdx + '_' + qIdx">사용</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline mb-0">
+                                                        <input class="form-check-input" type="radio" :name="'other_yn_' + sIdx + '_' + qIdx" :id="'other_n_' + sIdx + '_' + qIdx" value="N" v-model="question.otherAnswer">
+                                                        <label class="form-check-label small" :for="'other_n_' + sIdx + '_' + qIdx">미사용</label>
+                                                    </div>
+                                                    <input v-if="question.otherAnswer === 'Y'" type="text" class="form-control form-control-sm" style="width: 150px;" v-model="question.questionLabel" placeholder="내용 (예: 기타:)">
+                                                </div>
+                                                
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <span class="small fw-bold text-muted">배치(Layout):</span>
+                                                    <div class="form-check form-check-inline mb-0">
+                                                        <input class="form-check-input" type="radio" :name="'layout_' + sIdx + '_' + qIdx" :id="'layout_v_' + sIdx + '_' + qIdx" value="vertical" v-model="question.questionLayout">
+                                                        <label class="form-check-label small" :for="'layout_v_' + sIdx + '_' + qIdx">한 줄에 하나씩 (Vertical)</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline mb-0">
+                                                        <input class="form-check-input" type="radio" :name="'layout_' + sIdx + '_' + qIdx" :id="'layout_h_' + sIdx + '_' + qIdx" value="horizontal" v-model="question.questionLayout">
+                                                        <label class="form-check-label small" :for="'layout_h_' + sIdx + '_' + qIdx">한 줄에 모두 (Horizontal)</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Location/Image Info -->
+                                            <div v-if="['inputLocation', 'inputImage'].includes(question.questionType)" class="text-muted small">
+                                                <i class="bi bi-info-circle"></i> 
+                                                <span v-if="question.questionType === 'inputLocation'">위도/경도 입력 필드가 생성됩니다.</span>
+                                                <span v-if="question.questionType === 'inputImage'">파일 업로드 필드가 생성됩니다.</span>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="col-md-2 text-end">
                                         <button type="button" class="btn btn-xs btn-outline-danger" @click="removeQuestion(section, qIdx)">
@@ -125,14 +174,7 @@
                     생성된 섹션이 없습니다. '섹션 추가' 버튼을 눌러 설문을 구성하세요.
                 </div>
 
-                <!-- Action Buttons -->
-                <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
-                    <button type="button" class="btn btn-light" @click="goList">취소</button>
-                    <button type="submit" class="btn btn-primary" :disabled="isSaving">
-                        <span v-if="isSaving" class="spinner-border spinner-border-sm me-1"></span>
-                        저장
-                    </button>
-                </div>
+                <!-- Action Buttons Removed (Moved to Header) -->
             </form>
         </div>
     </div>
@@ -193,6 +235,10 @@
                             questionId: maxId + 1,
                             questionType: 'inputRadio',
                             questionText: '',
+                            questionLayout: 'vertical',
+                            otherAnswer: 'N',
+                            questionLabel: '기타:',
+                            textRows: 4,
                             labels: []
                         });
                     };
@@ -264,6 +310,11 @@
                     const goList = () => {
                         window.location.href = '/mgt/survey/selectPageListSurvey.do';
                     };
+                    
+                    const goPreview = () => {
+                        const url = `/mgt/survey/preview.do?surveyId=${survey.value.surveyId}`;
+                        window.open(url, '_blank', 'width=1024,height=800,scrollbars=yes');
+                    };
 
                     onMounted(() => {
                         AdminMenu.init();
@@ -274,12 +325,12 @@
                         addSection, removeSection,
                         addQuestion, removeQuestion,
                         addLabel, removeLabel,
-                        saveSurvey, goList
+                        saveSurvey, goList, goPreview
                     };
                 }
             });
             AdminLayout.register(app);
-            app.mount('#admin-survey-form');
+            app.mount('#app');
         </script>
         
         <style>

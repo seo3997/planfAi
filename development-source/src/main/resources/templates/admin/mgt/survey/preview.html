@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>설문 미리보기</title>
+    
+    <!-- CSS -->
+    <link href="/common/lib/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/common/lib/css/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Libraries -->
+    <script src="/common/lib/js/vue.global.js"></script>
+    <script src="/common/lib/js/axios.min.js"></script>
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .survey-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background-color: #fff;
+            box-shadow: 0 0 15px rgba(0,0,0,0.05);
+            min-height: 100vh;
+        }
+        .survey-header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 20px;
+        }
+        .question-box {
+            margin-bottom: 25px;
+        }
+        .question-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        .question-desc {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+        .form-check-label {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="survey-container" :style="containerStyle">
+        
+        <!-- Custom Header -->
+        <div v-if="survey.header" v-html="survey.header" class="mb-4"></div>
+
+        <div class="survey-header text-center">
+            <h1 class="mb-3">{{ survey.surveyTitle }}</h1>
+            <p v-if="survey.numberRoductionText" class="text-muted">{{ survey.numberRoductionText }}</p>
+        </div>
+
+        <form @submit.prevent="submitSurvey">
+           <div v-for="(section, sIdx) in survey.sections" :key="sIdx" class="mb-5">
+                <h3 v-if="section.sectionTitle" class="mb-4 pb-2 border-bottom">{{ section.sectionTitle }}</h3>
+                <div v-if="section.sectionHtmlTitle" v-html="section.sectionHtmlTitle" class="mb-3"></div>
+
+                <div v-for="(question, qIdx) in section.questions" :key="qIdx" class="question-box card border-0">
+                    <div class="card-body p-0">
+                        <!-- Question Text -->
+                        <div class="question-title">
+                            <span v-if="survey.sections.length > 1">{{ sIdx + 1 }}-{{ qIdx + 1 }}. </span>
+                            <span v-else>{{ qIdx + 1 }}. </span>
+                            {{ question.questionText }}
+                            <span v-if="question.required" class="text-danger">*</span>
+                        </div>
+                        
+                        <!-- Question Input -->
+                        <div class="mt-2">
+                             <!-- Radio -->
+                             <div v-if="question.questionType === 'inputRadio'" 
+                                  :class="question.questionLayout === 'horizontal' ? 'd-flex flex-wrap gap-3' : ''">
+                                <div v-for="(label, lIdx) in question.labels" :key="lIdx" class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" 
+                                           :name="'q_' + question.questionId" 
+                                           :id="'q_' + question.questionId + '_' + label.questionLabelId"
+                                           :value="label.questionLabelId"
+                                           v-model="answers[question.questionId]">
+                                    <label class="form-check-label" :for="'q_' + question.questionId + '_' + label.questionLabelId">
+                                        {{ label.questionLabel }}
+                                    </label>
+                                </div>
+                                <!-- Other (Radio) -->
+                                <div v-if="question.otherAnswer === 'Y'" class="form-check d-flex align-items-center gap-2 mb-2">
+                                    <input class="form-check-input" type="radio" 
+                                           :name="'q_' + question.questionId" 
+                                           :id="'q_' + question.questionId + '_other'"
+                                           value="OTHER"
+                                           v-model="answers[question.questionId]">
+                                    <label class="form-check-label text-nowrap" :for="'q_' + question.questionId + '_other'">
+                                        {{ question.questionLabel || '기타:' }}
+                                    </label>
+                                    <input type="text" class="form-control form-control-sm" style="width: 150px;" 
+                                           v-model="answers[question.questionId + '_other_text']" 
+                                           placeholder="내용을 입력하세요"
+                                           :disabled="answers[question.questionId] !== 'OTHER'">
+                                </div>
+                             </div>
+
+                             <!-- Checkbox -->
+                             <div v-if="question.questionType === 'inputCheckbox'"
+                                  :class="question.questionLayout === 'horizontal' ? 'd-flex flex-wrap gap-3' : ''">
+                                <div v-for="(label, lIdx) in question.labels" :key="lIdx" class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" 
+                                           :id="'q_' + question.questionId + '_' + label.questionLabelId"
+                                           :value="label.questionLabelId"
+                                           v-model="answers[question.questionId]">
+                                    <label class="form-check-label" :for="'q_' + question.questionId + '_' + label.questionLabelId">
+                                        {{ label.questionLabel }}
+                                    </label>
+                                </div>
+                                <!-- Other (Checkbox) -->
+                                <div v-if="question.otherAnswer === 'Y'" class="form-check d-flex align-items-center gap-2 mb-2">
+                                    <input class="form-check-input" type="checkbox" 
+                                           :id="'q_' + question.questionId + '_other'"
+                                           value="OTHER"
+                                           v-model="answers[question.questionId]">
+                                    <label class="form-check-label text-nowrap" :for="'q_' + question.questionId + '_other'">
+                                        {{ question.questionLabel || '기타:' }}
+                                    </label>
+                                    <input type="text" class="form-control form-control-sm" style="width: 150px;" 
+                                           v-model="answers[question.questionId + '_other_text']" 
+                                           placeholder="내용을 입력하세요"
+                                           :disabled="!answers[question.questionId].includes('OTHER')">
+                                </div>
+                             </div>
+
+                             <!-- Text Line -->
+                             <div v-if="question.questionType === 'inputTextline'">
+                                <input type="text" class="form-control" v-model="answers[question.questionId]" :maxlength="question.maxLength">
+                             </div>
+
+                             <!-- Text Area -->
+                             <div v-if="question.questionType === 'inputTextarea'">
+                                <textarea class="form-control" :rows="question.textRows || 4" v-model="answers[question.questionId]" :maxlength="question.maxLength"></textarea>
+                             </div>
+
+                             <!-- Location -->
+                             <div v-if="question.questionType === 'inputLocation'">
+                                 <div class="input-group mb-2">
+                                     <span class="input-group-text">위도 (Lat)</span>
+                                     <input type="text" class="form-control" v-model="answers[question.questionId].lat" placeholder="37.5665">
+                                 </div>
+                                 <div class="input-group">
+                                     <span class="input-group-text">경도 (Lng)</span>
+                                     <input type="text" class="form-control" v-model="answers[question.questionId].lng" placeholder="126.9780">
+                                 </div>
+                             </div>
+
+                             <!-- Image Upload -->
+                             <div v-if="question.questionType === 'inputImage'">
+                                 <input type="file" class="form-control" accept="image/*" @change="handleFileUpload($event, question.questionId)">
+                                 <div v-if="answers[question.questionId]" class="mt-2">
+                                     <p class="small text-success"><i class="bi bi-check-circle"></i> 파일 선택됨: {{ answers[question.questionId].name }}</p>
+                                 </div>
+                             </div>
+
+                             <!-- Comment -->
+                             <div v-if="question.questionType === 'inputComment'" class="text-muted bg-light p-3 rounded">
+                                <span v-html="question.questionText"></span>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+           </div>
+
+           <div class="d-grid gap-2 col-6 mx-auto mt-5 mb-5">
+                <button type="submit" class="btn btn-primary btn-lg">제출 확인 (미리보기)</button>
+           </div>
+        </form>
+
+        <!-- Custom Footer -->
+        <div v-if="survey.footer" v-html="survey.footer" class="mt-5 border-top pt-3"></div>
+        
+        <!-- User CSS Injection -->
+        <component is="style" v-if="survey.userCss">
+            {{ survey.userCss }}
+        </component>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const serverSurveyForm = /*[[${surveyForm}]]*/ {};
+        /*]]>*/
+
+        const { createApp, ref, onMounted } = Vue;
+        const app = createApp({
+            setup() {
+                const survey = ref(serverSurveyForm || {});
+                const answers = ref({});
+                const containerStyle = ref({});
+
+                // Initialize styles
+                if (survey.value.bgColor) {
+                    document.body.style.backgroundColor = survey.value.bgColor;
+                }
+                if (survey.value.textColor) {
+                    containerStyle.value.color = survey.value.textColor;
+                }
+                if (survey.value.fontSize) {
+                    containerStyle.value.fontSize = survey.value.fontSize;
+                }
+                
+                // Initialize answers
+                if (survey.value.sections) {
+                    survey.value.sections.forEach(s => {
+                        if (s.questions) {
+                            s.questions.forEach(q => {
+                                if (q.questionType === 'inputCheckbox') {
+                                    answers.value[q.questionId] = [];
+                                } else if (q.questionType === 'inputLocation') {
+                                    answers.value[q.questionId] = { lat: '', lng: '' };
+                                } else if (q.questionType === 'inputImage') {
+                                    answers.value[q.questionId] = null; // File object
+                                } else {
+                                    answers.value[q.questionId] = '';
+                                }
+                            });
+                        }
+                    });
+                }
+
+                const handleFileUpload = (event, questionId) => {
+                    const file = event.target.files[0];
+                    if (file) {
+                        answers.value[questionId] = file;
+                    }
+                };
+
+                const submitSurvey = () => {
+                    alert('미리보기 모드입니다.\n작성한 답변 데이터:\n' + JSON.stringify(answers.value, null, 2));
+                };
+
+                return {
+                    survey, answers, containerStyle, submitSurvey, handleFileUpload
+                };
+            }
+        });
+        app.mount('#app');
+    </script>
+</body>
+</html>

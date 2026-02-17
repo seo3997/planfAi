@@ -129,4 +129,24 @@ public class SurveyController {
         }
         return result;
     }
+
+    /**
+     * 설문 미리보기 (Admin Preview)
+     * URL: /mgt/survey/preview.do
+     */
+    @GetMapping("/preview.do")
+    public String preview(@ModelAttribute("searchVO") TbSurvey searchVO, Model model) {
+        TbSurvey surveyForm = null;
+        if (searchVO.getSurveyId() != null && !searchVO.getSurveyId().isEmpty()) {
+            surveyForm = surveyService.selectSurveyEntryForm(searchVO);
+        }
+
+        if (surveyForm == null) {
+            // Handle error or redirect
+            return "redirect:/mgt/survey/selectPageListSurvey.do";
+        }
+
+        model.addAttribute("surveyForm", surveyForm);
+        return "admin/mgt/survey/preview";
+    }
 }

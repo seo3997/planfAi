@@ -6,42 +6,60 @@
 </head>
 <body>
     <div id="admin-survey-master">
-        <div class="page-title-box">
-            <h2 class="page-title">설문 마스터 관리</h2>
-            <div class="breadcrumb-area">
-                <i class="bi bi-house-door text-muted"></i> > 운영 업무 > 설문 관리 > <span class="text-primary fw-medium">마스터 설정</span>
+        <!-- Workspace Header -->
+        <div class="d-flex justify-content-between align-items-center mb-3 mt-3">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-link text-dark p-0 text-decoration-none" @click="goList">
+                    <i class="bi bi-arrow-left fs-4"></i>
+                </button>
+                <h4 class="m-0 fw-bold">{{ survey.surveyTitle }}</h4>
+                <span class="badge bg-secondary rounded-pill">{{ survey.surveyId }}</span>
+            </div>
+            <div class="d-flex gap-2">
+                 <button type="button" class="btn btn-outline-secondary" @click="goPreview">
+                    <i class="bi bi-eye me-1"></i> 미리보기
+                </button>
+                <button type="button" class="btn btn-primary" @click="saveMaster" :disabled="isSaving">
+                    <span v-if="isSaving" class="spinner-border spinner-border-sm me-1"></span>
+                    저장
+                </button>
             </div>
         </div>
 
-        <div class="mgmt-card">
-            <form @submit.prevent="saveMaster">
-                <!-- Top Actions -->
-                <div class="d-flex justify-content-end gap-2 mb-3">
-                    <button type="button" class="btn btn-sm btn-outline-secondary" @click="goList">
-                        <i class="bi bi-list"></i> 목록
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-primary" @click="goEntryForm">
-                        <i class="bi bi-pencil-square"></i> 양식 수정
-                    </button>
-                    <button type="submit" class="btn btn-sm btn-primary" :disabled="isSaving">
-                        <span v-if="isSaving" class="spinner-border spinner-border-sm me-1"></span>
-                        저장
-                    </button>
-                </div>
+        <!-- Workspace Tabs -->
+        <ul class="nav nav-tabs nav-fill mb-4 border-bottom-0">
+            <li class="nav-item">
+                <a class="nav-link active fw-bold border-bottom border-primary border-3 text-primary" href="javascript:void(0);">
+                    설정 (Settings)
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-muted" :href="'/mgt/survey/editEntryForm.do?surveyId=' + survey.surveyId">
+                    질문 (Questions)
+                </a>
+            </li>
+             <li class="nav-item">
+                <a class="nav-link disabled text-muted" href="#">
+                    응답 (Responses)
+                </a>
+            </li>
+        </ul>
 
+        <div class="mgmt-card border-top-0 pt-0">
+            <form @submit.prevent="saveMaster">
                 <!-- Tabs -->
-                <ul class="nav nav-tabs mb-4">
+                <ul class="nav nav-pills mb-4 bg-light p-2 rounded">
                     <li class="nav-item">
-                        <a class="nav-link active" data-bs-toggle="tab" href="#basic-info">기본 정보</a>
+                        <a class="nav-link active" data-bs-toggle="pill" href="#basic-info">기본 정보</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" href="#access-control">권한 설정</a>
+                        <a class="nav-link" data-bs-toggle="pill" href="#access-control">권한 설정</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" href="#theme-design">테마/디자인</a>
+                        <a class="nav-link" data-bs-toggle="pill" href="#theme-design">테마/디자인</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" href="#text-setup">문구 설정</a>
+                        <a class="nav-link" data-bs-toggle="pill" href="#text-setup">문구 설정</a>
                     </li>
                 </ul>
 
@@ -220,18 +238,23 @@
                         window.location.href = `/mgt/survey/editEntryForm.do?surveyId=${survey.value.surveyId}`;
                     };
 
+                    const goPreview = () => {
+                        const url = `/mgt/survey/preview.do?surveyId=${survey.value.surveyId}`;
+                        window.open(url, '_blank', 'width=1024,height=800,scrollbars=yes');
+                    };
+
                     onMounted(() => {
                         AdminMenu.init();
                     });
 
                     return {
                         survey, isSaving,
-                        saveMaster, goList, goEntryForm
+                        saveMaster, goList, goEntryForm, goPreview
                     };
                 }
             });
             AdminLayout.register(app);
-            app.mount('#admin-survey-master');
+            app.mount('#app');
         </script>
         
         <style>
