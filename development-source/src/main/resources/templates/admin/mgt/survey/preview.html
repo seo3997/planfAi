@@ -16,20 +16,74 @@
     <style>
         body {
             background-color: #f8f9fa;
+            transition: background-color 0.3s ease;
+        }
+        .survey-wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
         .survey-container {
-            max-width: 800px;
+            width: 100%;
             margin: 0 auto;
             padding: 40px 20px;
-            background-color: #fff;
-            box-shadow: 0 0 15px rgba(0,0,0,0.05);
-            min-height: 100vh;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            flex-grow: 1;
+            transition: all 0.3s ease;
         }
+        
+        /* Glassmorphism Effect when background image exists */
+        body.has-bg .survey-container {
+            background-color: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Layout Types */
+        .layout-center { max-width: 800px; border-radius: 20px; margin-top: 40px; margin-bottom: 40px; }
+        .layout-top_banner { max-width: 1000px; border-radius: 20px; margin-top: 40px; margin-bottom: 40px; }
+        .layout-top_banner .survey-header { 
+            background: linear-gradient(135deg, rgba(43,75,138,0.1) 0%, rgba(73,167,176,0.1) 100%);
+            padding: 60px 40px; 
+            border-radius: 15px;
+            margin-bottom: 40px;
+        }
+        
+        .layout-left_1_3, .layout-right_1_2 { 
+            max-width: 1200px; 
+            display: flex; 
+            gap: 30px; 
+            background: transparent !important; 
+            box-shadow: none !important;
+        }
+        .layout-sidebar { 
+            width: 30%; 
+            background: #fff; 
+            padding: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 0 15px rgba(0,0,0,0.05);
+            height: fit-content;
+        }
+        .layout-main { 
+            flex-grow: 1; 
+            background: #fff; 
+            padding: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 0 15px rgba(0,0,0,0.05);
+        }
+
         .survey-header {
             margin-bottom: 30px;
             border-bottom: 1px solid #ddd;
             padding-bottom: 20px;
         }
+        .logo-area { margin-bottom: 20px; display: flex; }
+        .logo-area.align-LEFT { justify-content: flex-start; }
+        .logo-area.align-CENTER { justify-content: center; }
+        .logo-area.align-RIGHT { justify-content: flex-end; }
+        .logo-img { max-height: 50px; }
+
         .question-box {
             margin-bottom: 25px;
         }
@@ -46,20 +100,35 @@
         .form-check-label {
             cursor: pointer;
         }
+        
+        @media (max-width: 768px) {
+            .layout-left_1_3, .layout-right_1_2 { flex-direction: column; }
+            .layout-sidebar { width: 100%; }
+        }
     </style>
 </head>
 <body>
-    <div id="app" class="survey-container" :style="containerStyle">
+    <div id="app" class="survey-wrapper" :style="rootStyle">
         
-        <!-- Custom Header -->
-        <div v-if="survey.header" v-html="survey.header" class="mb-4"></div>
+        <div class="survey-container" :class="'layout-' + (survey.layoutType || 'center').toLowerCase()" :style="containerStyle">
+            
+            <div :class="isSidebarLayout ? 'layout-sidebar' : ''">
+                <!-- Logo -->
+                <div v-if="survey.logoImagePath" class="logo-area" :class="'align-' + survey.logoAlign">
+                    <img :src="survey.logoImagePath" class="logo-img" alt="Logo">
+                </div>
 
-        <div class="survey-header text-center">
-            <h1 class="mb-3">{{ survey.surveyTitle }}</h1>
-            <p v-if="survey.numberRoductionText" class="text-muted">{{ survey.numberRoductionText }}</p>
-        </div>
+                <!-- Custom Header -->
+                <div v-if="survey.header" v-html="survey.header" class="mb-4"></div>
 
-        <form @submit.prevent="submitSurvey">
+                <div class="survey-header" :class="{'text-center': !isSidebarLayout}">
+                    <h1 class="mb-3">{{ survey.surveyTitle }}</h1>
+                    <p v-if="survey.numberRoductionText" class="text-muted">{{ survey.numberRoductionText }}</p>
+                </div>
+            </div>
+
+            <div :class="isSidebarLayout ? 'layout-main' : ''">
+                <form @submit.prevent="submitSurvey">
            <div v-for="(section, sIdx) in survey.sections" :key="sIdx" class="mb-5">
                 <h3 v-if="section.sectionTitle" class="mb-4 pb-2 border-bottom">{{ section.sectionTitle }}</h3>
                 <div v-if="section.sectionHtmlTitle" v-html="section.sectionHtmlTitle" class="mb-3"></div>
@@ -173,18 +242,28 @@
                 </div>
            </div>
 
-           <div class="d-grid gap-2 col-6 mx-auto mt-5 mb-5">
-                <button type="submit" class="btn btn-primary btn-lg">제출 확인 (미리보기)</button>
-           </div>
-        </form>
+                   <div class="d-grid gap-2 col-6 mx-auto mt-5 mb-5">
+                        <button type="submit" class="btn btn-primary btn-lg" :style="accentButtonStyle">제출 확인 (미리보기)</button>
+                   </div>
+                </form>
 
-        <!-- Custom Footer -->
-        <div v-if="survey.footer" v-html="survey.footer" class="mt-5 border-top pt-3"></div>
+                <!-- Custom Footer -->
+                <div v-if="survey.footer" v-html="survey.footer" class="mt-5 border-top pt-3"></div>
+                
+                <!-- Service Logo in Footer -->
+                <div v-if="survey.showFooterLogo === 'Y'" class="text-center mt-4">
+                    <img src="/admin/images/logo_icon.png" alt="PlanfAi" style="height: 24px; opacity: 0.5;">
+                    <p class="small text-muted mt-1">Powered by PlanfAi</p>
+                </div>
+            </div>
+        </div>
         
         <!-- User CSS Injection -->
-        <component is="style" v-if="survey.userCss">
-            {{ survey.userCss }}
-        </component>
+        <div v-if="survey.userCss" style="display:none">
+            <teleport to="head">
+                <component is="style">{{ survey.userCss }}</component>
+            </teleport>
+        </div>
     </div>
 
     <script th:inline="javascript">
@@ -197,17 +276,42 @@
             setup() {
                 const survey = ref(serverSurveyForm || {});
                 const answers = ref({});
+                const rootStyle = ref({});
                 const containerStyle = ref({});
+                const accentButtonStyle = ref({});
+
+                const isSidebarLayout = Vue.computed(() => {
+                    return ['LEFT_1_3', 'RIGHT_1_2'].includes(survey.value.layoutType);
+                });
 
                 // Initialize styles
-                if (survey.value.bgColor) {
+                if (survey.value.fontFamily) {
+                    rootStyle.value.fontFamily = survey.value.fontFamily;
+                }
+                if (survey.value.bgImagePath) {
+                    document.body.style.backgroundImage = `url('${survey.value.bgImagePath}')`;
+                    document.body.style.backgroundSize = 'cover';
+                    document.body.style.backgroundAttachment = 'fixed';
+                    document.body.style.backgroundPosition = 'center';
+                    document.body.classList.add('has-bg');
+                } else if (survey.value.bgColor) {
                     document.body.style.backgroundColor = survey.value.bgColor;
                 }
                 if (survey.value.textColor) {
+                    rootStyle.value.color = survey.value.textColor;
                     containerStyle.value.color = survey.value.textColor;
                 }
                 if (survey.value.fontSize) {
                     containerStyle.value.fontSize = survey.value.fontSize;
+                }
+                if (survey.value.accentColor) {
+                    accentButtonStyle.value.backgroundColor = survey.value.accentColor;
+                    accentButtonStyle.value.borderColor = survey.value.accentColor;
+                }
+                
+                if (survey.value.showBorder === 'N') {
+                    containerStyle.value.boxShadow = 'none';
+                    containerStyle.value.border = 'none';
                 }
                 
                 // Initialize answers
@@ -241,7 +345,8 @@
                 };
 
                 return {
-                    survey, answers, containerStyle, submitSurvey, handleFileUpload
+                    survey, answers, rootStyle, containerStyle, accentButtonStyle, isSidebarLayout,
+                    submitSurvey, handleFileUpload
                 };
             }
         });

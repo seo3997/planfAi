@@ -61,6 +61,10 @@ public class SurveyController {
     public String manageSurveyMenu(@ModelAttribute("searchVO") TbSurvey searchVO, Model model) {
         TbSurvey surveyInfo = surveyService.selectSurveyDetail(searchVO);
         model.addAttribute("surveyInfo", surveyInfo);
+
+        // 테마 목록 추가
+        model.addAttribute("themeList", surveyService.selectThemeList());
+
         return "admin/mgt/survey/surveyMaster";
     }
 

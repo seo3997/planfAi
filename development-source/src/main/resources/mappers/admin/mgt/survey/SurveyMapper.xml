@@ -2,6 +2,15 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.whomade.planfAi.admin.mgt.survey.mapper.SurveyMapper">
 
+    <!-- 테마 목록 조회 -->
+    <select id="selectThemeList" resultType="com.whomade.planfAi.admin.mgt.survey.vo.TbSurveyTheme">
+        SELECT * FROM tb_survey_theme ORDER BY THEME_SEQ ASC
+    </select>
+
+    <select id="selectThemeDetail" parameterType="int" resultType="com.whomade.planfAi.admin.mgt.survey.vo.TbSurveyTheme">
+        SELECT * FROM tb_survey_theme WHERE THEME_SEQ = #{themeSeq}
+    </select>
+
     <!-- 설문 목록 조회 -->
     <select id="selectSurveyList" parameterType="com.whomade.planfAi.admin.mgt.survey.vo.TbSurvey" resultType="com.whomade.planfAi.admin.mgt.survey.vo.TbSurvey">
         SELECT
@@ -45,14 +54,24 @@
     <!-- 설문 상세 조회 -->
     <select id="selectSurveyDetail" parameterType="com.whomade.planfAi.admin.mgt.survey.vo.TbSurvey" resultType="com.whomade.planfAi.admin.mgt.survey.vo.TbSurvey">
         SELECT
-            *
-        FROM tb_survey
+            A.SURVEY_SEQ, A.SURVEY_ID, A.SURVEY_TITLE,
+            A.OPENED, A.CLOSED, A.ADMINEMAIL, A.ADMINPID,
+            A.ACCESSRESULTSRESTRICTION, A.RESULTSPASSWORD, A.ENTRYRESTRICTION, A.ENTRYPASSWORD,
+            A.MEMBERS, A.ONEENTRYONLY, A.SHOWBORDER, A.EXPORTDELIMITER, A.EXPORTINCLUDEQUESTIONS,
+            A.IP, A.BROWSERID, A.BGCOLOR, A.TEXTCOLOR, A.FONT_SIZE, A.HEADER, A.FOOTER, A.BASEHREF,
+            A.USERCSS, A.DIVIDER, A.EXITPAGETEXT_ISHTML, A.EXITPAGETEXT, A.NUMBERRODUCTIONTEXT,
+            A.THEME_SEQ, A.LOGO_IMAGE_PATH, A.LOGO_ALIGN, A.SHOW_FOOTER_LOGO, A.LAYOUT_TYPE, A.FONT_FAMILY, A.ACCENT_COLOR,
+            A.REGISTER_NO, DATE_FORMAT(A.REGIST_DT, '%Y-%m-%d %H:%i') AS REGIST_DT,
+            A.UPDUSR_NO, DATE_FORMAT(A.UPDT_DT, '%Y-%m-%d %H:%i') AS UPDT_DT,
+            B.BG_IMAGE_PATH AS bgImagePath
+        FROM tb_survey A
+        LEFT JOIN tb_survey_theme B ON A.THEME_SEQ = B.THEME_SEQ
         WHERE 1=1
         <if test="surveySeq != null">
-            AND SURVEY_SEQ = #{surveySeq}
+            AND A.SURVEY_SEQ = #{surveySeq}
         </if>
         <if test="surveyId != null and surveyId != ''">
-            AND SURVEY_ID = #{surveyId}
+            AND A.SURVEY_ID = #{surveyId}
         </if>
     </select>
 
@@ -64,6 +83,7 @@
             MEMBERS, ONEENTRYONLY, SHOWBORDER, EXPORTDELIMITER, EXPORTINCLUDEQUESTIONS,
             IP, BROWSERID, BGCOLOR, TEXTCOLOR, FONT_SIZE, HEADER, FOOTER, BASEHREF,
             USERCSS, DIVIDER, EXITPAGETEXT_ISHTML, EXITPAGETEXT, NUMBERRODUCTIONTEXT,
+            THEME_SEQ, LOGO_IMAGE_PATH, LOGO_ALIGN, SHOW_FOOTER_LOGO, LAYOUT_TYPE, FONT_FAMILY, ACCENT_COLOR,
             REGISTER_NO, REGIST_DT, UPDUSR_NO, UPDT_DT
         ) VALUES (
             #{surveyId}, #{surveyTitle}, #{opened}, #{closed}, #{adminEmail}, #{adminPid},
@@ -71,6 +91,7 @@
             #{members}, #{oneEntryOnly}, #{showBorder}, #{exportDelimiter}, #{exportIncludeQuestions},
             #{ip}, #{browserId}, #{bgColor}, #{textColor}, #{fontSize}, #{header}, #{footer}, #{baseHref},
             #{userCss}, #{divider}, #{exitPageTextIsHtml}, #{exitPageText}, #{numberRoductionText},
+            #{themeSeq}, #{logoImagePath}, #{logoAlign}, #{showFooterLogo}, #{layoutType}, #{fontFamily}, #{accentColor},
             #{registerNo}, NOW(), #{updusrNo}, NOW()
         )
     </insert>
@@ -106,6 +127,13 @@
             <if test="exitPageTextIsHtml != null">EXITPAGETEXT_ISHTML = #{exitPageTextIsHtml},</if>
             <if test="exitPageText != null">EXITPAGETEXT = #{exitPageText},</if>
             <if test="numberRoductionText != null">NUMBERRODUCTIONTEXT = #{numberRoductionText},</if>
+            <if test="themeSeq != null">THEME_SEQ = #{themeSeq},</if>
+            <if test="logoImagePath != null">LOGO_IMAGE_PATH = #{logoImagePath},</if>
+            <if test="logoAlign != null">LOGO_ALIGN = #{logoAlign},</if>
+            <if test="showFooterLogo != null">SHOW_FOOTER_LOGO = #{showFooterLogo},</if>
+            <if test="layoutType != null">LAYOUT_TYPE = #{layoutType},</if>
+            <if test="fontFamily != null">FONT_FAMILY = #{fontFamily},</if>
+            <if test="accentColor != null">ACCENT_COLOR = #{accentColor},</if>
             <if test="updusrNo != null">UPDUSR_NO = #{updusrNo},</if>
             UPDT_DT = NOW()
         </set>

@@ -5,6 +5,7 @@ import com.whomade.planfAi.admin.mgt.survey.vo.TbQuestion;
 import com.whomade.planfAi.admin.mgt.survey.vo.TbQuestionLabel;
 import com.whomade.planfAi.admin.mgt.survey.vo.TbSection;
 import com.whomade.planfAi.admin.mgt.survey.vo.TbSurvey;
+import com.whomade.planfAi.admin.mgt.survey.vo.TbSurveyTheme;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,20 @@ import java.util.UUID;
 public class SurveyService {
 
     private final SurveyMapper surveyMapper;
+
+    /**
+     * 테마 목록 조회
+     */
+    public List<TbSurveyTheme> selectThemeList() {
+        return surveyMapper.selectThemeList();
+    }
+
+    /**
+     * 테마 상세 조회
+     */
+    public TbSurveyTheme selectThemeDetail(int themeSeq) {
+        return surveyMapper.selectThemeDetail(themeSeq);
+    }
 
     /**
      * 설문 목록 조회
@@ -194,8 +209,18 @@ public class SurveyService {
         copy.setAdminEmail(original.getAdminEmail());
         copy.setBgColor(original.getBgColor());
         copy.setTextColor(original.getTextColor());
+        copy.setAccentColor(original.getAccentColor());
+        copy.setFontSize(original.getFontSize());
+        copy.setFontFamily(original.getFontFamily());
         copy.setHeader(original.getHeader());
         copy.setFooter(original.getFooter());
+        copy.setThemeSeq(original.getThemeSeq());
+        copy.setLayoutType(original.getLayoutType());
+        copy.setLogoImagePath(original.getLogoImagePath());
+        copy.setLogoAlign(original.getLogoAlign());
+        copy.setShowFooterLogo(original.getShowFooterLogo());
+        copy.setShowBorder(original.getShowBorder());
+        copy.setUserCss(original.getUserCss());
 
         // 3. 전체 구조 저장 로직 활용
         // saveSurveyEntryForm expects surveySeq == null for new insertion

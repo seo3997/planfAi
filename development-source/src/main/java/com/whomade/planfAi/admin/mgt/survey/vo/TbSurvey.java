@@ -42,6 +42,16 @@ public class TbSurvey {
     private String userCss;
     private String divider;
 
+    // 테마 및 디자인 고도화 필드
+    private Integer themeSeq;
+    private String bgImagePath;
+    private String logoImagePath;
+    private String logoAlign;
+    private String showFooterLogo;
+    private String layoutType;
+    private String fontFamily;
+    private String accentColor;
+
     // 문구
     private String exitPageTextIsHtml;
     private String exitPageText;

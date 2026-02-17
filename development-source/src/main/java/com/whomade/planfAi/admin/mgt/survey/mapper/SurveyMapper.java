@@ -4,12 +4,23 @@ import com.whomade.planfAi.admin.mgt.survey.vo.TbQuestion;
 import com.whomade.planfAi.admin.mgt.survey.vo.TbQuestionLabel;
 import com.whomade.planfAi.admin.mgt.survey.vo.TbSection;
 import com.whomade.planfAi.admin.mgt.survey.vo.TbSurvey;
+import com.whomade.planfAi.admin.mgt.survey.vo.TbSurveyTheme;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
 @Mapper
 public interface SurveyMapper {
+
+    /**
+     * 테마 목록 조회
+     */
+    List<TbSurveyTheme> selectThemeList();
+
+    /**
+     * 테마 상세 조회
+     */
+    TbSurveyTheme selectThemeDetail(int themeSeq);
 
     /**
      * 설문 목록 조회 (페이징)
