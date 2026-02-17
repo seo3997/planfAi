@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{admin/layout/base :: layout(~{::title}, ~{::#admin-survey-form}, ~{::#admin-survey-script}, ~{})}">
+      th:replace="~{admin/layout/base :: layout(~{::title}, ~{::#admin-survey-form}, ~{::#admin-survey-script}, ~{::#admin-survey-head})}">
 <head>
     <title>설문 양식 등록 - PlanfAi 관리자</title>
+    <th:block id="admin-survey-head">
+        <script src="/common/lib/js/sortable.min.js"></script>
+        <script src="/common/lib/js/vuedraggable.umd.min.js"></script>
+    </th:block>
 </head>
 <body>
     <div id="admin-survey-form">
@@ -63,112 +67,143 @@
                     </button>
                 </div>
 
-                <!-- Sections Loop -->
-                <div v-for="(section, sIdx) in survey.sections" :key="sIdx" class="card mb-4 border-main">
-                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center gap-2 w-75">
-                            <span class="badge bg-main">Section {{ sIdx + 1 }}</span>
-                            <input type="text" class="form-control form-control-sm" v-model="section.sectionTitle" placeholder="섹션 제목을 입력하세요">
-                        </div>
-                        <div>
-                            <button type="button" class="btn btn-sm btn-danger" @click="removeSection(sIdx)">
-                                <i class="bi bi-trash"></i> 삭제
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <!-- Questions Loop -->
-                        <div v-for="(question, qIdx) in section.questions" :key="qIdx" class="card mb-3 border-secondary">
-                            <div class="card-body p-3">
-                                <div class="row mb-2">
-                                    <div class="col-md-2">
-                                        <select class="form-select form-select-sm" v-model="question.questionType">
-                                            <option value="inputRadio">단일 선택 (Radio)</option>
-                                            <option value="inputCheckbox">다중 선택 (Checkbox)</option>
-                                            <option value="inputTextline">단답형 (Text)</option>
-                                            <option value="inputTextarea">서술형 (Textarea)</option>
-                                            <option value="inputLocation">위치 정보 (Location)</option>
-                                            <option value="inputImage">이미지 업로드 (Image)</option>
-                                            <option value="inputComment">안내 문구 (Comment)</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <input type="text" class="form-control form-control-sm" v-model="question.questionText" placeholder="질문 내용을 입력하세요">
-                                        
-                                        <!-- Detail Settings per Type -->
-                                        <div class="mt-2 d-flex flex-wrap gap-4 align-items-start bg-light p-2 rounded">
-                                            <!-- Textarea Rows -->
-                                            <div v-if="question.questionType === 'inputTextarea'" class="d-flex align-items-center gap-2">
-                                                <label class="small text-muted mb-0">줄 수(Rows):</label>
-                                                <input type="number" class="form-control form-control-sm" style="width: 80px;" v-model="question.textRows" placeholder="4">
-                                            </div>
-                                            
-                                            <!-- Checkbox/Radio Options -->
-                                            <div v-if="['inputRadio', 'inputCheckbox'].includes(question.questionType)" class="d-flex flex-column gap-2">
-                                                <div class="d-flex align-items-center gap-3">
-                                                    <span class="small fw-bold text-muted">기타(Other) 필드:</span>
-                                                    <div class="form-check form-check-inline mb-0">
-                                                        <input class="form-check-input" type="radio" :name="'other_yn_' + sIdx + '_' + qIdx" :id="'other_y_' + sIdx + '_' + qIdx" value="Y" v-model="question.otherAnswer">
-                                                        <label class="form-check-label small" :for="'other_y_' + sIdx + '_' + qIdx">사용</label>
+                <!-- Sections Loop with Draggable -->
+                <draggable 
+                    v-model="survey.sections" 
+                    item-key="sectionId"
+                    handle=".section-drag-handle"
+                    animation="200"
+                    ghost-class="ghost-section"
+                    @change="autoSave"
+                >
+                    <template #item="{element: section, index: sIdx}">
+                        <div class="card mb-4 border-main section-item">
+                            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center gap-2 w-75">
+                                    <i class="bi bi-grip-vertical section-drag-handle fs-5 cursor-move text-muted"></i>
+                                    <button type="button" class="btn btn-link btn-sm text-dark p-0 me-2" @click="section._collapsed = !section._collapsed">
+                                        <i class="bi" :class="section._collapsed ? 'bi-chevron-right' : 'bi-chevron-down'"></i>
+                                    </button>
+                                    <span class="badge bg-main">Section {{ sIdx + 1 }}</span>
+                                    <input type="text" class="form-control form-control-sm" v-model="section.sectionTitle" placeholder="섹션 제목을 입력하세요">
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn btn-sm btn-outline-danger" @click="removeSection(sIdx)">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="card-body" v-show="!section._collapsed">
+                                <!-- Questions Loop with Draggable -->
+                                <draggable 
+                                    v-model="section.questions" 
+                                    item-key="questionId"
+                                    handle=".question-drag-handle"
+                                    animation="200"
+                                    ghost-class="ghost-question"
+                                    group="questions"
+                                    @change="autoSave"
+                                >
+                                    <template #item="{element: question, index: qIdx}">
+                                        <div class="card mb-3 border-secondary question-item">
+                                            <div class="card-body p-3">
+                                                <div class="row mb-2 align-items-center">
+                                                    <div class="col-auto">
+                                                        <i class="bi bi-grip-vertical question-drag-handle cursor-move text-muted"></i>
                                                     </div>
-                                                    <div class="form-check form-check-inline mb-0">
-                                                        <input class="form-check-input" type="radio" :name="'other_yn_' + sIdx + '_' + qIdx" :id="'other_n_' + sIdx + '_' + qIdx" value="N" v-model="question.otherAnswer">
-                                                        <label class="form-check-label small" :for="'other_n_' + sIdx + '_' + qIdx">미사용</label>
+                                                    <div class="col-md-2">
+                                                        <select class="form-select form-select-sm" v-model="question.questionType">
+                                                            <option value="inputRadio">단일 선택 (Radio)</option>
+                                                            <option value="inputCheckbox">다중 선택 (Checkbox)</option>
+                                                            <option value="inputTextline">단답형 (Text)</option>
+                                                            <option value="inputTextarea">서술형 (Textarea)</option>
+                                                            <option value="inputLocation">위치 정보 (Location)</option>
+                                                            <option value="inputImage">이미지 업로드 (Image)</option>
+                                                            <option value="inputComment">안내 문구 (Comment)</option>
+                                                        </select>
                                                     </div>
-                                                    <input v-if="question.otherAnswer === 'Y'" type="text" class="form-control form-control-sm" style="width: 150px;" v-model="question.questionLabel" placeholder="내용 (예: 기타:)">
-                                                </div>
-                                                
-                                                <div class="d-flex align-items-center gap-3">
-                                                    <span class="small fw-bold text-muted">배치(Layout):</span>
-                                                    <div class="form-check form-check-inline mb-0">
-                                                        <input class="form-check-input" type="radio" :name="'layout_' + sIdx + '_' + qIdx" :id="'layout_v_' + sIdx + '_' + qIdx" value="vertical" v-model="question.questionLayout">
-                                                        <label class="form-check-label small" :for="'layout_v_' + sIdx + '_' + qIdx">한 줄에 하나씩 (Vertical)</label>
-                                                    </div>
-                                                    <div class="form-check form-check-inline mb-0">
-                                                        <input class="form-check-input" type="radio" :name="'layout_' + sIdx + '_' + qIdx" :id="'layout_h_' + sIdx + '_' + qIdx" value="horizontal" v-model="question.questionLayout">
-                                                        <label class="form-check-label small" :for="'layout_h_' + sIdx + '_' + qIdx">한 줄에 모두 (Horizontal)</label>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                                    <div class="col-md-7">
+                                                        <input type="text" class="form-control form-control-sm" v-model="question.questionText" placeholder="질문 내용을 입력하세요">
+                                                        
+                                                        <!-- Detail Settings per Type -->
+                                                        <div class="mt-2 d-flex flex-wrap gap-4 align-items-start bg-light p-2 rounded">
+                                                            <!-- Textarea Rows -->
+                                                            <div v-if="question.questionType === 'inputTextarea'" class="d-flex align-items-center gap-2">
+                                                                <label class="small text-muted mb-0">줄 수(Rows):</label>
+                                                                <input type="number" class="form-control form-control-sm" style="width: 80px;" v-model="question.textRows" placeholder="4">
+                                                            </div>
+                                                            
+                                                            <!-- Checkbox/Radio Options -->
+                                                            <div v-if="['inputRadio', 'inputCheckbox'].includes(question.questionType)" class="d-flex flex-column gap-2">
+                                                                <div class="d-flex align-items-center gap-3">
+                                                                    <span class="small fw-bold text-muted">기타(Other) 필드:</span>
+                                                                    <div class="form-check form-check-inline mb-0">
+                                                                        <input class="form-check-input" type="radio" :name="'other_yn_' + sIdx + '_' + qIdx" :id="'other_y_' + sIdx + '_' + qIdx" value="Y" v-model="question.otherAnswer">
+                                                                        <label class="form-check-label small" :for="'other_y_' + sIdx + '_' + qIdx">사용</label>
+                                                                    </div>
+                                                                    <div class="form-check form-check-inline mb-0">
+                                                                        <input class="form-check-input" type="radio" :name="'other_yn_' + sIdx + '_' + qIdx" :id="'other_n_' + sIdx + '_' + qIdx" value="N" v-model="question.otherAnswer">
+                                                                        <label class="form-check-label small" :for="'other_n_' + sIdx + '_' + qIdx">미사용</label>
+                                                                    </div>
+                                                                    <input v-if="question.otherAnswer === 'Y'" type="text" class="form-control form-control-sm" style="width: 150px;" v-model="question.questionLabel" placeholder="내용 (예: 기타:)">
+                                                                </div>
+                                                                
+                                                                <div class="d-flex align-items-center gap-3">
+                                                                    <span class="small fw-bold text-muted">배치(Layout):</span>
+                                                                    <div class="form-check form-check-inline mb-0">
+                                                                        <input class="form-check-input" type="radio" :name="'layout_' + sIdx + '_' + qIdx" :id="'layout_v_' + sIdx + '_' + qIdx" value="vertical" v-model="question.questionLayout">
+                                                                        <label class="form-check-label small" :for="'layout_v_' + sIdx + '_' + qIdx">한 줄에 하나씩 (Vertical)</label>
+                                                                    </div>
+                                                                    <div class="form-check form-check-inline mb-0">
+                                                                        <input class="form-check-input" type="radio" :name="'layout_' + sIdx + '_' + qIdx" :id="'layout_h_' + sIdx + '_' + qIdx" value="horizontal" v-model="question.questionLayout">
+                                                                        <label class="form-check-label small" :for="'layout_h_' + sIdx + '_' + qIdx">한 줄에 모두 (Horizontal)</label>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
 
-                                            <!-- Location/Image Info -->
-                                            <div v-if="['inputLocation', 'inputImage'].includes(question.questionType)" class="text-muted small">
-                                                <i class="bi bi-info-circle"></i> 
-                                                <span v-if="question.questionType === 'inputLocation'">위도/경도 입력 필드가 생성됩니다.</span>
-                                                <span v-if="question.questionType === 'inputImage'">파일 업로드 필드가 생성됩니다.</span>
+                                                            <!-- Location/Image Info -->
+                                                            <div v-if="['inputLocation', 'inputImage'].includes(question.questionType)" class="text-muted small">
+                                                                <i class="bi bi-info-circle"></i> 
+                                                                <span v-if="question.questionType === 'inputLocation'">위도/경도 입력 필드가 생성됩니다.</span>
+                                                                <span v-if="question.questionType === 'inputImage'">파일 업로드 필드가 생성됩니다.</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col text-end">
+                                                        <button type="button" class="btn btn-xs btn-outline-danger" @click="removeQuestion(section, qIdx)">
+                                                            <i class="bi bi-x-lg"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Options (Labels) Area: Only for Radio/Checkbox -->
+                                                <div v-if="['inputRadio', 'inputCheckbox'].includes(question.questionType)" class="ps-4 mt-2 border-start border-3">
+                                                    <div v-for="(label, lIdx) in question.labels" :key="lIdx" class="d-flex align-items-center gap-2 mb-1">
+                                                        <i class="bi" :class="question.questionType === 'inputRadio' ? 'bi-circle' : 'bi-square'"></i>
+                                                        <input type="text" class="form-control form-control-sm w-50" v-model="label.questionLabel" placeholder="보기 내용">
+                                                        <button type="button" class="btn btn-xs btn-light text-danger" @click="removeLabel(question, lIdx)">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                    <button type="button" class="btn btn-xs btn-link text-decoration-none" @click="addLabel(question)">
+                                                        <i class="bi bi-plus"></i> 보기 추가
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-2 text-end">
-                                        <button type="button" class="btn btn-xs btn-outline-danger" @click="removeQuestion(section, qIdx)">
-                                            <i class="bi bi-x-lg"></i>
-                                        </button>
-                                    </div>
-                                </div>
+                                    </template>
+                                </draggable>
 
-                                <!-- Options (Labels) Area: Only for Radio/Checkbox -->
-                                <div v-if="['inputRadio', 'inputCheckbox'].includes(question.questionType)" class="ps-4 mt-2 border-start border-3">
-                                    <div v-for="(label, lIdx) in question.labels" :key="lIdx" class="d-flex align-items-center gap-2 mb-1">
-                                        <i class="bi" :class="question.questionType === 'inputRadio' ? 'bi-circle' : 'bi-square'"></i>
-                                        <input type="text" class="form-control form-control-sm w-50" v-model="label.questionLabel" placeholder="보기 내용">
-                                        <button type="button" class="btn btn-xs btn-light text-danger" @click="removeLabel(question, lIdx)">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </div>
-                                    <button type="button" class="btn btn-xs btn-link text-decoration-none" @click="addLabel(question)">
-                                        <i class="bi bi-plus"></i> 보기 추가
+                                <div class="text-center mt-3">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary dashed-border w-100" @click="addQuestion(section)">
+                                        <i class="bi bi-plus-circle"></i> 질문 추가
                                     </button>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="text-center mt-3">
-                            <button type="button" class="btn btn-sm btn-outline-secondary dashed-border w-100" @click="addQuestion(section)">
-                                <i class="bi bi-plus-circle"></i> 질문 추가
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                    </template>
+                </draggable>
 
                 <div v-if="(!survey.sections || survey.sections.length === 0)" class="text-center p-5 text-muted bg-light rounded">
                     생성된 섹션이 없습니다. '섹션 추가' 버튼을 눌러 설문을 구성하세요.
@@ -197,8 +232,12 @@
                         sections: []
                     });
                     
-                    // Initialize if null
+                    // Initialize if null and add internal states
                     if (!survey.value.sections) survey.value.sections = [];
+                    survey.value.sections.forEach(s => {
+                        if (s._collapsed === undefined) s._collapsed = false;
+                    });
+                    
                     if (!survey.value.surveyId) survey.value.surveyId = ''; // Empty for new
                     if (!survey.value.opened) survey.value.opened = 'OPENED';
 
@@ -206,8 +245,6 @@
 
                     // --- Actions ---
                     const addSection = () => {
-                        // Generate temporary ID logic if needed, but for saving we rely on order
-                        // Section ID logical assignment: max + 1
                         const maxId = survey.value.sections.length > 0 
                             ? Math.max(...survey.value.sections.map(s => s.sectionId || 0)) 
                             : 0;
@@ -215,7 +252,8 @@
                         survey.value.sections.push({
                             sectionId: maxId + 1,
                             sectionTitle: '제목 없는 섹션',
-                            questions: []
+                            questions: [],
+                            _collapsed: false
                         });
                     };
 
@@ -264,9 +302,12 @@
                         question.labels.splice(idx, 1);
                     };
 
-                    const saveSurvey = async () => {
+                    const saveSurvey = async (silent = false) => {
+                        // Avoid multiple parallel saves
+                        if (isSaving.value) return;
+
                         if (!survey.value.surveyTitle) {
-                            alert('설문 제목을 입력해주세요.');
+                            if (!silent) alert('설문 제목을 입력해주세요.');
                             return;
                         }
 
@@ -294,17 +335,23 @@
                             const res = response.data;
                             
                             if (res.status === 'success') {
-                                alert(res.message);
-                                window.location.href = '/mgt/survey/selectPageListSurvey.do';
+                                if (res.surveyId && !survey.value.surveyId) {
+                                    survey.value.surveyId = res.surveyId;
+                                }
+                                if (!silent) alert(res.message || '저장되었습니다.');
                             } else {
-                                alert(res.message);
+                                if (!silent) alert(res.message);
                             }
                         } catch (error) {
                             console.error('Save error:', error);
-                            alert('저장 중 통신 오류가 발생했습니다.');
+                            if (!silent) alert('저장 중 통신 오류가 발생했습니다.');
                         } finally {
                             isSaving.value = false;
                         }
+                    };
+
+                    const autoSave = () => {
+                        saveSurvey(true);
                     };
 
                     const goList = () => {
@@ -325,10 +372,16 @@
                         addSection, removeSection,
                         addQuestion, removeQuestion,
                         addLabel, removeLabel,
-                        saveSurvey, goList, goPreview
+                        saveSurvey, autoSave, goList, goPreview
                     };
                 }
             });
+            const draggable = window.vuedraggable?.default || window.vuedraggable;
+            if (draggable) {
+                app.component('draggable', draggable);
+            } else {
+                console.error('vuedraggable library not found. Check if scripts are loaded correctly.');
+            }
             AdminLayout.register(app);
             app.mount('#app');
         </script>
@@ -363,6 +416,33 @@
             }
             .form-control-color {
                 height: 38px;
+            }
+            .cursor-move {
+                cursor: move !important;
+            }
+            .section-drag-handle, .question-drag-handle {
+                padding: 5px;
+                opacity: 0.6;
+                transition: opacity 0.2s;
+            }
+            .section-drag-handle:hover, .question-drag-handle:hover {
+                opacity: 1;
+            }
+            .ghost-section {
+                opacity: 0.5;
+                background: #e9ecef !important;
+                border: 2px dashed var(--main-color) !important;
+            }
+            .ghost-question {
+                opacity: 0.5;
+                background: #f8f9fa !important;
+                border: 2px dashed #6c757d !important;
+            }
+            .section-item {
+                transition: transform 0.2s;
+            }
+            .question-item {
+                transition: transform 0.2s;
             }
         </style>
     </div>
