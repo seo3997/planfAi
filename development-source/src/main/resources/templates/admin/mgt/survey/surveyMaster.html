@@ -29,12 +29,12 @@
         <!-- Workspace Tabs -->
         <ul class="nav nav-tabs nav-fill mb-4 border-bottom-0">
             <li class="nav-item">
-                <a class="nav-link active fw-bold border-bottom border-primary border-3 text-primary" href="javascript:void(0);">
+                <a class="nav-link active fw-bold border-bottom border-main border-3 text-main" href="javascript:void(0);">
                     설정 (Settings)
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-muted" :href="'/mgt/survey/editEntryForm.do?surveyId=' + survey.surveyId">
+                <a class="nav-link text-muted" :href="survey.surveyId ? '/mgt/survey/editEntryForm.do?surveyId=' + survey.surveyId : '#'">
                     질문 (Questions)
                 </a>
             </li>
@@ -258,6 +258,22 @@
         </script>
         
         <style>
+            :root {
+                --main-color: #2b4b8a;
+            }
+            .text-main {
+                color: var(--main-color) !important;
+            }
+            .bg-main {
+                background-color: var(--main-color) !important;
+            }
+            .border-main {
+                border-color: var(--main-color) !important;
+            }
+            .nav-tabs .nav-link.active {
+                color: var(--main-color) !important;
+                border-bottom: 3px solid var(--main-color) !important;
+            }
             .form-control-color {
                 height: 38px;
             }
