@@ -32,7 +32,17 @@ public class SurveyController {
             searchVO.setPageIndex(1);
         }
 
-        // 2. 목록 조회
+        // 2. 페이징 계산
+        int pageIndex = searchVO.getPageIndex();
+        int pageSize = searchVO.getRecordCountPerPage();
+        // MySQL LIMIT offset calculation: (page - 1) * size.
+        // If page 1, offset 0.
+        // TbSurvey default firstIndex is 1, which causes LIMIT 1, 10 (skipping 1st
+        // row).
+        // So we must manually set firstIndex based on pageIndex.
+        searchVO.setFirstIndex((pageIndex - 1) * pageSize);
+
+        // 3. 목록 조회
         List<TbSurvey> resultList = surveyService.selectSurveyList(searchVO);
         int totalCount = surveyService.selectSurveyCount(searchVO);
 
@@ -49,8 +59,30 @@ public class SurveyController {
      */
     @GetMapping("/manageSurveyMenu.do")
     public String manageSurveyMenu(@ModelAttribute("searchVO") TbSurvey searchVO, Model model) {
-        // 상세 조회 로직 추가 예정
+        TbSurvey surveyInfo = surveyService.selectSurveyDetail(searchVO);
+        model.addAttribute("surveyInfo", surveyInfo);
         return "admin/mgt/survey/surveyMaster";
+    }
+
+    /**
+     * 설문 마스터 정보 수정
+     * URL: /mgt/survey/updateSurveyMaster.do
+     */
+    @org.springframework.web.bind.annotation.PostMapping("/updateSurveyMaster.do")
+    @org.springframework.web.bind.annotation.ResponseBody
+    public java.util.Map<String, Object> updateSurveyMaster(
+            @org.springframework.web.bind.annotation.RequestBody TbSurvey surveyVO) {
+        java.util.Map<String, Object> result = new java.util.HashMap<>();
+        try {
+            surveyService.updateSurvey(surveyVO);
+            result.put("status", "success");
+            result.put("message", "저장되었습니다.");
+        } catch (Exception e) {
+            log.error("Survey Master Update Error", e);
+            result.put("status", "error");
+            result.put("message", "저장 중 오류가 발생했습니다: " + e.getMessage());
+        }
+        return result;
     }
 
     /**

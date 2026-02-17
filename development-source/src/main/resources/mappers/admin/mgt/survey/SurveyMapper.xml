@@ -75,7 +75,7 @@
         )
     </insert>
 
-    <!-- 설문 수정 -->
+    <!-- 설문 수정 (마스터 관리) -->
     <update id="updateSurvey" parameterType="com.whomade.planfAi.admin.mgt.survey.vo.TbSurvey">
         UPDATE tb_survey
         SET
@@ -83,12 +83,29 @@
             OPENED = #{opened},
             CLOSED = #{closed},
             ADMINEMAIL = #{adminEmail},
+            ADMINPID = #{adminPid},
+            ACCESSRESULTSRESTRICTION = #{accessResultsRestriction},
+            RESULTSPASSWORD = #{resultsPassword},
+            ENTRYRESTRICTION = #{entryRestriction},
+            ENTRYPASSWORD = #{entryPassword},
+            MEMBERS = #{members},
+            ONEENTRYONLY = #{oneEntryOnly},
+            SHOWBORDER = #{showBorder},
+            EXPORTDELIMITER = #{exportDelimiter},
+            EXPORTINCLUDEQUESTIONS = #{exportIncludeQuestions},
+            IP = #{ip},
+            BROWSERID = #{browserId},
             BGCOLOR = #{bgColor},
             TEXTCOLOR = #{textColor},
             FONT_SIZE = #{fontSize},
             HEADER = #{header},
             FOOTER = #{footer},
+            BASEHREF = #{baseHref},
+            USERCSS = #{userCss},
+            DIVIDER = #{divider},
+            EXITPAGETEXT_ISHTML = #{exitPageTextIsHtml},
             EXITPAGETEXT = #{exitPageText},
+            NUMBERRODUCTIONTEXT = #{numberRoductionText},
             UPDUSR_NO = #{updusrNo},
             UPDT_DT = NOW()
         WHERE SURVEY_SEQ = #{surveySeq}

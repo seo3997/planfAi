@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/layout/base :: layout(~{::title}, ~{::#admin-survey-master}, ~{::#admin-survey-script}, ~{})}">
+<head>
+    <title>설문 마스터 관리 - PlanfAi 관리자</title>
+</head>
+<body>
+    <div id="admin-survey-master">
+        <div class="page-title-box">
+            <h2 class="page-title">설문 마스터 관리</h2>
+            <div class="breadcrumb-area">
+                <i class="bi bi-house-door text-muted"></i> > 운영 업무 > 설문 관리 > <span class="text-primary fw-medium">마스터 설정</span>
+            </div>
+        </div>
+
+        <div class="mgmt-card">
+            <form @submit.prevent="saveMaster">
+                <!-- Top Actions -->
+                <div class="d-flex justify-content-end gap-2 mb-3">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" @click="goList">
+                        <i class="bi bi-list"></i> 목록
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-primary" @click="goEntryForm">
+                        <i class="bi bi-pencil-square"></i> 양식 수정
+                    </button>
+                    <button type="submit" class="btn btn-sm btn-primary" :disabled="isSaving">
+                        <span v-if="isSaving" class="spinner-border spinner-border-sm me-1"></span>
+                        저장
+                    </button>
+                </div>
+
+                <!-- Tabs -->
+                <ul class="nav nav-tabs mb-4">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#basic-info">기본 정보</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#access-control">권한 설정</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#theme-design">테마/디자인</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#text-setup">문구 설정</a>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+                    <!-- 1. Basic Info -->
+                    <div class="tab-pane fade show active" id="basic-info">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">설문 ID</label>
+                                <input type="text" class="form-control" v-model="survey.surveyId" readonly disabled>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">설문 제목 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" v-model="survey.surveyTitle" required>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">상태</label>
+                                <select class="form-select" v-model="survey.opened">
+                                    <option value="OPENED">진행중 (OPENED)</option>
+                                    <option value="CLOSED">마감 (CLOSED)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">마감일</label>
+                                <input type="date" class="form-control" v-model="survey.closed">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">담당자 이메일</label>
+                                <input type="email" class="form-control" v-model="survey.adminEmail">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">담당자 ID</label>
+                                <input type="text" class="form-control" v-model="survey.adminPid">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Access Control -->
+                    <div class="tab-pane fade" id="access-control">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">결과 조회 암호</label>
+                                <input type="text" class="form-control" v-model="survey.resultsPassword" placeholder="입력 시 결과 조회 제한">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">참여 암호</label>
+                                <input type="text" class="form-control" v-model="survey.entryPassword" placeholder="입력 시 참여 제한">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label class="form-label">IP 접근 제한</label>
+                                <input type="text" class="form-control" v-model="survey.ip" placeholder="허용 IP 목록 (콤마 구분)">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-check form-switch mt-4">
+                                    <input class="form-check-input" type="checkbox" id="oneEntryOnly" v-model="survey.oneEntryOnly" true-value="Y" false-value="N">
+                                    <label class="form-check-label" for="oneEntryOnly">1인 1회 참여 제한</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Theme/Design -->
+                    <div class="tab-pane fade" id="theme-design">
+                         <div class="row mb-3">
+                            <div class="col-md-3">
+                                <label class="form-label">배경색</label>
+                                <input type="color" class="form-control form-control-color w-100" v-model="survey.bgColor">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">글자색</label>
+                                <input type="color" class="form-control form-control-color w-100" v-model="survey.textColor">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">폰트 크기</label>
+                                <input type="text" class="form-control" v-model="survey.fontSize" placeholder="예: 14px">
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-check form-switch mt-4">
+                                    <input class="form-check-input" type="checkbox" id="showBorder" v-model="survey.showBorder" true-value="Y" false-value="N">
+                                    <label class="form-check-label" for="showBorder">테두리 표시</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                             <label class="form-label">헤더 (Header HTML)</label>
+                             <textarea class="form-control" rows="3" v-model="survey.header"></textarea>
+                        </div>
+                        <div class="mb-3">
+                             <label class="form-label">푸터 (Footer HTML)</label>
+                             <textarea class="form-control" rows="3" v-model="survey.footer"></textarea>
+                        </div>
+                        <div class="mb-3">
+                             <label class="form-label">사용자 CSS</label>
+                             <textarea class="form-control" rows="3" v-model="survey.userCss"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- 4. Text Setup -->
+                    <div class="tab-pane fade" id="text-setup">
+                        <div class="mb-3">
+                             <label class="form-label">종료 페이지 문구</label>
+                             <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="exitPageTextIsHtml" v-model="survey.exitPageTextIsHtml" true-value="Y" false-value="N">
+                                <label class="form-check-label" for="exitPageTextIsHtml">HTML 사용</label>
+                             </div>
+                             <textarea class="form-control" rows="5" v-model="survey.exitPageText"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="admin-survey-script">
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            const serverSurveyInfo = /*[[${surveyInfo}]]*/ {};
+            /*]]>*/
+
+            const initVueApp = true; // IMPORTANT
+            const { createApp, ref, onMounted } = Vue;
+            const app = createApp({
+                setup() {
+                    const survey = ref(serverSurveyInfo || {});
+                    const isSaving = ref(false);
+
+                    // Initialize defaults if null
+                    if (!survey.value.opened) survey.value.opened = 'OPENED';
+                    if (!survey.value.oneEntryOnly) survey.value.oneEntryOnly = 'N';
+                    if (!survey.value.showBorder) survey.value.showBorder = 'N';
+                    if (!survey.value.exitPageTextIsHtml) survey.value.exitPageTextIsHtml = 'N';
+                    
+                    // Format date for input type="date" (YYYY-MM-DD)
+                    if (survey.value.closed && survey.value.closed.length > 10) {
+                         survey.value.closed = survey.value.closed.substring(0, 10);
+                    }
+
+                    const saveMaster = async () => {
+                        if (!survey.value.surveyTitle) {
+                            alert('설문 제목을 입력해주세요.');
+                            return;
+                        }
+
+                        isSaving.value = true;
+                        try {
+                            const response = await axios.post('/mgt/survey/updateSurveyMaster.do', survey.value);
+                            const res = response.data;
+                            
+                            if (res.status === 'success') {
+                                alert(res.message);
+                                window.location.reload();
+                            } else {
+                                alert(res.message);
+                            }
+                        } catch (error) {
+                            console.error('Save error:', error);
+                            alert('저장 중 통신 오류가 발생했습니다.');
+                        } finally {
+                            isSaving.value = false;
+                        }
+                    };
+
+                    const goList = () => {
+                        window.location.href = '/mgt/survey/selectPageListSurvey.do';
+                    };
+
+                    const goEntryForm = () => {
+                        window.location.href = `/mgt/survey/editEntryForm.do?surveyId=${survey.value.surveyId}`;
+                    };
+
+                    onMounted(() => {
+                        AdminMenu.init();
+                    });
+
+                    return {
+                        survey, isSaving,
+                        saveMaster, goList, goEntryForm
+                    };
+                }
+            });
+            AdminLayout.register(app);
+            app.mount('#admin-survey-master');
+        </script>
+        
+        <style>
+            .form-control-color {
+                height: 38px;
+            }
+        </style>
+    </div>
+</body>
+</html>

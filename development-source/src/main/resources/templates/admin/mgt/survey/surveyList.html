@@ -95,6 +95,24 @@
                     @update:model-value="handlePageChange"
                 ></b-pagination>
             </div>
+
+            <!-- Create Survey Modal -->
+            <b-modal id="modal-create-survey" v-model="showCreateModal" title="설문 생성" @ok="createSurvey" ok-title="생성" cancel-title="취소">
+                <form @submit.prevent="createSurvey">
+                    <div class="mb-3">
+                        <label class="form-label">설문 ID (자동생성)</label>
+                        <input type="text" class="form-control" v-model="newSurvey.surveyId" placeholder="입력하지 않으면 자동 생성됩니다">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">설문 제목 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" v-model="newSurvey.surveyTitle" required placeholder="설문 제목을 입력하세요">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">담당자 이메일</label>
+                        <input type="email" class="form-control" v-model="newSurvey.adminEmail" placeholder="담당자 이메일">
+                    </div>
+                </form>
+            </b-modal>
         </div>
     </div>
 
@@ -122,6 +140,14 @@
                         searchKeyword: serverSearchVO.searchKeyword || ''
                     });
 
+                    // New Survey Data
+                    const newSurvey = ref({
+                        surveyId: '',
+                        surveyTitle: '',
+                        adminEmail: '',
+                        opened: 'OPENED'
+                    });
+
                     // Search Action (SSR Reload)
                     const doSearch = () => {
                         const params = new URLSearchParams();
@@ -144,9 +170,52 @@
                     };
 
                     const goRegister = () => {
-                        // TODO: Implement Create Page
-                        alert("설문 등록 페이지 점검 중입니다."); 
-                        // window.location.href = '/mgt/survey/editEntryForm.do';
+                        // Open Modal
+                        newSurvey.value = { surveyId: '', surveyTitle: '', adminEmail: '', opened: 'OPENED' };
+                        const modal = window['bootstrap-vue-next'].useModalController ? window['bootstrap-vue-next'].useModalController() : null;
+                        // BootstrapVueNext uses v-model for visibility usually, but here we use ID
+                        // We can use standard Bootstrap JS or BVN method.
+                        // Ideally we bind v-model="showModal"
+                        // But let's check BVN documentation usage in this project.
+                        // Assuming simple ID based usage is not fully supported in Vue3 BVN without directive.
+                        // Let's use a ref for modal visibility
+                    };
+                    
+                    // Let's use a reactive variable for modal visibility if b-modal supports v-model
+                    // Since I cannot see b-modal props easily, relying on ID might be risky with Vue 3.
+                    // Let's use a ref `showCreateModal`.
+                    const showCreateModal = ref(false);
+
+                    const openCreateModal = () => {
+                        newSurvey.value = { surveyId: '', surveyTitle: '', adminEmail: '', opened: 'OPENED' };
+                        showCreateModal.value = true;
+                    };
+
+                    const createSurvey = async (bvModalEvent) => {
+                        if (!newSurvey.value.surveyTitle) {
+                            alert('설문 제목을 입력해주세요.');
+                            if(bvModalEvent) bvModalEvent.preventDefault();
+                            return;
+                        }
+
+                        try {
+                            const response = await axios.post('/mgt/survey/saveEntryForm.do', newSurvey.value);
+                            const res = response.data;
+                            
+                            if (res.status === 'success') {
+                                alert(res.message);
+                                showCreateModal.value = false;
+                                // Reload page to show new survey
+                                window.location.reload(); 
+                            } else {
+                                alert(res.message);
+                                if(bvModalEvent) bvModalEvent.preventDefault();
+                            }
+                        } catch (error) {
+                            console.error('Create error:', error);
+                            alert('생성 중 오류가 발생했습니다.');
+                            if(bvModalEvent) bvModalEvent.preventDefault();
+                        }
                     };
 
                     const goDetail = (item) => {
@@ -175,7 +244,8 @@
                     return {
                         surveyList, totalCount, currentPage, pageSize, fields,
                         searchDto, doSearch, resetSearch, handlePageChange,
-                        goRegister, goDetail, formatDate
+                        goRegister: openCreateModal, goDetail, formatDate,
+                        newSurvey, createSurvey, showCreateModal, openCreateModal
                     };
                 }
             });
