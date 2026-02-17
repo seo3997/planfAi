@@ -14,9 +14,9 @@
             A.BGCOLOR,
             A.TEXTCOLOR,
             A.REGISTER_NO,
-            A.REGIST_DT,
+            DATE_FORMAT(A.REGIST_DT, '%Y-%m-%d %H:%i') AS REGIST_DT,
             A.UPDUSR_NO,
-            A.UPDT_DT
+            DATE_FORMAT(A.UPDT_DT, '%Y-%m-%d %H:%i') AS UPDT_DT
         FROM tb_survey A
         WHERE 1=1
         <if test="searchKeyword != null and searchKeyword != ''">

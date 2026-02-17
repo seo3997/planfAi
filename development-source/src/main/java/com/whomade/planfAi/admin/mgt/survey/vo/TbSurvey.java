@@ -49,9 +49,9 @@ public class TbSurvey {
 
     // 공통 이력 컬럼
     private Integer registerNo;
-    private Date registDt;
+    private String registDt;
     private Integer updusrNo;
-    private Date updtDt;
+    private String updtDt;
 
     // 페이징 (검색조건)
     private int pageIndex = 1;
