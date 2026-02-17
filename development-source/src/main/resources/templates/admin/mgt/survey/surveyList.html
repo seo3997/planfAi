@@ -58,6 +58,8 @@
                     hover
                     @row-clicked="goDetail"
                     show-empty
+                    stacked="false"
+                    no-stack-on-cards
                     empty-text="조회된 설문이 없습니다."
                 >
                     <!-- No (Index) -->
@@ -73,11 +75,26 @@
                     <!-- Status (Badge) -->
                     <template #cell(opened)="data">
                         <span class="badge" 
-                              :class="data.value === 'OPENED' ? 'bg-success' : 'bg-secondary'">
-                            {{ data.value === 'OPENED' ? '진행중' : '마감' }}
+                              :class="data.value === 'OPENED' ? 'bg-success' : (data.value === 'DRAFT' ? 'bg-info' : 'bg-secondary')">
+                            {{ data.value === 'OPENED' ? '설문중 (Open)' : (data.value === 'DRAFT' ? '설문문항작성중' : '마감 (Close)') }}
                         </span>
                     </template>
                     
+                    <!-- Actions -->
+                    <template #cell(actions)="data">
+                        <div class="d-flex gap-1 justify-content-center">
+                            <button class="btn btn-sm btn-outline-primary py-0 px-2" @click.stop="copySurvey(data.item.surveyId)" title="복사">
+                                <i class="bi bi-files"></i> 복사
+                            </button>
+                            <button class="btn btn-sm btn-outline-info py-0 px-2" @click.stop="openRenameModal(data.item)" title="이름변경">
+                                <i class="bi bi-pencil-square"></i> 이름변경
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger py-0 px-2" @click.stop="deleteSurvey(data.item)" title="삭제">
+                                <i class="bi bi-trash"></i> 삭제
+                            </button>
+                        </div>
+                    </template>
+
                     <!-- Reg Date -->
                     <template #cell(registDt)="data">
                         {{ formatDate(data.value) }}
@@ -113,6 +130,14 @@
                     </div>
                 </form>
             </b-modal>
+
+            <!-- Rename Survey Modal -->
+            <b-modal id="modal-rename-survey" v-model="showRenameModal" title="설문 이름 변경" @ok="renameSurvey" ok-title="변경" cancel-title="취소">
+                <div class="mb-3">
+                    <label class="form-label">새로운 설문 제목 <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" v-model="renameData.surveyTitle" required placeholder="설문 제목을 입력하세요">
+                </div>
+            </b-modal>
         </div>
     </div>
 
@@ -145,7 +170,7 @@
                         surveyId: '',
                         surveyTitle: '',
                         adminEmail: '',
-                        opened: 'OPENED'
+                        opened: 'DRAFT'
                     });
 
                     // Search Action (SSR Reload)
@@ -171,7 +196,7 @@
 
                     const goRegister = () => {
                         // Open Modal
-                        newSurvey.value = { surveyId: '', surveyTitle: '', adminEmail: '', opened: 'OPENED' };
+                        newSurvey.value = { surveyId: '', surveyTitle: '', adminEmail: '', opened: 'DRAFT' };
                         const modal = window['bootstrap-vue-next'].useModalController ? window['bootstrap-vue-next'].useModalController() : null;
                         // BootstrapVueNext uses v-model for visibility usually, but here we use ID
                         // We can use standard Bootstrap JS or BVN method.
@@ -187,7 +212,7 @@
                     const showCreateModal = ref(false);
 
                     const openCreateModal = () => {
-                        newSurvey.value = { surveyId: '', surveyTitle: '', adminEmail: '', opened: 'OPENED' };
+                        newSurvey.value = { surveyId: '', surveyTitle: '', adminEmail: '', opened: 'DRAFT' };
                         showCreateModal.value = true;
                     };
 
@@ -218,6 +243,75 @@
                         }
                     };
 
+                    // Rename Logic
+                    const showRenameModal = ref(false);
+                    const renameData = ref({ surveyId: '', surveyTitle: '' });
+
+                    const openRenameModal = (item) => {
+                        renameData.value = { surveyId: item.surveyId, surveyTitle: item.surveyTitle };
+                        showRenameModal.value = true;
+                    };
+
+                    const renameSurvey = async (bvModalEvent) => {
+                        if (!renameData.value.surveyTitle) {
+                            alert('설문 제목을 입력해주세요.');
+                            if(bvModalEvent) bvModalEvent.preventDefault();
+                            return;
+                        }
+
+                        try {
+                            const response = await axios.post('/mgt/survey/updateSurveyMaster.do', renameData.value);
+                            const res = response.data;
+                            if (res.status === 'success') {
+                                alert(res.message);
+                                showRenameModal.value = false;
+                                window.location.reload(); 
+                            } else {
+                                alert(res.message);
+                                if(bvModalEvent) bvModalEvent.preventDefault();
+                            }
+                        } catch (error) {
+                            console.error('Rename error:', error);
+                            alert('변경 중 오류가 발생했습니다.');
+                            if(bvModalEvent) bvModalEvent.preventDefault();
+                        }
+                    };
+
+                    // Copy & Delete Logic
+                    const copySurvey = async (surveyId) => {
+                        if (!confirm('해당 설문을 복사하시겠습니까?')) return;
+                        try {
+                            const response = await axios.post('/mgt/survey/copySurvey.do', { surveyId });
+                            const res = response.data;
+                            if (res.status === 'success') {
+                                alert(res.message);
+                                window.location.reload();
+                            } else {
+                                alert(res.message);
+                            }
+                        } catch (error) {
+                            console.error('Copy error:', error);
+                            alert('복사 중 오류가 발생했습니다.');
+                        }
+                    };
+
+                    const deleteSurvey = async (item) => {
+                        if (!confirm(`'${item.surveyTitle}' 설문을 삭제하시겠습니까?\n삭제된 데이터는 복구할 수 없습니다.`)) return;
+                        try {
+                            const response = await axios.post('/mgt/survey/deleteSurvey.do', { surveyId: item.surveyId });
+                            const res = response.data;
+                            if (res.status === 'success') {
+                                alert(res.message);
+                                window.location.reload();
+                            } else {
+                                alert(res.message);
+                            }
+                        } catch (error) {
+                            console.error('Delete error:', error);
+                            alert('삭제 중 오류가 발생했습니다.');
+                        }
+                    };
+
                     const goDetail = (item) => {
                         // Go to Master Management
                         window.location.href = `/mgt/survey/manageSurveyMenu.do?surveyId=${item.surveyId}`;
@@ -225,16 +319,23 @@
 
                     const formatDate = (val) => {
                         if (!val) return '';
-                        return new Date(val).toLocaleDateString();
+                        const d = new Date(val);
+                        const yyyy = d.getFullYear();
+                        const mm = String(d.getMonth() + 1).padStart(2, '0');
+                        const dd = String(d.getDate()).padStart(2, '0');
+                        const hh = String(d.getHours()).padStart(2, '0');
+                        const min = String(d.getMinutes()).padStart(2, '0');
+                        return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
                     };
 
                     const fields = [
                         { key: 'no', label: 'No', thStyle: { width: '60px' }, tdClass: 'text-center' },
-                        { key: 'surveyId', label: '설문ID', thStyle: { width: '120px' }, tdClass: 'text-center' },
+                        { key: 'surveyId', label: '설문ID', thStyle: { width: '130px' }, tdClass: 'text-center' },
                         { key: 'surveyTitle', label: '설문 제목', tdClass: 'text-start ps-3' },
-                        { key: 'opened', label: '상태', thStyle: { width: '100px' }, tdClass: 'text-center' },
+                        { key: 'opened', label: '상태', thStyle: { width: '150px' }, tdClass: 'text-center' },
+                        { key: 'actions', label: '작업', thStyle: { width: '250px' }, tdClass: 'text-center' },
                         { key: 'adminEmail', label: '담당자', thStyle: { width: '150px' }, tdClass: 'text-center' },
-                        { key: 'registDt', label: '등록일', thStyle: { width: '120px' }, tdClass: 'text-center' }
+                        { key: 'registDt', label: '등록일', thStyle: { width: '160px' }, tdClass: 'text-center' }
                     ];
 
                     onMounted(() => {
@@ -245,10 +346,15 @@
                         surveyList, totalCount, currentPage, pageSize, fields,
                         searchDto, doSearch, resetSearch, handlePageChange,
                         goRegister: openCreateModal, goDetail, formatDate,
-                        newSurvey, createSurvey, showCreateModal, openCreateModal
+                        newSurvey, createSurvey, showCreateModal, openCreateModal,
+                        copySurvey, deleteSurvey, showRenameModal, renameData, openRenameModal, renameSurvey
                     };
                 }
             });
+            const bvn = window['bootstrap-vue-next'];
+            if (bvn) {
+                app.use(bvn.BootstrapVueNext || bvn.default || bvn);
+            }
             AdminLayout.register(app);
             app.mount('#app'); // Mount to layout content
         </script>

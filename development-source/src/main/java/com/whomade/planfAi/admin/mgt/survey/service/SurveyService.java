@@ -172,4 +172,36 @@ public class SurveyService {
         surveyMapper.deleteSectionBySurveyId(vo.getSurveyId());
         return surveyMapper.deleteSurvey(vo);
     }
+
+    /**
+     * 설문 복사
+     */
+    @Transactional
+    public String copySurvey(String originalSurveyId) throws Exception {
+        TbSurvey searchVO = new TbSurvey();
+        searchVO.setSurveyId(originalSurveyId);
+
+        // 1. 원본 데이터 조회
+        TbSurvey original = selectSurveyEntryForm(searchVO);
+        if (original == null)
+            throw new Exception("원본 설문을 찾을 수 없습니다.");
+
+        // 2. 새 복사본 생성
+        TbSurvey copy = new TbSurvey();
+        // 기본 정보 복사 (주요 필드 위주)
+        copy.setSurveyTitle("[복사본] " + original.getSurveyTitle());
+        copy.setOpened("DRAFT"); // 복사본은 기본적으로 작성중 상태
+        copy.setAdminEmail(original.getAdminEmail());
+        copy.setBgColor(original.getBgColor());
+        copy.setTextColor(original.getTextColor());
+        copy.setHeader(original.getHeader());
+        copy.setFooter(original.getFooter());
+
+        // 3. 전체 구조 저장 로직 활용
+        // saveSurveyEntryForm expects surveySeq == null for new insertion
+        copy.setSections(original.getSections());
+        saveSurveyEntryForm(copy);
+
+        return copy.getSurveyId();
+    }
 }

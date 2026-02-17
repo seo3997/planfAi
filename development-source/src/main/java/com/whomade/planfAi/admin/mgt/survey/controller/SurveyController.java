@@ -149,4 +149,45 @@ public class SurveyController {
         model.addAttribute("surveyForm", surveyForm);
         return "admin/mgt/survey/preview";
     }
+
+    /**
+     * 설문 삭제
+     */
+    @org.springframework.web.bind.annotation.PostMapping("/deleteSurvey.do")
+    @org.springframework.web.bind.annotation.ResponseBody
+    public java.util.Map<String, Object> deleteSurvey(
+            @org.springframework.web.bind.annotation.RequestBody TbSurvey surveyVO) {
+        java.util.Map<String, Object> result = new java.util.HashMap<>();
+        try {
+            surveyService.deleteSurvey(surveyVO);
+            result.put("status", "success");
+            result.put("message", "삭제되었습니다.");
+        } catch (Exception e) {
+            log.error("Survey Delete Error", e);
+            result.put("status", "error");
+            result.put("message", "삭제 중 오류가 발생했습니다: " + e.getMessage());
+        }
+        return result;
+    }
+
+    /**
+     * 설문 복사
+     */
+    @org.springframework.web.bind.annotation.PostMapping("/copySurvey.do")
+    @org.springframework.web.bind.annotation.ResponseBody
+    public java.util.Map<String, Object> copySurvey(
+            @org.springframework.web.bind.annotation.RequestBody TbSurvey surveyVO) {
+        java.util.Map<String, Object> result = new java.util.HashMap<>();
+        try {
+            String newId = surveyService.copySurvey(surveyVO.getSurveyId());
+            result.put("status", "success");
+            result.put("message", "복사되었습니다.");
+            result.put("surveyId", newId);
+        } catch (Exception e) {
+            log.error("Survey Copy Error", e);
+            result.put("status", "error");
+            result.put("message", "복사 중 오류가 발생했습니다: " + e.getMessage());
+        }
+        return result;
+    }
 }

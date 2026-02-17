@@ -80,7 +80,8 @@
                             <div class="col-md-6">
                                 <label class="form-label">상태</label>
                                 <select class="form-select" v-model="survey.opened">
-                                    <option value="OPENED">진행중 (OPENED)</option>
+                                    <option value="DRAFT">설문문항작성중 (DRAFT)</option>
+                                    <option value="OPENED">설문중 (OPENED)</option>
                                     <option value="CLOSED">마감 (CLOSED)</option>
                                 </select>
                             </div>
@@ -195,7 +196,7 @@
                     const isSaving = ref(false);
 
                     // Initialize defaults if null
-                    if (!survey.value.opened) survey.value.opened = 'OPENED';
+                    if (!survey.value.opened) survey.value.opened = 'DRAFT';
                     if (!survey.value.oneEntryOnly) survey.value.oneEntryOnly = 'N';
                     if (!survey.value.showBorder) survey.value.showBorder = 'N';
                     if (!survey.value.exitPageTextIsHtml) survey.value.exitPageTextIsHtml = 'N';
