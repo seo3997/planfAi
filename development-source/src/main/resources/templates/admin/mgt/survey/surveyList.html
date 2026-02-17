@@ -248,7 +248,11 @@
                     const renameData = ref({ surveyId: '', surveyTitle: '' });
 
                     const openRenameModal = (item) => {
-                        renameData.value = { surveyId: item.surveyId, surveyTitle: item.surveyTitle };
+                        renameData.value = { 
+                            surveySeq: item.surveySeq,
+                            surveyId: item.surveyId, 
+                            surveyTitle: item.surveyTitle 
+                        };
                         showRenameModal.value = true;
                     };
 
@@ -296,9 +300,17 @@
                     };
 
                     const deleteSurvey = async (item) => {
+                        if (item.opened !== 'DRAFT') {
+                            alert('작성 중(DRAFT) 상태의 설문만 삭제할 수 있습니다.');
+                            return;
+                        }
+
                         if (!confirm(`'${item.surveyTitle}' 설문을 삭제하시겠습니까?\n삭제된 데이터는 복구할 수 없습니다.`)) return;
                         try {
-                            const response = await axios.post('/mgt/survey/deleteSurvey.do', { surveyId: item.surveyId });
+                            const response = await axios.post('/mgt/survey/deleteSurvey.do', { 
+                                surveySeq: item.surveySeq,
+                                surveyId: item.surveyId 
+                            });
                             const res = response.data;
                             if (res.status === 'success') {
                                 alert(res.message);

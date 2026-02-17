@@ -78,43 +78,62 @@
     <!-- 설문 수정 (마스터 관리) -->
     <update id="updateSurvey" parameterType="com.whomade.planfAi.admin.mgt.survey.vo.TbSurvey">
         UPDATE tb_survey
-        SET
-            SURVEY_TITLE = #{surveyTitle},
-            OPENED = #{opened},
-            CLOSED = #{closed},
-            ADMINEMAIL = #{adminEmail},
-            ADMINPID = #{adminPid},
-            ACCESSRESULTSRESTRICTION = #{accessResultsRestriction},
-            RESULTSPASSWORD = #{resultsPassword},
-            ENTRYRESTRICTION = #{entryRestriction},
-            ENTRYPASSWORD = #{entryPassword},
-            MEMBERS = #{members},
-            ONEENTRYONLY = #{oneEntryOnly},
-            SHOWBORDER = #{showBorder},
-            EXPORTDELIMITER = #{exportDelimiter},
-            EXPORTINCLUDEQUESTIONS = #{exportIncludeQuestions},
-            IP = #{ip},
-            BROWSERID = #{browserId},
-            BGCOLOR = #{bgColor},
-            TEXTCOLOR = #{textColor},
-            FONT_SIZE = #{fontSize},
-            HEADER = #{header},
-            FOOTER = #{footer},
-            BASEHREF = #{baseHref},
-            USERCSS = #{userCss},
-            DIVIDER = #{divider},
-            EXITPAGETEXT_ISHTML = #{exitPageTextIsHtml},
-            EXITPAGETEXT = #{exitPageText},
-            NUMBERRODUCTIONTEXT = #{numberRoductionText},
-            UPDUSR_NO = #{updusrNo},
+        <set>
+            <if test="surveyTitle != null">SURVEY_TITLE = #{surveyTitle},</if>
+            <if test="opened != null">OPENED = #{opened},</if>
+            <if test="closed != null">CLOSED = #{closed},</if>
+            <if test="adminEmail != null">ADMINEMAIL = #{adminEmail},</if>
+            <if test="adminPid != null">ADMINPID = #{adminPid},</if>
+            <if test="accessResultsRestriction != null">ACCESSRESULTSRESTRICTION = #{accessResultsRestriction},</if>
+            <if test="resultsPassword != null">RESULTSPASSWORD = #{resultsPassword},</if>
+            <if test="entryRestriction != null">ENTRYRESTRICTION = #{entryRestriction},</if>
+            <if test="entryPassword != null">ENTRYPASSWORD = #{entryPassword},</if>
+            <if test="members != null">MEMBERS = #{members},</if>
+            <if test="oneEntryOnly != null">ONEENTRYONLY = #{oneEntryOnly},</if>
+            <if test="showBorder != null">SHOWBORDER = #{showBorder},</if>
+            <if test="exportDelimiter != null">EXPORTDELIMITER = #{exportDelimiter},</if>
+            <if test="exportIncludeQuestions != null">EXPORTINCLUDEQUESTIONS = #{exportIncludeQuestions},</if>
+            <if test="ip != null">IP = #{ip},</if>
+            <if test="browserId != null">BROWSERID = #{browserId},</if>
+            <if test="bgColor != null">BGCOLOR = #{bgColor},</if>
+            <if test="textColor != null">TEXTCOLOR = #{textColor},</if>
+            <if test="fontSize != null">FONT_SIZE = #{fontSize},</if>
+            <if test="header != null">HEADER = #{header},</if>
+            <if test="footer != null">FOOTER = #{footer},</if>
+            <if test="baseHref != null">BASEHREF = #{baseHref},</if>
+            <if test="userCss != null">USERCSS = #{userCss},</if>
+            <if test="divider != null">DIVIDER = #{divider},</if>
+            <if test="exitPageTextIsHtml != null">EXITPAGETEXT_ISHTML = #{exitPageTextIsHtml},</if>
+            <if test="exitPageText != null">EXITPAGETEXT = #{exitPageText},</if>
+            <if test="numberRoductionText != null">NUMBERRODUCTIONTEXT = #{numberRoductionText},</if>
+            <if test="updusrNo != null">UPDUSR_NO = #{updusrNo},</if>
             UPDT_DT = NOW()
-        WHERE SURVEY_SEQ = #{surveySeq}
+        </set>
+        <where>
+            <choose>
+                <when test="surveySeq != null and surveySeq != 0">
+                    AND SURVEY_SEQ = #{surveySeq}
+                </when>
+                <otherwise>
+                    AND SURVEY_ID = #{surveyId}
+                </otherwise>
+            </choose>
+        </where>
     </update>
 
     <!-- 설문 삭제 -->
     <delete id="deleteSurvey" parameterType="com.whomade.planfAi.admin.mgt.survey.vo.TbSurvey">
         DELETE FROM tb_survey
-        WHERE SURVEY_SEQ = #{surveySeq}
+        <where>
+            <choose>
+                <when test="surveySeq != null and surveySeq != 0">
+                    AND SURVEY_SEQ = #{surveySeq}
+                </when>
+                <otherwise>
+                    AND SURVEY_ID = #{surveyId}
+                </otherwise>
+            </choose>
+        </where>
     </delete>
 
     <!-- ========================================== -->
