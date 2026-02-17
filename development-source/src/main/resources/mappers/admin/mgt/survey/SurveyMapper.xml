@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.whomade.planfAi.admin.mgt.survey.mapper.SurveyMapper">
+
+    <!-- 설문 목록 조회 -->
+    <select id="selectSurveyList" parameterType="com.whomade.planfAi.admin.mgt.survey.vo.TbSurvey" resultType="com.whomade.planfAi.admin.mgt.survey.vo.TbSurvey">
+        SELECT
+            A.SURVEY_SEQ,
+            A.SURVEY_ID,
+            A.SURVEY_TITLE,
+            A.OPENED,
+            A.CLOSED,
+            A.ADMINEMAIL,
+            A.BGCOLOR,
+            A.TEXTCOLOR,
+            A.REGISTER_NO,
+            A.REGIST_DT,
+            A.UPDUSR_NO,
+            A.UPDT_DT
+        FROM tb_survey A
+        WHERE 1=1
+        <if test="searchKeyword != null and searchKeyword != ''">
+            AND (
+                A.SURVEY_TITLE LIKE CONCAT('%', #{searchKeyword}, '%')
+                OR A.SURVEY_ID LIKE CONCAT('%', #{searchKeyword}, '%')
+            )
+        </if>
+        ORDER BY A.REGIST_DT DESC
+        LIMIT #{firstIndex}, #{recordCountPerPage}
+    </select>
+
+    <!-- 설문 목록 총 건수 조회 -->
+    <select id="selectSurveyCount" parameterType="com.whomade.planfAi.admin.mgt.survey.vo.TbSurvey" resultType="int">
+        SELECT COUNT(*)
+        FROM tb_survey A
+        WHERE 1=1
+        <if test="searchKeyword != null and searchKeyword != ''">
+            AND (
+                A.SURVEY_TITLE LIKE CONCAT('%', #{searchKeyword}, '%')
+                OR A.SURVEY_ID LIKE CONCAT('%', #{searchKeyword}, '%')
+            )
+        </if>
+    </select>
+    
+    <!-- 설문 상세 조회 -->
+    <select id="selectSurveyDetail" parameterType="com.whomade.planfAi.admin.mgt.survey.vo.TbSurvey" resultType="com.whomade.planfAi.admin.mgt.survey.vo.TbSurvey">
+        SELECT
+            *
+        FROM tb_survey
+        WHERE 1=1
+        <if test="surveySeq != null">
+            AND SURVEY_SEQ = #{surveySeq}
+        </if>
+        <if test="surveyId != null and surveyId != ''">
+            AND SURVEY_ID = #{surveyId}
+        </if>
+    </select>
+
+    <!-- 설문 등록 -->
+    <insert id="insertSurvey" parameterType="com.whomade.planfAi.admin.mgt.survey.vo.TbSurvey">
+        INSERT INTO tb_survey (
+            SURVEY_ID, SURVEY_TITLE, OPENED, CLOSED, ADMINEMAIL, ADMINPID,
+            ACCESSRESULTSRESTRICTION, RESULTSPASSWORD, ENTRYRESTRICTION, ENTRYPASSWORD,
+            MEMBERS, ONEENTRYONLY, SHOWBORDER, EXPORTDELIMITER, EXPORTINCLUDEQUESTIONS,
+            IP, BROWSERID, BGCOLOR, TEXTCOLOR, FONT_SIZE, HEADER, FOOTER, BASEHREF,
+            USERCSS, DIVIDER, EXITPAGETEXT_ISHTML, EXITPAGETEXT, NUMBERRODUCTIONTEXT,
+            REGISTER_NO, REGIST_DT, UPDUSR_NO, UPDT_DT
+        ) VALUES (
+            #{surveyId}, #{surveyTitle}, #{opened}, #{closed}, #{adminEmail}, #{adminPid},
+            #{accessResultsRestriction}, #{resultsPassword}, #{entryRestriction}, #{entryPassword},
+            #{members}, #{oneEntryOnly}, #{showBorder}, #{exportDelimiter}, #{exportIncludeQuestions},
+            #{ip}, #{browserId}, #{bgColor}, #{textColor}, #{fontSize}, #{header}, #{footer}, #{baseHref},
+            #{userCss}, #{divider}, #{exitPageTextIsHtml}, #{exitPageText}, #{numberRoductionText},
+            #{registerNo}, NOW(), #{updusrNo}, NOW()
+        )
+    </insert>
+
+    <!-- 설문 수정 -->
+    <update id="updateSurvey" parameterType="com.whomade.planfAi.admin.mgt.survey.vo.TbSurvey">
+        UPDATE tb_survey
+        SET
+            SURVEY_TITLE = #{surveyTitle},
+            OPENED = #{opened},
+            CLOSED = #{closed},
+            ADMINEMAIL = #{adminEmail},
+            BGCOLOR = #{bgColor},
+            TEXTCOLOR = #{textColor},
+            FONT_SIZE = #{fontSize},
+            HEADER = #{header},
+            FOOTER = #{footer},
+            EXITPAGETEXT = #{exitPageText},
+            UPDUSR_NO = #{updusrNo},
+            UPDT_DT = NOW()
+        WHERE SURVEY_SEQ = #{surveySeq}
+    </update>
+
+    <!-- 설문 삭제 -->
+    <delete id="deleteSurvey" parameterType="com.whomade.planfAi.admin.mgt.survey.vo.TbSurvey">
+        DELETE FROM tb_survey
+        WHERE SURVEY_SEQ = #{surveySeq}
+    </delete>
+
+    <!-- ========================================== -->
+    <!-- Section Queries -->
+    <!-- ========================================== -->
+    <select id="selectSectionList" parameterType="com.whomade.planfAi.admin.mgt.survey.vo.TbSurvey" resultType="com.whomade.planfAi.admin.mgt.survey.vo.TbSection">
+        SELECT * FROM tb_section
+        WHERE SURVEY_ID = #{surveyId}
+        ORDER BY SECTION_ID ASC
+    </select>
+    
+    <insert id="insertSection" parameterType="com.whomade.planfAi.admin.mgt.survey.vo.TbSection">
+        INSERT INTO tb_section (
+            SURVEY_ID, SECTION_ID, SECTION_TITLE, SECTION_HTMLTITLE,
+            REGISTER_NO, REGIST_DT, UPDUSR_NO, UPDT_DT
+        ) VALUES (
+            #{surveyId}, #{sectionId}, #{sectionTitle}, #{sectionHtmlTitle},
+            #{registerNo}, NOW(), #{updusrNo}, NOW()
+        )
+    </insert>
+
+    <delete id="deleteSectionBySurveyId" parameterType="string">
+        DELETE FROM tb_section WHERE SURVEY_ID = #{surveyId}
+    </delete>
+
+    <!-- ========================================== -->
+    <!-- Question Queries -->
+    <!-- ========================================== -->
+    <select id="selectQuestionList" parameterType="com.whomade.planfAi.admin.mgt.survey.vo.TbSurvey" resultType="com.whomade.planfAi.admin.mgt.survey.vo.TbQuestion">
+        SELECT * FROM tb_question
+        WHERE SURVEY_ID = #{surveyId}
+        ORDER BY SECTION_ID, QUESTION_ID ASC
+    </select>
+    
+    <insert id="insertQuestion" parameterType="com.whomade.planfAi.admin.mgt.survey.vo.TbQuestion">
+        INSERT INTO tb_question (
+            SURVEY_ID, SECTION_ID, QUESTION_ID, QUESTION_TYPE,
+            SHOWDIVIDER, EXPORTINCLUDE, EXPORTEXPAND, QUESTIONTEXT,
+            QUESTION_CD, QUESTION_ISHTML, QUESTION_LAYOUT, QUESTION_LABEL,
+            OTHERANSWER, TEXTCOLS, TEXTROWS, TEXTSIZE, MAXLENGTH, SUMMARY_CD,
+            REGISTER_NO, REGIST_DT, UPDUSR_NO, UPDT_DT
+        ) VALUES (
+            #{surveyId}, #{sectionId}, #{questionId}, #{questionType},
+            #{showDivider}, #{exportInclude}, #{exportExpand}, #{questionText},
+            #{questionCd}, #{questionIsHtml}, #{questionLayout}, #{questionLabel},
+            #{otherAnswer}, #{textCols}, #{textRows}, #{textSize}, #{maxLength}, #{summaryCd},
+            #{registerNo}, NOW(), #{updusrNo}, NOW()
+        )
+    </insert>
+
+    <delete id="deleteQuestionBySurveyId" parameterType="string">
+        DELETE FROM tb_question WHERE SURVEY_ID = #{surveyId}
+    </delete>
+
+    <!-- ========================================== -->
+    <!-- Question Label Queries -->
+    <!-- ========================================== -->
+    <select id="selectQuestionLabelList" parameterType="com.whomade.planfAi.admin.mgt.survey.vo.TbSurvey" resultType="com.whomade.planfAi.admin.mgt.survey.vo.TbQuestionLabel">
+        SELECT * FROM tb_question_label
+        WHERE SURVEY_ID = #{surveyId}
+        ORDER BY SECTION_ID, QUESTION_ID, QUESTION_LABEL_ID ASC
+    </select>
+    
+    <insert id="insertQuestionLabel" parameterType="com.whomade.planfAi.admin.mgt.survey.vo.TbQuestionLabel">
+        INSERT INTO tb_question_label (
+            SURVEY_ID, SECTION_ID, QUESTION_ID, QUESTION_LABEL_ID,
+            QUESTION_LABEL, EXPORTCODE, SELECTED,
+            REGISTER_NO, REGIST_DT, UPDUSR_NO, UPDT_DT
+        ) VALUES (
+            #{surveyId}, #{sectionId}, #{questionId}, #{questionLabelId},
+            #{questionLabel}, #{exportCode}, #{selected},
+            #{registerNo}, NOW(), #{updusrNo}, NOW()
+        )
+    </insert>
+
+    <delete id="deleteQuestionLabelBySurveyId" parameterType="string">
+        DELETE FROM tb_question_label WHERE SURVEY_ID = #{surveyId}
+    </delete>
+
+</mapper>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/layout/base :: layout(~{::title}, ~{::#admin-survey-content}, ~{::#admin-survey-script}, ~{})}">
+<head>
+    <title>설문 관리 - PlanfAi 관리자</title>
+</head>
+<body>
+    <div id="admin-survey-content">
+        <div class="page-title-box">
+            <h2 class="page-title">설문 리스트</h2>
+            <div class="breadcrumb-area">
+                <i class="bi bi-house-door text-muted"></i> > 운영 업무 > <span class="text-primary fw-medium">설문 관리</span>
+            </div>
+        </div>
+
+        <div class="mgmt-card">
+            <!-- Search Area -->
+            <div class="search-filter-box">
+                <div class="filter-row">
+                    <!-- SEARCH_KEYWORD -->
+                    <div class="filter-item">
+                        <div class="filter-label">검색어</div>
+                        <div class="filter-content">
+                             <select class="form-select form-select-sm" style="width: 120px; flex: none;" v-model="searchDto.searchCondition">
+                                <option value="ALL">전체</option>
+                                <option value="TITLE">제목</option>
+                                <option value="ID">아이디</option>
+                            </select>
+                            <input type="text" class="form-control form-control-sm" v-model="searchDto.searchKeyword" @keyup.enter="doSearch" placeholder="검색어를 입력하세요">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="search-filter-actions">
+                    <button class="btn btn-sm btn-reset d-flex align-items-center justify-content-center gap-1" @click="resetSearch">
+                        <i class="bi bi-arrow-counterclockwise"></i>초기화
+                    </button>
+                    <button class="btn btn-sm btn-search d-flex align-items-center justify-content-center gap-1" @click="doSearch">
+                        <i class="bi bi-search"></i>검색
+                    </button>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="text-muted fs-7">
+                    총 <span class="text-primary fw-bold">{{ totalCount }}</span>검
+                </div>
+                <button class="btn btn-sm btn-primary" @click="goRegister">
+                    <i class="bi bi-pencil me-1"></i>설문 등록
+                </button>
+            </div>
+
+            <div class="data-table-wrapper">
+                <b-table
+                    class="admin-b-table"
+                    :items="surveyList"
+                    :fields="fields"
+                    hover
+                    @row-clicked="goDetail"
+                    show-empty
+                    empty-text="조회된 설문이 없습니다."
+                >
+                    <!-- No (Index) -->
+                    <template #cell(no)="data">
+                        {{ totalCount - ((currentPage - 1) * pageSize) - data.index }}
+                    </template>
+
+                    <!-- Survey Title (Link style) -->
+                    <template #cell(surveyTitle)="data">
+                        <span class="text-primary fw-bold cursor-pointer">{{ data.value }}</span>
+                    </template>
+
+                    <!-- Status (Badge) -->
+                    <template #cell(opened)="data">
+                        <span class="badge" 
+                              :class="data.value === 'OPENED' ? 'bg-success' : 'bg-secondary'">
+                            {{ data.value === 'OPENED' ? '진행중' : '마감' }}
+                        </span>
+                    </template>
+                    
+                    <!-- Reg Date -->
+                    <template #cell(registDt)="data">
+                        {{ formatDate(data.value) }}
+                    </template>
+                </b-table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="mt-4 d-flex justify-content-center">
+                <b-pagination
+                    v-model="currentPage"
+                    :total-rows="totalCount"
+                    :per-page="pageSize"
+                    size="sm"
+                    @update:model-value="handlePageChange"
+                ></b-pagination>
+            </div>
+        </div>
+    </div>
+
+    <div id="admin-survey-script">
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            const serverResultList = /*[[${resultList}]]*/ [];
+            const serverTotalCount = /*[[${totalCount}]]*/ 0;
+            const serverSearchVO = /*[[${searchVO}]]*/ {};
+            /*]]>*/
+
+            const initVueApp = true; // IMPORTANT
+            const { createApp, ref, onMounted } = Vue;
+            const app = createApp({
+                setup() {
+                    const surveyList = ref(serverResultList || []);
+                    const totalCount = ref(serverTotalCount || 0);
+                    
+                    // From Model
+                    const currentPage = ref(serverSearchVO.pageIndex || 1);
+                    const pageSize = serverSearchVO.recordCountPerPage || 10;
+                    
+                    const searchDto = ref({
+                        searchCondition: serverSearchVO.searchCondition || 'ALL',
+                        searchKeyword: serverSearchVO.searchKeyword || ''
+                    });
+
+                    // Search Action (SSR Reload)
+                    const doSearch = () => {
+                        const params = new URLSearchParams();
+                        params.append('pageIndex', 1); // Reset to page 1 on search
+                        params.append('searchCondition', searchDto.value.searchCondition);
+                        params.append('searchKeyword', searchDto.value.searchKeyword);
+                        window.location.href = '/mgt/survey/selectPageListSurvey.do?' + params.toString();
+                    };
+
+                    const resetSearch = () => {
+                        window.location.href = '/mgt/survey/selectPageListSurvey.do';
+                    };
+
+                    const handlePageChange = (page) => {
+                        const params = new URLSearchParams();
+                        params.append('pageIndex', page);
+                        params.append('searchCondition', searchDto.value.searchCondition);
+                        params.append('searchKeyword', searchDto.value.searchKeyword);
+                        window.location.href = '/mgt/survey/selectPageListSurvey.do?' + params.toString();
+                    };
+
+                    const goRegister = () => {
+                        // TODO: Implement Create Page
+                        alert("설문 등록 페이지 점검 중입니다."); 
+                        // window.location.href = '/mgt/survey/editEntryForm.do';
+                    };
+
+                    const goDetail = (item) => {
+                        // Go to Master Management
+                        window.location.href = `/mgt/survey/manageSurveyMenu.do?surveyId=${item.surveyId}`;
+                    };
+
+                    const formatDate = (val) => {
+                        if (!val) return '';
+                        return new Date(val).toLocaleDateString();
+                    };
+
+                    const fields = [
+                        { key: 'no', label: 'No', thStyle: { width: '60px' }, tdClass: 'text-center' },
+                        { key: 'surveyId', label: '설문ID', thStyle: { width: '120px' }, tdClass: 'text-center' },
+                        { key: 'surveyTitle', label: '설문 제목', tdClass: 'text-start ps-3' },
+                        { key: 'opened', label: '상태', thStyle: { width: '100px' }, tdClass: 'text-center' },
+                        { key: 'adminEmail', label: '담당자', thStyle: { width: '150px' }, tdClass: 'text-center' },
+                        { key: 'registDt', label: '등록일', thStyle: { width: '120px' }, tdClass: 'text-center' }
+                    ];
+
+                    onMounted(() => {
+                        AdminMenu.init(); // Initialize Layout Menu
+                    });
+
+                    return {
+                        surveyList, totalCount, currentPage, pageSize, fields,
+                        searchDto, doSearch, resetSearch, handlePageChange,
+                        goRegister, goDetail, formatDate
+                    };
+                }
+            });
+            AdminLayout.register(app);
+            app.mount('#app'); // Mount to layout content
+        </script>
+    </div>
+</body>
+</html>
