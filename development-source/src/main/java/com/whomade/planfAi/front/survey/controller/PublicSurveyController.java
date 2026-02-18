@@ -77,11 +77,11 @@ public class PublicSurveyController {
         return ResponseEntity.ok(result);
     }
 
-    @Value("${file.board.upload-dir}")
-    private String uploadDir;
+    @Value("${file.survey.upload-dir}")
+    private String surveyUploadDir;
 
-    @Value("${file.board.public-url}")
-    private String publicUrl;
+    @Value("${file.survey.public-url}")
+    private String surveyPublicUrl;
 
     /**
      * 이미지 업로드 API
@@ -89,29 +89,39 @@ public class PublicSurveyController {
     @PostMapping("/upload-image")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> uploadImage(
-            @RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+            @RequestParam("file") org.springframework.web.multipart.MultipartFile file,
+            @RequestParam(value = "surveyId", required = false) String surveyId) {
         Map<String, Object> result = new HashMap<>();
         try {
             if (file.isEmpty()) {
                 throw new Exception("파일이 비어있습니다.");
             }
 
+            String targetId = (surveyId == null || surveyId.isEmpty()) ? "common" : surveyId;
             String originalFilename = file.getOriginalFilename();
-            String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            String extension = "";
+            if (originalFilename != null && originalFilename.contains(".")) {
+                extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            }
             String savedName = java.util.UUID.randomUUID().toString() + extension;
 
-            // 날짜별 폴더 생성
-            String datePath = new java.text.SimpleDateFormat("yyyy/MM/dd").format(new java.util.Date());
-            java.io.File dir = new java.io.File(uploadDir + "/survey/" + datePath);
+            // 저장 디렉토리 설정 (trailing slash 제거 후 조합)
+            String baseDir = surveyUploadDir.endsWith("/") ? surveyUploadDir.substring(0, surveyUploadDir.length() - 1)
+                    : surveyUploadDir;
+            java.io.File dir = new java.io.File(baseDir + "/" + targetId);
             if (!dir.exists())
                 dir.mkdirs();
 
             java.io.File dest = new java.io.File(dir, savedName);
             file.transferTo(dest);
 
+            // 공용 URL 생성 (trailing slash 체크)
+            String baseUrl = surveyPublicUrl.endsWith("/") ? surveyPublicUrl : surveyPublicUrl + "/";
+            String finalUrl = baseUrl + targetId + "/" + savedName;
+
             result.put("status", "success");
-            result.put("filePath", "/common/img/board/survey/" + datePath + "/" + savedName);
-            result.put("fullUrl", publicUrl + "survey/" + datePath + "/" + savedName);
+            result.put("filePath", finalUrl);
+            result.put("fullUrl", finalUrl);
         } catch (Exception e) {
             result.put("status", "error");
             result.put("message", e.getMessage());

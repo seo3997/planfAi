@@ -188,13 +188,13 @@ HTML 헤더/푸터 (HEADER, FOOTER): 단순 텍스트가 아닌 HTML 태그를 �
 7-5 설문지 외형 설정
 설문 제작자가 설문의 시각적 요소와 구조적 배치를 자유롭게 구성하여 브랜드 정체성을 반영하고 응답률을 높일 수 있도록 지원한다.
 
-1. 테이블 구성
-   [신규 마스터 테이블] tb_survey_theme
-   사용자가 선택할 수 있는 디자인 프리셋(Pre-set) 목록을 관리하는 테이블이다.
-   resources/schema/admin/mgt/survey/schema.sql tb_survey_theme 테이블을 참고한다.
-2. tb_survey 테이블 추가/변경 컬럼 상세
-   기존 스타일 필드 외에, 고도화된 설문 설정을 위해 아래 필드들을 추가 및 확장한다.
-   resources/schema/admin/mgt/survey/schema.sql tb_survey 테이블을 참고한다.
+7-5-1. 테이블 구성
+[신규 마스터 테이블] tb_survey_theme
+사용자가 선택할 수 있는 디자인 프리셋(Pre-set) 목록을 관리하는 테이블이다.
+resources/schema/admin/mgt/survey/schema.sql tb_survey_theme 테이블을 참고한다.
+7-5-2. tb_survey 테이블 추가/변경 컬럼 상세
+기존 스타일 필드 외에, 고도화된 설문 설정을 위해 아래 필드들을 추가 및 확장한다.
+resources/schema/admin/mgt/survey/schema.sql tb_survey 테이블을 참고한다.
 
 ① 시각적 테마 및 레이아웃 관련
 THEME_SEQ (INT): tb_survey_theme와 연결되는 외래키. 사용자가 선택한 기본 테마 세트를 결정한다.
@@ -226,17 +226,18 @@ EXITPAGETEXT (TEXT): 설문 완료 시 노출되는 문구.
 
 EXITPAGETEXT_ISHTML (CHAR): 완료 문구의 HTML 렌더링 여부.
 
-3. 주요 구현 로직 요구사항
-   테마-개별 스타일 우선순위: THEME_SEQ를 선택하면 해당 테마의 기본값이 로드되지만, 사용자가 BGCOLOR나 TEXTCOLOR를 직접 수정할 경우 개별 설정값이 테마값보다 우선하여 적용되어야 한다.
+7-5-3. 주요 구현 로직 요구사항
+테마-개별 스타일 우선순위: THEME_SEQ를 선택하면 해당 테마의 기본값이 로드되지만, 사용자가 BGCOLOR나 TEXTCOLOR를 직접 수정할 경우 개별 설정값이 테마값보다 우선하여 적용되어야 한다.
 
 실시간 미리보기(Live Preview): 관리자 화면에서 로고를 업로드하거나 레이아웃을 바꿀 때, 우측 미리보기 패널에 즉시 반영되어야 한다.
 
 반응형 레이아웃: LAYOUT_TYPE이 LEFT_1_3 등으로 설정되더라도, 모바일 기기 접속 시에는 자동으로 1컬럼(중앙 정렬)으로 전환되는 반응형 로직이 포함되어야 한다.
 
-4. 몽키서베이 설문지 생성 에서 테마별로 설문지 생성 과 스타일 적요을 참조한다.
+7-5-4. 몽키서베이 설문지 생성 에서 테마별로 설문지 생성 과 스타일 적요을 참조한다.
 
-7) 설문 오픈 및 접속 경로 설계
-   설문 상태가 **'수집중(OPEN)'**으로 변경되는 시점을 기준으로 서비스의 흐름이 전환됩니다.
+8.설문 배포 및 응답 수집 설계
+8-1. 설문 오픈 및 접속 경로 설계
+설문 상태가 **'수집중(OPEN)'**으로 변경되는 시점을 기준으로 서비스의 흐름이 전환됩니다.
 
 접속 경로 (URL)
 엔드포인트: https://{domain}/survey/v/{SURVEY_ID}
@@ -251,22 +252,48 @@ RESULTS_ID 발급: 사용자가 설문 페이지에 접속하거나 제출하는
 
 중복 방지 (선택 사항): \* 브라우저 LocalStorage에 survey*completed*{SURVEY_ID}: true 값을 저장하여 재참여를 방지합니다.
 
-7-1. 응답 데이터 저장 구조 (Data Flow)
-사용자가 저장 버튼을 클릭했을 때, 화면에서 넘어온 데이터는 질문 유형에 따라 두 갈래로 나뉘어 저장됩니다.
+8-2. 응답 데이터 저장 구조 (Data Flow)
+사용자가 설문 완료 후 저장 버튼을 클릭하면, 데이터는 질문 유형에 따라 두 가지 테이블로 분기되어 저장됩니다.
 
 A. 기본 응답 내역 (tb_results)
-역할: 설문의 핵심 답변(주관식, 단일 선택)을 저장하는 마스터 테이블입니다.
+역할: 설문의 핵심 답변(주관식, 단일 선택, 미디어 데이터)을 저장하는 마스터 테이블.
 
 주요 데이터 필드:
 RESULTS_ID: 한 명의 응답자를 식별하는 키 (모든 응답 묶음의 공통 ID).
-QUESTION_RESULT: 주관식 입력 텍스트 또는 단일 선택된 값.
-OTHERANSWER_RESULT: '기타' 항목을 선택하고 직접 입력한 텍스트.
-REGISTER_NO: 로그인하지 않았으므로 NULL 처리.
+QUESTION_RESULT: 주관식 입력 텍스트 또는 단일 선택된 값 저장.
+inputImage: 서버에 저장된 이미지 경로 저장.
+inputLocation: 위경도 정보를 구분자(예: ,)를 사용하여 저장.
+OTHERANSWER_RESULT: '기타' 항목을 선택하고 직접 입력한 텍스트 저장.
+REGISTER_NO: 비로그인 참여이므로 NULL 처리.
 
 B. 상세 라벨 응답 (tb_results_label)
-역할: 다중 선택(Checkbox)이나 매트릭스형 질문처럼 하나의 질문에 여러 응답이 발생하는 경우를 처리합니다.
+역할: 다중 선택(Checkbox)이나 매트릭스형 질문처럼 하나의 질문에 여러 응답이 발생하는 경우 처리.
 
 주요 데이터 필드:
 QUESTION_LABEL_ID: 선택된 각 보기(옵션)의 고유 ID.
-QUESTION_LABEL_RESULT: 해당 옵션에 대한 값 (예: 'Y', '1', '5점' 등).
-RESULTS_ID: 위 tb_results와 동일한 ID를 사용하여 매핑.
+QUESTION_LABEL_RESULT: 해당 옵션에 대한 값 (예: 'Y', '1', '5점' 등) 저장.
+RESULTS_ID: tb_results와 동일한 ID를 사용하여 데이터 매핑.
+
+8-3. 통계 추출 설계 (MRD 8번 기준)
+수집된 데이터를 바탕으로 관리자 화면에서 실시간 리포트를 생성하며, 데이터 성격에 따라 다음과 같은 시각화 방식을 적용합니다.
+통계 유형,활용 테이블,데이터 처리 및 시각화 방식
+객관식 결과,tb_results_label,QUESTION_LABEL_ID별 카운트를 합산하여 파이(Pie) 또는 바(Bar) 차트 생성
+주관식 결과,tb_results,QUESTION_RESULT의 텍스트를 추출하여 응답 리스트 또는 워드클라우드 노출
+미디어 결과,tb_results,inputImage 경로를 통한 갤러리 뷰 및 inputLocation 기반 지도 마커 표시
+기타 의견,tb_results,OTHERANSWER_RESULT에 값이 있는 경우 별도의 비고란 리스트 제공
+8-4. 업무 프로세스 및 단계별 흐름 (Flow)
+[Level 1] 관리자: 설문 오픈
+설정 화면에서 상태를 **'수집중(OPEN)'**으로 변경 후 저장합니다.
+시스템은 해당 SURVEY_ID를 포함한 **외부 접속용 URL(Short URL)**을 생성합니다.
+
+[Level 2] 사용자: 설문 참여
+사용자는 로그인 없이 제공된 URL에 접속합니다.
+설문 문항을 작성하고 저장 버튼을 클릭합니다.
+
+[Level 3] 서버: 데이터 적재
+새로운 RESULTS_ID를 생성하여 응답 세션을 식별합니다.
+단답형/주관식/이미지/위치 정보는 **tb_results**에 INSERT 합니다.
+다중 선택형(객관식)은 선택된 개수만큼 **tb_results_label**에 INSERT 합니다.
+
+[Level 4] 관리자: 통계 확인 (MRD)
+관리자 화면에서 저장된 데이터를 실시간으로 집계하여 통계 대시보드에 노출합니다.

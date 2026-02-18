@@ -324,7 +324,7 @@
                     formData.append('file', file);
                     
                     try {
-                        const res = await axios.post('/survey/upload-image', formData);
+                        const res = await axios.post('/survey/upload-image?surveyId=' + survey.value.surveyId, formData);
                         if(res.data.status === 'success') {
                             uploadedImages.value[qId] = res.data.fullUrl;
                             answers.value[qId] = res.data.filePath; // Store path for submission

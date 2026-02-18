@@ -11,6 +11,9 @@ public class WebConfig implements WebMvcConfigurer {
     @Value("${file.board.resource-path}")
     private String boardResourcePath;
 
+    @Value("${file.survey.resource-path}")
+    private String surveyResourcePath;
+
     private final SurveyAccessInterceptor surveyAccessInterceptor;
 
     public WebConfig(SurveyAccessInterceptor surveyAccessInterceptor) {
@@ -22,6 +25,10 @@ public class WebConfig implements WebMvcConfigurer {
         // board image/file serving
         registry.addResourceHandler("/common/img/board/**")
                 .addResourceLocations(boardResourcePath);
+
+        // survey image serving
+        registry.addResourceHandler("/common/img/survey/**")
+                .addResourceLocations(surveyResourcePath);
     }
 
     @Override

@@ -234,9 +234,36 @@
 
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label class="form-label">로고 이미지 경로</label>
-                                <input type="text" class="form-control" v-model="survey.logoImagePath" placeholder="/static/images/logo.png">
+                                <label class="form-label">로고 이미지</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" v-model="survey.logoImagePath" placeholder="/static/images/logo.png" readonly>
+                                    <input type="file" id="logoUpload" class="d-none" accept="image/*" @change="handleFileUpload($event, 'logo')">
+                                    <button class="btn btn-outline-secondary" type="button" @click="document.getElementById('logoUpload').click()">
+                                        <i class="bi bi-cloud-upload"></i> 업로드
+                                    </button>
+                                </div>
+                                <div v-if="survey.logoImagePath" class="mt-2">
+                                    <img :src="survey.logoImagePath" class="img-thumbnail" style="max-height: 50px;">
+                                    <button type="button" class="btn btn-sm btn-link text-danger text-decoration-none" @click="survey.logoImagePath = ''">삭제</button>
+                                </div>
                             </div>
+                            <div class="col-md-6">
+                                <label class="form-label">배경 이미지</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" v-model="survey.bgImagePath" placeholder="배경 이미지 URL" readonly>
+                                    <input type="file" id="bgUpload" class="d-none" accept="image/*" @change="handleFileUpload($event, 'background')">
+                                    <button class="btn btn-outline-secondary" type="button" @click="document.getElementById('bgUpload').click()">
+                                        <i class="bi bi-cloud-upload"></i> 업로드
+                                    </button>
+                                </div>
+                                <div v-if="survey.bgImagePath" class="mt-2">
+                                    <img :src="survey.bgImagePath" class="img-thumbnail" style="max-height: 50px;">
+                                    <button type="button" class="btn btn-sm btn-link text-danger text-decoration-none" @click="survey.bgImagePath = ''">삭제</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label">적용 폰트 (Font Family)</label>
                                 <input type="text" class="form-control" v-model="survey.fontFamily" placeholder="예: 'Pretendard', sans-serif">
@@ -333,6 +360,30 @@
                         // Add theme default styles to userCss if needed or handle separately
                     };
 
+                    const handleFileUpload = async (event, type) => {
+                        const file = event.target.files[0];
+                        if (!file) return;
+
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        
+                        try {
+                            const response = await axios.post('/survey/upload-image?surveyId=' + survey.value.surveyId, formData);
+                            if (response.data.status === 'success') {
+                                if (type === 'logo') {
+                                    survey.value.logoImagePath = response.data.fullUrl;
+                                } else {
+                                    survey.value.bgImagePath = response.data.fullUrl;
+                                }
+                            } else {
+                                alert(response.data.message);
+                            }
+                        } catch (error) {
+                            console.error('Upload error:', error);
+                            alert('이미지 업로드에 실패했습니다.');
+                        }
+                    };
+
                     const saveMaster = async () => {
                         if (!survey.value.surveyTitle) {
                             alert('설문 제목을 입력해주세요.');
@@ -413,7 +464,7 @@
 
                     return {
                         survey, themeList, surveyDomain, isSaving,
-                        saveMaster, goList, goEntryForm, goPreview, applyTheme, resetTheme, copyToClipboard
+                        saveMaster, goList, goEntryForm, goPreview, applyTheme, resetTheme, copyToClipboard, handleFileUpload
                     };
                 }
             });
