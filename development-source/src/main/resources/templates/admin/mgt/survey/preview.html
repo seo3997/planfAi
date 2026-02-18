@@ -252,10 +252,10 @@
                                            :id="'q_' + question.questionId + '_other'"
                                            value="OTHER"
                                            v-model="answers[question.questionId]">
-                                    <label class="form-check-label text-nowrap" :for="'q_' + question.questionId + '_other'">
+                                    <label class="form-check-label text-nowrap w-auto" :for="'q_' + question.questionId + '_other'">
                                         {{ question.questionLabel || '기타:' }}
                                     </label>
-                                    <input type="text" class="form-control form-control-sm" style="width: 150px;" 
+                                    <input type="text" class="form-control form-control-sm" style="min-width: 250px; flex: 1;" 
                                            v-model="answers[question.questionId + '_other_text']" 
                                            placeholder="내용을 입력하세요"
                                            :disabled="answers[question.questionId] !== 'OTHER'">
@@ -280,10 +280,10 @@
                                            :id="'q_' + question.questionId + '_other'"
                                            value="OTHER"
                                            v-model="answers[question.questionId]">
-                                    <label class="form-check-label text-nowrap" :for="'q_' + question.questionId + '_other'">
+                                    <label class="form-check-label text-nowrap w-auto" :for="'q_' + question.questionId + '_other'">
                                         {{ question.questionLabel || '기타:' }}
                                     </label>
-                                    <input type="text" class="form-control form-control-sm" style="width: 150px;" 
+                                    <input type="text" class="form-control form-control-sm" style="min-width: 250px; flex: 1;" 
                                            v-model="answers[question.questionId + '_other_text']" 
                                            placeholder="내용을 입력하세요"
                                            :disabled="!answers[question.questionId].includes('OTHER')">
