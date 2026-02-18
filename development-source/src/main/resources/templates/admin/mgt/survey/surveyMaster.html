@@ -323,6 +323,25 @@
 
                     onMounted(() => {
                         AdminMenu.init();
+
+                        // Tab Persistence
+                        const activeTab = localStorage.getItem('surveyActiveTab');
+                        if (activeTab) {
+                            const tabEl = document.querySelector(`a[href="${activeTab}"]`);
+                            if (tabEl) {
+                                const tab = new bootstrap.Tab(tabEl);
+                                tab.show();
+                            }
+                        }
+
+                        // Listen for tab changes
+                        const tabLinks = document.querySelectorAll('a[data-bs-toggle="pill"]');
+                        tabLinks.forEach(link => {
+                            link.addEventListener('shown.bs.tab', (e) => {
+                                const target = e.target.getAttribute('href');
+                                localStorage.setItem('surveyActiveTab', target);
+                            });
+                        });
                     });
 
                     return {
