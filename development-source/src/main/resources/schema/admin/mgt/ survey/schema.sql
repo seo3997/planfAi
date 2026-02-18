@@ -33,14 +33,14 @@ CREATE TABLE `tb_survey` (
   `DIVIDER` varchar(200) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL COMMENT '문항 간 구분선 스타일',
   
   -- HTML 및 사용자 정의 콘텐츠
-  `HEADER` varchar(200) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL COMMENT '설문 상단 헤더 HTML',
-  `FOOTER` varchar(200) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL COMMENT '설문 하단 푸터 HTML',
+  `HEADER` text CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL COMMENT '설문 상단 헤더 HTML',
+  `FOOTER` text CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL COMMENT '설문 하단 푸터 HTML',
   `BASEHREF` varchar(200) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL COMMENT '상대 경로 참조용 베이스 URL',
-  `USERCSS` varchar(200) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL COMMENT '사용자 정의 추가 CSS 스타일',
+  `USERCSS` text CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL COMMENT '사용자 정의 추가 CSS 스타일',
   
   -- 문구 및 완료 페이지 설정
-  `NUMBERRODUCTIONTEXT` varchar(200) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL COMMENT '문항 번호 접두 문구',
-  `EXITPAGETEXT` varchar(200) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL COMMENT '설문 종료 후 표시 문구',
+  `NUMBERRODUCTIONTEXT` varchar(1000) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL COMMENT '문항 번호 접두 문구',
+  `EXITPAGETEXT` text CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL COMMENT '설문 종료 후 표시 문구',
   `EXITPAGETEXT_ISHTML` char(1) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL COMMENT '종료 문구 HTML 허용 여부',
   
   -- 시스템 기록
