@@ -12,8 +12,15 @@
     <!-- Libraries -->
     <script src="/common/lib/js/vue.global.js"></script>
     <script src="/common/lib/js/axios.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
+        #map-container { height: 400px; width: 100%; border-radius: 8px; }
+        .map-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center; }
+        .map-modal.show { display: flex; }
+        .map-modal-content { background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 800px; }
+        
         body {
             background-color: #f8f9fa;
             transition: background-color 0.3s ease;
@@ -307,25 +314,47 @@
                                 <textarea class="form-control" :rows="question.textRows || 4" v-model="answers[question.questionId]" :maxlength="question.maxLength"></textarea>
                              </div>
 
-                             <!-- Location -->
-                             <div v-if="question.questionType === 'inputLocation'">
-                                 <div class="input-group mb-2">
-                                     <span class="input-group-text">위도 (Lat)</span>
-                                     <input type="text" class="form-control" v-model="answers[question.questionId].lat" placeholder="37.5665">
-                                 </div>
-                                 <div class="input-group">
-                                     <span class="input-group-text">경도 (Lng)</span>
-                                     <input type="text" class="form-control" v-model="answers[question.questionId].lng" placeholder="126.9780">
-                                 </div>
-                             </div>
+                              <!-- Location -->
+                              <div v-if="question.questionType === 'inputLocation'">
+                                  <div class="row g-2 mb-2">
+                                      <div class="col-6">
+                                          <div class="input-group input-group-sm">
+                                              <span class="input-group-text bg-light">위도</span>
+                                              <input type="text" class="form-control" v-model="answers[question.questionId].lat" placeholder="37.5665" readonly>
+                                          </div>
+                                      </div>
+                                      <div class="col-6">
+                                          <div class="input-group input-group-sm">
+                                              <span class="input-group-text bg-light">경도</span>
+                                              <input type="text" class="form-control" v-model="answers[question.questionId].lng" placeholder="126.9780" readonly>
+                                          </div>
+                                      </div>
+                                  </div>
+                                  <button type="button" class="btn btn-outline-primary btn-sm w-100" @click="openMap(question.questionId)">
+                                      <i class="bi bi-geo-alt-fill me-1"></i> 지도에서 위치 선택하기
+                                  </button>
+                              </div>
 
-                             <!-- Image Upload -->
-                             <div v-if="question.questionType === 'inputImage'">
-                                 <input type="file" class="form-control" accept="image/*" @change="handleFileUpload($event, question.questionId)">
-                                 <div v-if="answers[question.questionId]" class="mt-2">
-                                     <p class="small text-success"><i class="bi bi-check-circle"></i> 파일 선택됨: {{ answers[question.questionId].name }}</p>
-                                 </div>
-                             </div>
+                              <!-- Image Upload -->
+                              <div v-if="question.questionType === 'inputImage'">
+                                  <div class="d-grid">
+                                      <label class="btn btn-outline-secondary py-3 border-dashed" style="cursor: pointer; border-style: dashed !important; border-width: 2px;">
+                                          <input type="file" class="d-none" accept="image/png, image/jpeg, image/gif" @change="handleFileUpload($event, question.questionId)">
+                                          <div class="d-flex flex-column align-items-center">
+                                              <i class="bi bi-image fs-3 mb-1"></i>
+                                              <span class="fw-bold">이미지 선택하기</span>
+                                              <span class="small text-muted">PNG, JPG, GIF 파일만 가능</span>
+                                          </div>
+                                      </label>
+                                  </div>
+                                  <div v-if="answers[question.questionId] && answers[question.questionId].name" class="mt-3 text-center p-3 border rounded bg-light anim-fade-in">
+                                      <div class="d-flex justify-content-between align-items-center mb-2 px-2">
+                                          <span class="small text-success fw-bold"><i class="bi bi-check-circle-fill me-1"></i> 선택된 파일: {{ answers[question.questionId].name }}</span>
+                                          <button type="button" class="btn-close small" style="transform: scale(0.7);" @click="answers[question.questionId] = null"></button>
+                                      </div>
+                                      <img :id="'preview_' + question.questionId" class="img-fluid rounded shadow-sm border" style="max-height: 200px;" alt="Preview">
+                                  </div>
+                              </div>
 
                              <!-- Comment -->
                              <div v-if="question.questionType === 'inputComment'" class="text-muted bg-light p-3 rounded">
@@ -357,6 +386,30 @@
             <teleport to="head">
                 <component is="style">{{ survey.userCss }}</component>
             </teleport>
+        </div>
+
+        <!-- Map Modal -->
+        <div class="map-modal" :class="{'show': mapModal.show}" @click.self="closeMap">
+            <div class="map-modal-content anim-fade-in">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="m-0 fw-bold"><i class="bi bi-map me-2"></i>지도에서 위치 선택</h5>
+                    <button type="button" class="btn-close" @click="closeMap"></button>
+                </div>
+                
+                <!-- Search Box -->
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" v-model="mapSearchKeyword" placeholder="주소를 입력하세요 (예: 강남역, 시청 등)" @keyup.enter="searchAddress">
+                    <button class="btn btn-outline-primary" type="button" @click="searchAddress">
+                        <i class="bi bi-search"></i> 검색
+                    </button>
+                </div>
+
+                <div id="map-container"></div>
+                <div class="mt-3 text-end">
+                    <button type="button" class="btn btn-secondary me-2" @click="closeMap">취소</button>
+                    <button type="button" class="btn btn-primary" @click="confirmLocation">위치 확정</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -447,10 +500,93 @@
                     });
                 }
 
+                const mapModal = ref({ show: false, questionId: null, lat: null, lng: null });
+                const mapSearchKeyword = ref('');
+                let leafletMap = null;
+                let mapMarker = null;
+
+                const searchAddress = async () => {
+                    if (!mapSearchKeyword.value) return;
+                    try {
+                        const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(mapSearchKeyword.value)}`);
+                        const data = await response.json();
+                        if (data && data.length > 0) {
+                            const result = data[0];
+                            const newLat = parseFloat(result.lat);
+                            const newLng = parseFloat(result.lon);
+                            
+                            mapModal.value.lat = newLat.toFixed(6);
+                            mapModal.value.lng = newLng.toFixed(6);
+                            
+                            if (leafletMap) {
+                                leafletMap.setView([newLat, newLng], 15);
+                                if (mapMarker) mapMarker.setLatLng([newLat, newLng]);
+                            }
+                        } else {
+                            alert('검색 결과가 없습니다.');
+                        }
+                    } catch (error) {
+                        console.error('Search error:', error);
+                        alert('검색 중 오류가 발생했습니다.');
+                    }
+                };
+
+                const openMap = (questionId) => {
+                    mapModal.value.questionId = questionId;
+                    mapModal.value.lat = answers.value[questionId].lat || 37.5665;
+                    mapModal.value.lng = answers.value[questionId].lng || 126.9780;
+                    mapModal.value.show = true;
+                    
+                    setTimeout(() => {
+                        if (!leafletMap) {
+                            leafletMap = L.map('map-container').setView([mapModal.value.lat, mapModal.value.lng], 13);
+                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                attribution: '&copy; OpenStreetMap contributors'
+                            }).addTo(leafletMap);
+                            
+                            mapMarker = L.marker([mapModal.value.lat, mapModal.value.lng], { draggable: true }).addTo(leafletMap);
+                            
+                            leafletMap.on('click', (e) => {
+                                mapMarker.setLatLng(e.latlng);
+                                mapModal.value.lat = e.latlng.lat.toFixed(6);
+                                mapModal.value.lng = e.latlng.lng.toFixed(6);
+                            });
+                            
+                            mapMarker.on('dragend', (e) => {
+                                const pos = e.target.getLatLng();
+                                mapModal.value.lat = pos.lat.toFixed(6);
+                                mapModal.value.lng = pos.lng.toFixed(6);
+                            });
+                        } else {
+                            leafletMap.setView([mapModal.value.lat, mapModal.value.lng], 13);
+                            mapMarker.setLatLng([mapModal.value.lat, mapModal.value.lng]);
+                        }
+                        leafletMap.invalidateSize();
+                    }, 100);
+                };
+
+                const closeMap = () => {
+                    mapModal.value.show = false;
+                };
+
+                const confirmLocation = () => {
+                    const qId = mapModal.value.questionId;
+                    answers.value[qId].lat = mapModal.value.lat;
+                    answers.value[qId].lng = mapModal.value.lng;
+                    closeMap();
+                };
+
                 const handleFileUpload = (event, questionId) => {
                     const file = event.target.files[0];
                     if (file) {
                         answers.value[questionId] = file;
+                        // Preview logic
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            const img = document.getElementById('preview_' + questionId);
+                            if (img) img.src = e.target.result;
+                        };
+                        reader.readAsDataURL(file);
                     }
                 };
 
@@ -460,7 +596,8 @@
 
                 return {
                     survey, answers, rootStyle, containerStyle, accentButtonStyle, isSidebarLayout,
-                    submitSurvey, handleFileUpload
+                    submitSurvey, handleFileUpload,
+                    mapModal, mapSearchKeyword, openMap, closeMap, confirmLocation, searchAddress
                 };
             }
         });

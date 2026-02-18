@@ -135,9 +135,9 @@
                          <!-- Theme Selection -->
                          <div class="mb-4">
                             <label class="form-label fw-bold">기본 테마 선택</label>
-                            <div class="row g-3">
+                            <div class="d-flex flex-nowrap overflow-auto pb-2 gap-3" style="scrollbar-width: thin;">
                                 <!-- Reset Theme -->
-                                <div class="col-md-2">
+                                <div style="min-width: 140px; flex: 0 0 auto;">
                                     <div class="theme-card-simple border rounded p-2 text-center" 
                                          :class="{'border-primary bg-light shadow-sm': !survey.themeSeq}"
                                          @click="resetTheme"
@@ -149,7 +149,7 @@
                                     </div>
                                 </div>
                                 <!-- Theme List -->
-                                <div class="col-md-2" v-for="theme in themeList" :key="theme.themeSeq">
+                                <div v-for="theme in themeList" :key="theme.themeSeq" style="min-width: 140px; flex: 0 0 auto;">
                                     <div class="theme-card-simple border rounded p-2 text-center" 
                                          :class="{'border-primary bg-light shadow-sm': survey.themeSeq === theme.themeSeq}"
                                          @click="applyTheme(theme)"
