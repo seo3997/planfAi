@@ -40,7 +40,7 @@
             width: 100%;
             margin: 0 auto;
             padding: 40px 20px;
-            background-color: rgba(255, 255, 255, 0.95);
+            background-color: rgba(255, 255, 255, 0.6);
             backdrop-filter: blur(10px);
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             flex-grow: 1;
@@ -48,7 +48,7 @@
         }
         
         body.has-bg .survey-container {
-            background-color: rgba(255, 255, 255, 0.85);
+            background-color: rgba(255, 255, 255, 0.6);
             backdrop-filter: blur(12px) !important;
             border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 24px;
@@ -335,14 +335,34 @@
 
                 const isSidebarLayout = computed(() => ['LEFT_1_3', 'RIGHT_1_2'].includes(survey.value.layoutType));
 
-                // Init styles logic (same as preview)
+                const hexToRgba = (hex, alpha) => {
+                    if (!hex) return '';
+                    let r = 255, g = 255, b = 255;
+                    if (hex.startsWith('#')) {
+                        const h = hex.replace('#', '');
+                        if (h.length === 3) {
+                            r = parseInt(h[0] + h[0], 16);
+                            g = parseInt(h[1] + h[1], 16);
+                            b = parseInt(h[2] + h[2], 16);
+                        } else if (h.length === 6) {
+                            r = parseInt(h.substring(0, 2), 16);
+                            g = parseInt(h.substring(2, 4), 16);
+                            b = parseInt(h.substring(4, 6), 16);
+                        }
+                    }
+                    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+                };
+
                 if(survey.value.bgImagePath) {
                     document.body.style.backgroundImage = `url('${survey.value.bgImagePath}')`;
                     document.body.style.backgroundSize = 'cover';
                     document.body.style.backgroundAttachment = 'fixed';
                     document.body.classList.add('has-bg');
                 }
-                if(survey.value.bgColor) containerStyle.value.backgroundColor = survey.value.bgColor;
+                if(survey.value.bgColor) {
+                    // Apply 60% alpha to the user-selected background color
+                    containerStyle.value.backgroundColor = hexToRgba(survey.value.bgColor, 0.6);
+                }
                 if(survey.value.textColor) {
                     rootStyle.value.color = survey.value.textColor;
                     containerStyle.value.color = survey.value.textColor;
