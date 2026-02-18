@@ -17,11 +17,16 @@
         body {
             background-color: #f8f9fa;
             transition: background-color 0.3s ease;
+            margin: 0;
+            padding: 0;
         }
         .survey-wrapper {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            width: 100%;
         }
         .survey-container {
             width: 100%;
@@ -34,76 +39,158 @@
             transition: all 0.3s ease;
         }
         
-        /* Glassmorphism Effect when background image exists */
+        /* Semi-Transparent Professional Layout */
         body.has-bg .survey-container {
-            background-color: rgba(255, 255, 255, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            background-color: rgba(255, 255, 255, 0.6) !important;
+            backdrop-filter: blur(10px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1) !important;
+            border-radius: 24px;
+            color: #212529;
+        }
+        
+        body.has-bg .question-box.card {
+            background-color: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin-bottom: 40px !important;
         }
 
-        /* Layout Types */
-        .layout-center { max-width: 800px; border-radius: 20px; margin-top: 40px; margin-bottom: 40px; }
-        .layout-top_banner { max-width: 1000px; border-radius: 20px; margin-top: 40px; margin-bottom: 40px; }
-        .layout-top_banner .survey-header { 
-            background: linear-gradient(135deg, rgba(43,75,138,0.1) 0%, rgba(73,167,176,0.1) 100%);
-            padding: 60px 40px; 
-            border-radius: 15px;
+        body.has-bg .survey-header {
+            background-color: transparent !important;
+            border-bottom: 2px solid #f8f9fa;
+            padding-bottom: 40px;
             margin-bottom: 40px;
+        }
+
+        body.has-bg .form-control, body.has-bg .form-select {
+            background-color: #ffffff !important;
+            border: 1px solid #ced4da !important;
+            color: #212529 !important;
+            border-radius: 8px;
+        }
+
+        body.has-bg .form-control:focus {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13,110,253,0.1);
+        }
+
+        .survey-header {
+            margin-bottom: 40px;
+        }
+        .logo-area { margin-bottom: 30px; display: flex; }
+        .logo-area.align-LEFT { justify-content: flex-start; }
+        .logo-area.align-CENTER { justify-content: center; }
+        .logo-area.align-RIGHT { justify-content: flex-end; }
+        .logo-img { max-height: 60px; }
+
+        .question-box {
+            margin-bottom: 40px;
+        }
+        .question-title {
+            font-weight: 700;
+            margin-bottom: 12px;
+            font-size: 1.25rem;
+            color: #1a1a1a;
+        }
+        .question-desc {
+            font-size: 0.95rem;
+            color: #6c757d;
+            margin-bottom: 15px;
+        }
+        
+        /* Clean Option Style */
+        .form-check {
+            padding: 10px 12px 10px 2.5em; /* Match Bootstrap default but add padding */
+            border-radius: 8px;
+            margin-bottom: 4px;
+            border: 1px solid transparent;
+            transition: background-color 0.2s ease;
+        }
+        .form-check:hover {
+            background-color: #f8f9fa;
+        }
+        .form-check-input {
+            cursor: pointer;
+            margin-top: 0.3em;
+        }
+        .form-check-label {
+            cursor: pointer;
+            width: 100%;
+            display: inline-block;
+            color: #444;
+            font-weight: 500;
+        }
+        
+        /* Layout Definitions */
+        .layout-center { 
+            max-width: 800px; 
+            margin-top: 50px !important;
+            margin-bottom: 50px !important;
+            flex-grow: 0 !important;
+        }
+        .layout-top_banner { 
+            max-width: 1000px; 
+            margin-top: 50px !important;
+            margin-bottom: 50px !important;
+            flex-grow: 0 !important;
         }
         
         .layout-left_1_3, .layout-right_1_2 { 
             max-width: 1200px; 
             display: flex; 
-            gap: 30px; 
-            background: transparent !important; 
+            gap: 40px; 
+            background-color: transparent !important;
+            border: none !important;
             box-shadow: none !important;
+            margin-top: 50px !important;
+            margin-bottom: 50px !important;
+            flex-grow: 0 !important;
+            padding: 0 !important;
         }
+
         .layout-sidebar { 
-            width: 30%; 
-            background: #fff; 
-            padding: 30px; 
-            border-radius: 10px; 
-            box-shadow: 0 0 15px rgba(0,0,0,0.05);
+            width: 320px; 
+            background: #ffffff; 
+            padding: 40px; 
+            border-radius: 24px; 
+            box-shadow: 0 15px 40px rgba(0,0,0,0.08);
             height: fit-content;
+            border: 1px solid #e9ecef;
         }
+
         .layout-main { 
             flex-grow: 1; 
-            background: #fff; 
-            padding: 30px; 
-            border-radius: 10px; 
-            box-shadow: 0 0 15px rgba(0,0,0,0.05);
+            background: #ffffff; 
+            padding: 40px; 
+            border-radius: 24px; 
+            box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+            border: 1px solid #e9ecef;
         }
 
-        .survey-header {
-            margin-bottom: 30px;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 20px;
-        }
-        .logo-area { margin-bottom: 20px; display: flex; }
-        .logo-area.align-LEFT { justify-content: flex-start; }
-        .logo-area.align-CENTER { justify-content: center; }
-        .logo-area.align-RIGHT { justify-content: flex-end; }
-        .logo-img { max-height: 50px; }
-
-        .question-box {
-            margin-bottom: 25px;
-        }
-        .question-title {
-            font-weight: 600;
-            margin-bottom: 10px;
-            font-size: 1.1rem;
-        }
-        .question-desc {
-            font-size: 0.9rem;
-            color: #6c757d;
-            margin-bottom: 10px;
-        }
-        .form-check-label {
-            cursor: pointer;
+        .btn-primary {
+            padding: 14px 40px;
+            border-radius: 12px;
+            font-weight: 700;
+            transition: all 0.3s ease;
         }
         
+        @media (max-width: 1100px) {
+            .layout-left_1_3, .layout-right_1_2 { 
+                flex-direction: column; 
+                padding: 0 20px !important;
+            }
+            .layout-sidebar, .layout-main { width: 100%; }
+        }
+
         @media (max-width: 768px) {
-            .layout-left_1_3, .layout-right_1_2 { flex-direction: column; }
-            .layout-sidebar { width: 100%; }
+            .survey-container { 
+                margin-top: 0 !important; 
+                margin-bottom: 0 !important; 
+                border-radius: 0 !important; 
+            }
+            .layout-center, .layout-top_banner { max-width: 100%; }
         }
     </style>
 </head>
@@ -121,9 +208,9 @@
                 <!-- Custom Header -->
                 <div v-if="survey.header" v-html="survey.header" class="mb-4"></div>
 
-                <div class="survey-header" :class="{'text-center': !isSidebarLayout}">
-                    <h1 class="mb-3">{{ survey.surveyTitle }}</h1>
-                    <p v-if="survey.numberRoductionText" class="text-muted">{{ survey.numberRoductionText }}</p>
+                <div class="survey-header" v-if="survey.surveyTitle" :class="{'text-center': !isSidebarLayout}">
+                    <h1 class="mb-3 fw-bold">{{ survey.surveyTitle }}</h1>
+                    <p v-if="survey.numberRoductionText" class="text-muted fs-5">{{ survey.numberRoductionText }}</p>
                 </div>
             </div>
 
@@ -133,8 +220,8 @@
                 <h3 v-if="section.sectionTitle" class="mb-4 pb-2 border-bottom">{{ section.sectionTitle }}</h3>
                 <div v-if="section.sectionHtmlTitle" v-html="section.sectionHtmlTitle" class="mb-3"></div>
 
-                <div v-for="(question, qIdx) in section.questions" :key="qIdx" class="question-box card border-0">
-                    <div class="card-body p-0">
+                <div v-for="(question, qIdx) in section.questions" :key="qIdx" class="question-box card border-0 shadow-none">
+                    <div class="card-body" :class="!isSidebarLayout ? 'p-0' : ''">
                         <!-- Question Text -->
                         <div class="question-title">
                             <span v-if="survey.sections.length > 1">{{ sIdx + 1 }}-{{ qIdx + 1 }}. </span>
