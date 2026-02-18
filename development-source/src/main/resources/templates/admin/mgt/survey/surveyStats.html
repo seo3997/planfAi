@@ -466,7 +466,10 @@
                     if (mapInstances[qId]) mapInstances[qId].setView([loc.lat, loc.lng], 16);
                 };
 
-                onMounted(() => setTimeout(initCharts, 500));
+                onMounted(() => {
+                    AdminMenu.init();
+                    setTimeout(initCharts, 500);
+                });
 
                 return {
                     survey, stats, totalResponses, viewMode, getTypeName, getLabelCount, getLabelPercent,
