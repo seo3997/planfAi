@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/layout/base :: layout(~{::title}, ~{::#admin-survey-stats}, ~{::#admin-survey-script}, ~{::#admin-survey-head})}">
+<head>
+    <title>설문 응답 통계 - PlanfAi 관리자</title>
+    <th:block id="admin-survey-head">
+        <!-- Visualization Libraries -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    </th:block>
+</head>
+<body>
+    <div id="admin-survey-stats">
+        <!-- Workspace Header -->
+        <div class="d-flex justify-content-between align-items-center mb-3 mt-3">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-link text-dark p-0 text-decoration-none" @click="goMaster">
+                    <i class="bi bi-arrow-left fs-4"></i>
+                </button>
+                <h4 class="m-0 fw-bold">{{ survey.surveyTitle }} - 통계</h4>
+                <span class="badge bg-primary rounded-pill">Total: {{ totalResponses }}</span>
+            </div>
+            <div class="d-flex gap-2">
+                 <button type="button" class="btn btn-outline-secondary" @click="downloadExcel">
+                    <i class="bi bi-download me-1"></i> 엑셀 다운로드
+                </button>
+            </div>
+        </div>
+
+        <!-- Workspace Tabs -->
+        <ul class="nav nav-tabs nav-fill mb-4 border-bottom-0">
+            <li class="nav-item">
+                <a class="nav-link text-muted" :href="'/mgt/survey/manageSurveyMenu.do?surveyId=' + survey.surveyId">
+                    설정 (Settings)
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-muted" :href="'/mgt/survey/editEntryForm.do?surveyId=' + survey.surveyId">
+                    질문 (Questions)
+                </a>
+            </li>
+             <li class="nav-item">
+                <a class="nav-link active fw-bold border-bottom border-main border-3 text-main" href="javascript:void(0);">
+                    응답 (Responses)
+                </a>
+            </li>
+        </ul>
+
+        <div class="stats-container">
+            <!-- Question Stats Iteration -->
+            <div v-for="(section, sIdx) in survey.sections" :key="sIdx" class="mb-5">
+                <h5 class="fw-bold mb-4 text-secondary border-start border-4 border-primary ps-3">{{ section.sectionTitle || '섹션 ' + (sIdx+1) }}</h5>
+                
+                <div v-for="(question, qIdx) in section.questions" :key="qIdx" class="card mb-4 border-0 shadow-sm overflow-hidden">
+                    <div class="card-header bg-white border-bottom-0 pt-4 px-4">
+                        <h6 class="fw-bold mb-1">
+                            <span class="text-primary me-2">Q{{ qIdx + 1 }}.</span>
+                            {{ question.questionText }}
+                        </h6>
+                        <span class="badge bg-light text-dark">{{ getTypeName(question.questionType) }}</span>
+                    </div>
+                    
+                    <div class="card-body p-4">
+                        <!-- Label Based (Radio/Checkbox) -->
+                        <div v-if="['inputRadio', 'inputCheckbox'].includes(question.questionType)" class="row align-items-center">
+                            <div class="col-md-5">
+                                <div class="chart-wrapper" style="height: 300px;">
+                                    <canvas :id="'chart-' + question.questionId"></canvas>
+                                </div>
+                            </div>
+                            <div class="col-md-7">
+                                <ul class="list-group list-group-flush">
+                                    <li v-for="label in question.labels" :key="label.questionLabelId" class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                                        <span>{{ label.questionLabel }}</span>
+                                        <div class="text-end">
+                                            <span class="fw-bold">{{ getLabelCount(question.questionId, label.questionLabelId) }}명</span>
+                                            <span class="text-muted small ms-2">({{ getLabelPercent(question.questionId, label.questionLabelId) }}%)</span>
+                                        </div>
+                                    </li>
+                                    <!-- Other Answer Stats -->
+                                    <li v-if="question.otherAnswer === 'Y'" class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                                        <span class="text-info">기타 (입력값)</span>
+                                        <span class="fw-bold">{{ getOtherCount(question.questionId) }}명</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Text Based (Line/Area) -->
+                        <div v-else-if="['inputTextline', 'inputTextarea'].includes(question.questionType)">
+                            <div class="table-responsive" style="max-height: 300px;">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-light sticky-top">
+                                        <tr>
+                                            <th>#</th>
+                                            <th>답변 내용</th>
+                                            <th class="text-end">작성일</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(res, rIdx) in getTextResponses(question.questionId)" :key="rIdx">
+                                            <td class="text-muted small">{{ rIdx + 1 }}</td>
+                                            <td class="text-wrap">{{ res.questionResult }}</td>
+                                            <td class="text-end text-muted small">{{ formatDate(res.registDt) }}</td>
+                                        </tr>
+                                        <tr v-if="!getTextResponses(question.questionId).length">
+                                            <td colspan="3" class="text-center py-4 text-muted">등록된 응답이 없습니다.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Location Based -->
+                        <div v-else-if="question.questionType === 'inputLocation'">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div :id="'map-' + question.questionId" class="rounded border" style="height: 400px; z-index: 1;"></div>
+                                </div>
+                                <div class="col-md-4">
+                                     <div class="table-responsive" style="max-height: 400px;">
+                                        <table class="table table-sm table-hover">
+                                            <thead class="table-light">
+                                                <tr><th>위도/경도</th></tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-for="(loc, lIdx) in getLocationResponses(question.questionId)" :key="lIdx" class="cursor-pointer" @click="focusMap(question.questionId, loc)">
+                                                    <td class="small">{{ loc.lat.toFixed(4) }}, {{ loc.lng.toFixed(4) }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                     </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Image Based -->
+                        <div v-else-if="question.questionType === 'inputImage'">
+                             <div class="row g-3">
+                                <div v-for="(img, iIdx) in getTextResponses(question.questionId)" :key="iIdx" class="col-6 col-md-3">
+                                    <div class="img-thumb-card border rounded overflow-hidden">
+                                        <a :href="img.questionResult" target="_blank">
+                                            <img :src="img.questionResult" class="img-fluid w-100" style="height: 120px; object-fit: cover;">
+                                        </a>
+                                        <div class="p-2 bg-light text-center">
+                                            <span class="small text-muted">{{ formatDate(img.registDt) }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div v-if="!getTextResponses(question.questionId).length" class="col-12 text-center py-4 text-muted">등록된 응답 이미지가 없습니다.</div>
+                             </div>
+                        </div>
+
+                        <!-- Others (Comment) -->
+                        <div v-else class="text-muted small">이 유형은 통계를 제공하지 않습니다.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script id="admin-survey-script" th:inline="javascript">
+        /*<![CDATA[*/
+        const serverSurvey = /*[[${survey}]]*/ {};
+        const serverStats = /*[[${stats}]]*/ {};
+        /*]]>*/
+
+        const initVueApp = true;
+        const { createApp, ref, onMounted } = Vue;
+
+        const app = createApp({
+            setup() {
+                const survey = ref(serverSurvey);
+                const stats = ref(serverStats);
+                const totalResponses = ref(0);
+                const mapInstances = {};
+
+                // Find total responses (approx)
+                if (Object.keys(stats.value).length > 0) {
+                   const firstKey = Object.keys(stats.value)[0];
+                   const data = stats.value[firstKey];
+                   if (Array.isArray(data)) totalResponses.value = data.length;
+                   else if (typeof data === 'object') {
+                       totalResponses.value = Object.values(data).reduce((a, b) => a + b, 0);
+                   }
+                }
+
+                const getTypeName = (type) => {
+                    const names = {
+                        'inputRadio': '단일 선택(객관식)',
+                        'inputCheckbox': '다중 선택(객관식)',
+                        'inputTextline': '단답형(주관식)',
+                        'inputTextarea': '서술형(주관식)',
+                        'inputLocation': '위치 정보',
+                        'inputImage': '이미지 첨부',
+                        'inputComment': '안내 문구'
+                    };
+                    return names[type] || type;
+                };
+
+                const getLabelCount = (qId, lId) => {
+                    return (stats.value[qId] && stats.value[qId][lId]) || 0;
+                };
+
+                const getLabelPercent = (qId, lId) => {
+                    const qStats = stats.value[qId] || {};
+                    const total = Object.values(qStats).reduce((a, b) => a + (typeof b === 'number' ? b : 0), 0);
+                    if (total === 0) return 0;
+                    return ((getLabelCount(qId, lId) / total) * 100).toFixed(1);
+                };
+
+                const getOtherCount = (qId) => {
+                    return (stats.value[qId] && stats.value[qId]['OTHER']) || 0;
+                };
+
+                const getTextResponses = (qId) => {
+                    return (stats.value[qId] && Array.isArray(stats.value[qId])) ? stats.value[qId] : [];
+                };
+
+                const getLocationResponses = (qId) => {
+                    return (stats.value[qId] && Array.isArray(stats.value[qId])) ? stats.value[qId] : [];
+                };
+
+                const formatDate = (dateStr) => {
+                    if (!dateStr) return '-';
+                    return dateStr.substring(0, 10);
+                };
+
+                const goMaster = () => {
+                    location.href = '/mgt/survey/manageSurveyMenu.do?surveyId=' + survey.value.surveyId;
+                };
+
+                const downloadExcel = () => alert('엑셀 다운로드 기능은 준비 중입니다.');
+
+                const initCharts = () => {
+                    survey.value.sections.forEach(s => s.questions.forEach(q => {
+                        if (['inputRadio', 'inputCheckbox'].includes(q.questionType)) {
+                            const ctx = document.getElementById('chart-' + q.questionId);
+                            if (!ctx) return;
+
+                            const labels = q.labels.map(l => l.questionLabel);
+                            const data = q.labels.map(l => getLabelCount(q.questionId, l.questionLabelId));
+                            
+                            if (q.otherAnswer === 'Y') {
+                                labels.push('기타');
+                                data.push(getOtherCount(q.questionId));
+                            }
+
+                            new Chart(ctx, {
+                                type: q.questionType === 'inputRadio' ? 'pie' : 'bar',
+                                data: {
+                                    labels: labels,
+                                    datasets: [{
+                                        data: data,
+                                        backgroundColor: [
+                                            '#49a7b0', '#2b4b8a', '#ffc107', '#fd7e14', '#198754', '#0dcaf0'
+                                        ]
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: { legend: { position: 'right' } },
+                                    indexAxis: q.questionType === 'inputCheckbox' ? 'y' : 'x'
+                                }
+                            });
+                        }
+
+                        if (q.questionType === 'inputLocation') {
+                            const mapId = 'map-' + q.questionId;
+                            const responses = getLocationResponses(q.questionId);
+                            if (responses.length > 0) {
+                                const lMap = L.map(mapId).setView([responses[0].lat, responses[0].lng], 12);
+                                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(lMap);
+                                responses.forEach(loc => {
+                                    L.marker([loc.lat, loc.lng]).addTo(lMap);
+                                });
+                                mapInstances[q.questionId] = lMap;
+                            }
+                        }
+                    }));
+                };
+
+                const focusMap = (qId, loc) => {
+                    if (mapInstances[qId]) {
+                        mapInstances[qId].setView([loc.lat, loc.lng], 16);
+                    }
+                };
+
+                onMounted(() => {
+                    // Start after libraries loaded
+                    setTimeout(initCharts, 500);
+                });
+
+                return {
+                    survey, stats, totalResponses, getTypeName, getLabelCount, getLabelPercent,
+                    getOtherCount, getTextResponses, getLocationResponses, formatDate,
+                    goMaster, downloadExcel, focusMap
+                };
+            }
+        });
+
+        // Register AdminLayout if available or mount directly
+        if (typeof AdminLayout !== 'undefined') {
+            AdminLayout.register(app);
+        }
+        app.mount('#app');
+    </script>
+
+    <style>
+        .stats-container { max-width: 1000px; margin: 0 auto; }
+        .cursor-pointer { cursor: pointer; }
+        .img-thumb-card:hover { transform: scale(1.02); transition: 0.2s; }
+        .chart-wrapper { position: relative; }
+    </style>
+</body>
+</html>

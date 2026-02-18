@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.UUID;
 
 @Service
@@ -272,10 +275,82 @@ public class SurveyService {
     }
 
     /**
-     * 질문별 통계 데이터 조회 (관리자용)
+     * 설문 전체 통계 데이터 조회
      */
-    public java.util.Map<String, Object> getQuestionStats(String surveyId, int questionId, String type) {
-        java.util.Map<String, Object> stats = new java.util.HashMap<>();
+    public Map<Integer, Object> getQuestionStats(String surveyId) {
+        Map<Integer, Object> allStats = new HashMap<>();
+
+        // 1. 설문 구조 가져오기
+        TbSurvey searchVO = new TbSurvey();
+        searchVO.setSurveyId(surveyId);
+        TbSurvey surveyForm = selectSurveyEntryForm(searchVO);
+
+        if (surveyForm != null && surveyForm.getSections() != null) {
+            for (com.whomade.planfAi.admin.mgt.survey.vo.TbSection section : surveyForm.getSections()) {
+                if (section.getQuestions() != null) {
+                    for (TbQuestion question : section.getQuestions()) {
+                        String type = question.getQuestionType();
+                        int qId = question.getQuestionId();
+
+                        // 타입별 데이터 수집
+                        if ("inputRadio".equals(type) || "inputCheckbox".equals(type)) {
+                            // 라벨별 카운트 (Map<LabelId, Count>)
+                            List<Map<String, Object>> labelStats = surveyMapper.selectLabelStats(surveyId, qId);
+                            Map<String, Integer> countMap = new HashMap<>();
+                            for (Map<String, Object> row : labelStats) {
+                                Object labelIdObj = row.get("labelId") != null ? row.get("labelId")
+                                        : row.get("LABELID"); // 대소문자 대응
+                                Object countObj = row.get("count") != null ? row.get("count") : row.get("COUNT");
+
+                                String labelIdStr = labelIdObj != null ? String.valueOf(labelIdObj) : "";
+                                int count = 0;
+                                if (countObj != null) {
+                                    if (countObj instanceof Number) {
+                                        count = ((Number) countObj).intValue();
+                                    } else {
+                                        try {
+                                            count = Integer.parseInt(String.valueOf(countObj));
+                                        } catch (NumberFormatException e) {
+                                            count = 0;
+                                        }
+                                    }
+                                }
+
+                                if (!labelIdStr.isEmpty()) {
+                                    countMap.put(labelIdStr, count);
+                                }
+                            }
+                            allStats.put(qId, countMap);
+                        } else if ("inputLocation".equals(type)) {
+                            // 위경도 리스트
+                            List<Map<String, Object>> locResults = surveyMapper.selectLocationResults(surveyId, qId);
+                            List<Map<String, Object>> formattedLocs = new ArrayList<>();
+                            for (Map<String, Object> row : locResults) {
+                                Map<String, Object> loc = new HashMap<>();
+                                try {
+                                    loc.put("lat", Double.parseDouble(String.valueOf(row.get("lat"))));
+                                    loc.put("lng", Double.parseDouble(String.valueOf(row.get("lng"))));
+                                    formattedLocs.add(loc);
+                                } catch (Exception e) {
+                                }
+                            }
+                            allStats.put(qId, formattedLocs);
+                        } else {
+                            // 텍스트/이미지 리스트
+                            allStats.put(qId, surveyMapper.selectTextResults(surveyId, qId));
+                        }
+                    }
+                }
+            }
+        }
+        return allStats;
+    }
+
+    /**
+     * 질문별 통계 데이터 조회 (개별 호출용)
+     */
+    public Map<String, Object> getQuestionStats(String surveyId, int questionId, String type) {
+        Map<String, Object> stats = new HashMap<>();
 
         if ("inputRadio".equals(type) || "inputCheckbox".equals(type)) {
             stats.put("labels", surveyMapper.selectLabelStats(surveyId, questionId));

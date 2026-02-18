@@ -39,7 +39,7 @@
                 </a>
             </li>
              <li class="nav-item">
-                <a class="nav-link disabled text-muted" href="#">
+                <a class="nav-link text-muted" :href="survey.surveyId ? '/mgt/survey/surveyStats.do?surveyId=' + survey.surveyId : '#'">
                     응답 (Responses)
                 </a>
             </li>

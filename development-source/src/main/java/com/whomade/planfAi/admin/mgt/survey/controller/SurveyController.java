@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 @Controller
 @RequestMapping("/mgt/survey")
@@ -197,5 +199,25 @@ public class SurveyController {
             result.put("message", "복사 중 오류가 발생했습니다: " + e.getMessage());
         }
         return result;
+    }
+
+    /**
+     * 설문 통계/응답 결과 (03.설문통계.png 대응)
+     * URL: /mgt/survey/surveyStats.do
+     */
+    @GetMapping("/surveyStats.do")
+    public String surveyStats(@ModelAttribute("searchVO") TbSurvey searchVO, Model model) {
+        TbSurvey surveyForm = surveyService.selectSurveyEntryForm(searchVO);
+        if (surveyForm == null) {
+            return "redirect:/mgt/survey/selectPageListSurvey.do";
+        }
+
+        // 전체 통계 데이터 조회
+        Map<Integer, Object> stats = surveyService.getQuestionStats(searchVO.getSurveyId());
+
+        model.addAttribute("survey", surveyForm);
+        model.addAttribute("stats", stats);
+
+        return "admin/mgt/survey/surveyStats";
     }
 }
