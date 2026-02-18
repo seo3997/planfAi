@@ -241,4 +241,64 @@
         DELETE FROM tb_question_label WHERE SURVEY_ID = #{surveyId}
     </delete>
 
+    <!-- 응답 마스터 저장 -->
+    <insert id="insertResults" parameterType="com.whomade.planfAi.admin.mgt.survey.vo.TbResults">
+        INSERT INTO tb_results (
+            RESULTS_ID, SURVEY_ID, SECTION_ID, QUESTION_ID,
+            QUESTION_RESULT, OTHERANSWER_RESULT,
+            REGISTER_NO, REGIST_DT, UPDUSR_NO, UPDT_DT
+        ) VALUES (
+            #{resultsId}, #{surveyId}, #{sectionId}, #{questionId},
+            #{questionResult}, #{otherAnswerResult},
+            #{registerNo}, NOW(), #{updusrNo}, NOW()
+        )
+    </insert>
+
+    <!-- 응답 라벨 저장 -->
+    <insert id="insertResultsLabel" parameterType="com.whomade.planfAi.admin.mgt.survey.vo.TbResultsLabel">
+        INSERT INTO tb_results_label (
+            RESULTS_ID, RESULTS_LABEL_ID, SURVEY_ID, SECTION_ID, QUESTION_ID,
+            QUESTION_LABEL_ID, QUESTION_LABEL_RESULT,
+            REGISTER_NO, REGIST_DT, UPDUSR_NO, UPDT_DT
+        ) VALUES (
+            #{resultsId}, #{resultsLabelId}, #{surveyId}, #{sectionId}, #{questionId},
+            #{questionLabelId}, #{questionLabelResult},
+            #{registerNo}, NOW(), #{updusrNo}, NOW()
+        )
+    </insert>
+
+    <!-- 통계: 객관식 라벨별 카운트 -->
+    <select id="selectLabelStats" resultType="map">
+        SELECT 
+            L.QUESTION_LABEL_ID as labelId,
+            L.QUESTION_LABEL as labelText,
+            (SELECT COUNT(*) 
+             FROM tb_results_label RL 
+             WHERE RL.SURVEY_ID = #{surveyId} 
+               AND RL.QUESTION_ID = #{questionId} 
+               AND RL.QUESTION_LABEL_ID = L.QUESTION_LABEL_ID) as count
+        FROM tb_question_label L
+        WHERE L.SURVEY_ID = #{surveyId} AND L.QUESTION_ID = #{questionId}
+        ORDER BY L.QUESTION_LABEL_ID ASC
+    </select>
+
+    <!-- 통계: 주관식 응답 목록 -->
+    <select id="selectTextResults" parameterType="map" resultType="com.whomade.planfAi.admin.mgt.survey.vo.TbResults">
+        SELECT * FROM tb_results
+        WHERE SURVEY_ID = #{surveyId} AND QUESTION_ID = #{questionId}
+        AND QUESTION_RESULT IS NOT NULL AND QUESTION_RESULT != ''
+        ORDER BY REGIST_DT DESC
+    </select>
+
+    <!-- 통계: 위치 정보 목록 (지도용) -->
+    <select id="selectLocationResults" resultType="map">
+        SELECT 
+            RESULTS_ID as resultsId,
+            SUBSTRING_INDEX(QUESTION_RESULT, ',', 1) as lat,
+            SUBSTRING_INDEX(QUESTION_RESULT, ',', -1) as lng
+        FROM tb_results
+        WHERE SURVEY_ID = #{surveyId} AND QUESTION_ID = #{questionId}
+        AND QUESTION_RESULT LIKE '%,%'
+    </select>
+
 </mapper>

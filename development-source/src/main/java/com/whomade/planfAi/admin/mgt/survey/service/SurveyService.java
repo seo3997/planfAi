@@ -229,4 +229,62 @@ public class SurveyService {
 
         return copy.getSurveyId();
     }
+
+    /**
+     * 설문 응답 저장
+     */
+    @Transactional
+    public void saveSurveyResponse(com.whomade.planfAi.admin.mgt.survey.vo.SurveyResponseDto dto) {
+        // 1. 응답자 식별 ID 생성 (UUID의 해시값을 사용하여 정수형으로 변환)
+        int resultsId = Math.abs(UUID.randomUUID().hashCode());
+        String surveyId = dto.getSurveyId();
+
+        for (com.whomade.planfAi.admin.mgt.survey.vo.SurveyResponseDto.Answer answer : dto.getAnswers()) {
+            // A. 기본 응답 저장 (tb_results)
+            com.whomade.planfAi.admin.mgt.survey.vo.TbResults res = new com.whomade.planfAi.admin.mgt.survey.vo.TbResults();
+            res.setResultsId(resultsId);
+            res.setSurveyId(surveyId);
+            res.setSectionId(answer.getSectionId());
+            res.setQuestionId(answer.getQuestionId());
+            res.setOtherAnswerResult(answer.getOtherResult());
+
+            // inputLocation, inputImage, inputTextline 등 처리
+            // 프론트엔드에서 이미 "lat,lng" 또는 "path/to/img" 형식으로 result를 보내준다고 가정
+            res.setQuestionResult(answer.getResult());
+
+            surveyMapper.insertResults(res);
+
+            // B. 다중 선택 또는 상세 라벨 응답 저장 (tb_results_label)
+            if (answer.getLabelIds() != null && !answer.getLabelIds().isEmpty()) {
+                for (Integer labelId : answer.getLabelIds()) {
+                    com.whomade.planfAi.admin.mgt.survey.vo.TbResultsLabel rl = new com.whomade.planfAi.admin.mgt.survey.vo.TbResultsLabel();
+                    rl.setResultsId(resultsId);
+                    rl.setResultsLabelId(Math.abs(java.util.UUID.randomUUID().hashCode())); // 고유 ID 추가
+                    rl.setSurveyId(surveyId);
+                    rl.setSectionId(answer.getSectionId());
+                    rl.setQuestionId(answer.getQuestionId());
+                    rl.setQuestionLabelId(labelId);
+                    rl.setQuestionLabelResult("Y");
+                    surveyMapper.insertResultsLabel(rl);
+                }
+            }
+        }
+    }
+
+    /**
+     * 질문별 통계 데이터 조회 (관리자용)
+     */
+    public java.util.Map<String, Object> getQuestionStats(String surveyId, int questionId, String type) {
+        java.util.Map<String, Object> stats = new java.util.HashMap<>();
+
+        if ("inputRadio".equals(type) || "inputCheckbox".equals(type)) {
+            stats.put("labels", surveyMapper.selectLabelStats(surveyId, questionId));
+        } else if ("inputLocation".equals(type)) {
+            stats.put("locations", surveyMapper.selectLocationResults(surveyId, questionId));
+        } else {
+            stats.put("results", surveyMapper.selectTextResults(surveyId, questionId));
+        }
+
+        return stats;
+    }
 }

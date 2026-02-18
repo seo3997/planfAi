@@ -20,6 +20,9 @@ public class SurveyController {
 
     private final SurveyService surveyService;
 
+    @org.springframework.beans.factory.annotation.Value("${survey.domain}")
+    private String surveyDomain;
+
     /**
      * 설문 목록 조회 (00.설문리스트관리_01~02.png 대응)
      * URL: /mgt/survey/selectPageListSurvey.do
@@ -61,6 +64,7 @@ public class SurveyController {
     public String manageSurveyMenu(@ModelAttribute("searchVO") TbSurvey searchVO, Model model) {
         TbSurvey surveyInfo = surveyService.selectSurveyDetail(searchVO);
         model.addAttribute("surveyInfo", surveyInfo);
+        model.addAttribute("surveyDomain", surveyDomain);
 
         // 테마 목록 추가
         model.addAttribute("themeList", surveyService.selectThemeList());

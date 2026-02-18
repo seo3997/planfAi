@@ -90,6 +90,30 @@
                                 <input type="date" class="form-control" v-model="survey.closed">
                             </div>
                         </div>
+
+                        <!-- 8-1. Survey Deployment URL: Shown only when OPENED -->
+                        <div class="row mb-4" v-if="survey.opened === 'OPENED' && survey.surveyId">
+                            <div class="col-md-12">
+                                <div class="bg-light p-3 rounded border border-success border-opacity-25">
+                                    <label class="form-label fw-bold text-success d-flex align-items-center gap-2">
+                                        <i class="bi bi-broadcast fs-5"></i> 설문 배포 URL (수집 중)
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control bg-white fw-bold" 
+                                               :value="(surveyDomain.startsWith('http') ? '' : 'https://') + surveyDomain + '/survey/v/' + survey.surveyId" readonly>
+                                        <button class="btn btn-primary" type="button" @click="copyToClipboard((surveyDomain.startsWith('http') ? '' : 'https://') + surveyDomain + '/survey/v/' + survey.surveyId)">
+                                            <i class="bi bi-clipboard me-1"></i> 복사
+                                        </button>
+                                        <a :href="(surveyDomain.startsWith('http') ? '' : 'https://') + surveyDomain + '/survey/v/' + survey.surveyId" target="_blank" class="btn btn-outline-success">
+                                            <i class="bi bi-box-arrow-up-right"></i> 바로가기
+                                        </a>
+                                    </div>
+                                    <p class="small text-muted mt-2 mb-0">
+                                        <i class="bi bi-info-circle me-1"></i> 현재 설문이 활성화 상태입니다. 위 주소를 응답자에게 공유하여 데이터를 수집하세요.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label">담당자 이메일</label>
@@ -261,6 +285,7 @@
             /*<![CDATA[*/
             const serverSurveyInfo = /*[[${surveyInfo}]]*/ {};
             const serverThemeList = /*[[${themeList}]]*/ [];
+            const serverSurveyDomain = /*[[${surveyDomain}]]*/ 'www.planf.shop';
             /*]]>*/
 
             const initVueApp = true; // IMPORTANT
@@ -269,6 +294,7 @@
                 setup() {
                     const survey = ref(serverSurveyInfo || {});
                     const themeList = ref(serverThemeList || []);
+                    const surveyDomain = ref(serverSurveyDomain);
                     const isSaving = ref(false);
 
                     // Initialize defaults if null
@@ -343,6 +369,23 @@
                         window.open(url, '_blank', 'width=1024,height=800,scrollbars=yes');
                     };
 
+                    const copyToClipboard = (text) => {
+                        if (navigator.clipboard) {
+                            navigator.clipboard.writeText(text).then(() => {
+                                alert('주소가 클립보드에 복사되었습니다.');
+                            });
+                        } else {
+                            // Fallback
+                            const textArea = document.createElement("textarea");
+                            textArea.value = text;
+                            document.body.appendChild(textArea);
+                            textArea.select();
+                            document.execCommand("copy");
+                            document.body.removeChild(textArea);
+                            alert('주소가 클립보드에 복사되었습니다.');
+                        }
+                    };
+
                     onMounted(() => {
                         AdminMenu.init();
 
@@ -367,8 +410,8 @@
                     });
 
                     return {
-                        survey, themeList, isSaving,
-                        saveMaster, goList, goEntryForm, goPreview, applyTheme, resetTheme
+                        survey, themeList, surveyDomain, isSaving,
+                        saveMaster, goList, goEntryForm, goPreview, applyTheme, resetTheme, copyToClipboard
                     };
                 }
             });

@@ -152,3 +152,36 @@ VALUES
 ('Modern Skyscraper', 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=400&auto=format&fit=crop', 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop', '#e9ecef', '#212529', '#0d6efd', 'CENTER', 'N'),
 ('Calm Raindrop', 'https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?q=80&w=400&auto=format&fit=crop', 'https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?q=80&w=1974&auto=format&fit=crop', '#dee2e6', '#212529', '#198754', 'LEFT_1_3', 'N'),
 ('Elegant Walnut', 'https://images.unsplash.com/photo-1516233501032-2d03a129ef9b?q=80&w=400&auto=format&fit=crop', 'https://images.unsplash.com/photo-1516233501032-2d03a129ef9b?q=80&w=2070&auto=format&fit=crop', '#efebe9', '#3e2723', '#795548', 'CENTER', 'N');
+
+-- planfaidb.tb_results definition
+CREATE TABLE `tb_results` (
+  `RESULTS_SEQ` int NOT NULL AUTO_INCREMENT,
+  `RESULTS_ID` int NOT NULL,
+  `SURVEY_ID` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `SECTION_ID` int NOT NULL,
+  `QUESTION_ID` int NOT NULL,
+  `QUESTION_RESULT` text CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL COMMENT '답변 내용 (텍스트, 이미지 경로, 위경도 등)',
+  `OTHERANSWER_RESULT` varchar(200) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL COMMENT '기타 항목 입력 내용',
+  `REGISTER_NO` int DEFAULT NULL COMMENT '등록자 번호',
+  `REGIST_DT` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '등록 일시',
+  `UPDUSR_NO` int DEFAULT NULL COMMENT '수정자 번호',
+  `UPDT_DT` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정 일시',
+  PRIMARY KEY (`RESULTS_SEQ`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+-- planfaidb.tb_results_label definition
+CREATE TABLE `tb_results_label` (
+  `RESULTS_LABEL_SEQ` int NOT NULL AUTO_INCREMENT,
+  `RESULTS_ID` int NOT NULL,
+  `RESULTS_LABEL_ID` int NOT NULL,
+  `SURVEY_ID` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `SECTION_ID` int NOT NULL,
+  `QUESTION_ID` int NOT NULL,
+  `QUESTION_LABEL_ID` int NOT NULL,
+  `QUESTION_LABEL_RESULT` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL COMMENT '라벨 선택 여부 (Y등)',
+  `REGISTER_NO` int DEFAULT NULL COMMENT '등록자 번호',
+  `REGIST_DT` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '등록 일시',
+  `UPDUSR_NO` int DEFAULT NULL COMMENT '수정자 번호',
+  `UPDT_DT` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정 일시',
+  PRIMARY KEY (`RESULTS_LABEL_SEQ`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;

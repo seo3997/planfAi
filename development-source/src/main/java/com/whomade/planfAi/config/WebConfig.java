@@ -11,10 +11,22 @@ public class WebConfig implements WebMvcConfigurer {
     @Value("${file.board.resource-path}")
     private String boardResourcePath;
 
+    private final SurveyAccessInterceptor surveyAccessInterceptor;
+
+    public WebConfig(SurveyAccessInterceptor surveyAccessInterceptor) {
+        this.surveyAccessInterceptor = surveyAccessInterceptor;
+    }
+
     @Override
     public void addResourceHandlers(@SuppressWarnings("null") ResourceHandlerRegistry registry) {
         // board image/file serving
         registry.addResourceHandler("/common/img/board/**")
                 .addResourceLocations(boardResourcePath);
+    }
+
+    @Override
+    public void addInterceptors(org.springframework.web.servlet.config.annotation.InterceptorRegistry registry) {
+        registry.addInterceptor(surveyAccessInterceptor)
+                .addPathPatterns("/survey/v/**");
     }
 }

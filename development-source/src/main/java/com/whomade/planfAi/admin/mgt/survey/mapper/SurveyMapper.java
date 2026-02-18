@@ -90,4 +90,24 @@ public interface SurveyMapper {
     int insertQuestionLabel(TbQuestionLabel vo);
 
     int deleteQuestionLabelBySurveyId(String surveyId);
+
+    // --- Survey Results & Stats ---
+    int insertResults(com.whomade.planfAi.admin.mgt.survey.vo.TbResults vo);
+
+    int insertResultsLabel(com.whomade.planfAi.admin.mgt.survey.vo.TbResultsLabel vo);
+
+    /**
+     * 특정 질문의 라벨별 응답 통계 (객관식)
+     */
+    List<java.util.Map<String, Object>> selectLabelStats(String surveyId, int questionId);
+
+    /**
+     * 특정 질문의 주관식 응답 목록
+     */
+    List<com.whomade.planfAi.admin.mgt.survey.vo.TbResults> selectTextResults(String surveyId, int questionId);
+
+    /**
+     * 위치 정보 응답 목록 (지도 마커용)
+     */
+    List<java.util.Map<String, Object>> selectLocationResults(String surveyId, int questionId);
 }

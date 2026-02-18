@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>설문 참여 불가</title>
+    <link href="/common/lib/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/common/lib/css/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .error-card { max-width: 450px; width: 90%; text-align: center; padding: 40px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .icon-box { font-size: 4rem; color: #ffc107; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="error-card">
+        <div class="icon-box">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+        <h2 class="fw-bold mb-3">설문에 참여할 수 없습니다.</h2>
+        <p class="text-muted mb-4">해당 설문은 아직 시작되지 않았거나, 마감되었습니다.<br>관리자에게 문의해 주세요.</p>
+        <button class="btn btn-primary btn-lg w-100 rounded-pill" onclick="window.close()">창 닫기</button>
+    </div>
+</body>
+</html>
