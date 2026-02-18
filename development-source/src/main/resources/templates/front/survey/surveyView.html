@@ -65,14 +65,16 @@
         .question-title {
             font-weight: 700;
             margin-bottom: 12px;
-            font-size: 1.25rem;
+            font-size: 1.35rem;
             color: inherit;
+            letter-spacing: -0.02em;
         }
         .question-desc {
-            font-size: 0.95rem;
-            opacity: 0.7;
-            margin-bottom: 15px;
+            font-size: 1rem;
+            opacity: 0.6;
+            margin-bottom: 18px;
             color: inherit !important;
+            line-height: 1.6;
         }
         
         .form-check {
@@ -82,14 +84,45 @@
             border: 1px solid rgba(0,0,0,0.05);
             background-color: rgba(255,255,255,0.5);
             transition: all 0.2s ease;
+            position: relative;
         }
         .form-check:hover {
             background-color: rgba(255,255,255,0.8);
             border-color: rgba(0,0,0,0.1);
             transform: translateY(-1px);
         }
-        .form-check-input { cursor: pointer; }
-        .form-check-label { cursor: pointer; width: 100%; font-weight: 500; }
+        .form-check-input { 
+            cursor: pointer; 
+            width: 1.25em;
+            height: 1.25em;
+            margin-top: 0.125em;
+            margin-left: -2.2em; /* Adjusted for 3em padding */
+        }
+        .form-check-label { cursor: pointer; width: 100%; font-weight: 500; line-height: 1.5; }
+        
+        .other-input-group {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            gap: 8px;
+        }
+        .other-text-input {
+            border: none;
+            border-bottom: 2px solid #dee2e6;
+            background: transparent !important;
+            padding: 0px 4px;
+            flex-grow: 1;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+        .other-text-input:focus {
+            border-bottom-color: var(--accent-color, #2b4b8a);
+        }
+        .other-text-input:disabled {
+            border-bottom-color: #eee;
+            opacity: 0.5;
+        }
         
         /* Layouts */
         .layout-center { max-width: 800px; margin: 50px auto; border-radius: 24px; }
@@ -134,17 +167,17 @@
 
             <div :class="isSidebarLayout ? 'layout-main' : ''" :style="isSidebarLayout ? containerStyle : {}">
                 <form @submit.prevent="submitSurvey">
-                    <div v-for="(section, sIdx) in survey.sections" :key="sIdx" class="mb-5">
-                        <h3 v-if="section.sectionTitle" class="mb-4 pb-2 border-bottom fw-bold text-primary">{{ section.sectionTitle }}</h3>
+                    <div v-for="(section, sIdx) in survey.sections" :key="sIdx" class="mb-5 anim-fade-in" :style="{animationDelay: (sIdx * 0.1) + 's'}">
+                        <h3 v-if="section.sectionTitle" class="mb-4 pb-2 border-bottom fw-bold" :style="{color: survey.accentColor || '#0d6efd', borderBottom: '2px solid ' + (survey.accentColor || '#0d6efd' ) + '33'}">{{ section.sectionTitle }}</h3>
                         <div v-if="section.sectionHtmlTitle" v-html="section.sectionHtmlTitle" class="mb-3"></div>
 
-                        <div v-for="(question, qIdx) in section.questions" :key="qIdx" class="question-box card border-0 shadow-none bg-transparent">
+                        <div v-for="(question, qIdx) in section.questions" :key="qIdx" class="question-box card border-0 shadow-none bg-transparent mb-5">
                             <div class="card-body p-0">
-                                <div class="question-title">
-                                    <span v-if="survey.sections.length > 1">{{ sIdx + 1 }}-{{ qIdx + 1 }}. </span>
-                                    <span v-else>{{ qIdx + 1 }}. </span>
-                                    {{ question.questionText }}
-                                    <span v-if="question.required === 'Y'" class="text-danger">*</span>
+                                <div class="question-title d-flex align-items-baseline">
+                                    <span class="text-muted opacity-50 me-2 fs-5 fw-normal" v-if="survey.sections.length > 1">Q{{ sIdx + 1 }}-{{ qIdx + 1 }}.</span>
+                                    <span class="text-muted opacity-50 me-2 fs-5 fw-normal" v-else>Q{{ qIdx + 1 }}.</span>
+                                    <span>{{ question.questionText }}</span>
+                                    <span v-if="question.required === 'Y'" class="text-danger ms-1">*</span>
                                 </div>
                                 
                                 <div class="mt-2">
@@ -155,10 +188,16 @@
                                             <label class="form-check-label" :for="'l_'+label.questionLabelId">{{ label.questionLabel }}</label>
                                         </div>
                                         <!-- Other (Radio) -->
-                                        <div v-if="question.otherAnswer === 'Y'" class="form-check d-flex align-items-center gap-2">
-                                            <input class="form-check-input" type="radio" value="OTHER" v-model="answers[question.questionId]">
-                                            <label class="form-check-label w-auto">기타:</label>
-                                            <input type="text" class="form-control form-control-sm border-0 border-bottom bg-transparent" v-model="answers[question.questionId + '_other']" :disabled="answers[question.questionId] !== 'OTHER'">
+                                        <div v-if="question.otherAnswer === 'Y'" class="form-check d-flex align-items-center">
+                                            <div class="other-input-group">
+                                                <input class="form-check-input" type="radio" value="OTHER" v-model="answers[question.questionId]" :id="'q_'+question.questionId+'_other_radio'">
+                                                <label class="form-check-label w-auto mb-0" :for="'q_'+question.questionId+'_other_radio'" style="white-space: nowrap;">기타:</label>
+                                                <input type="text" class="other-text-input" 
+                                                       v-model="answers[question.questionId + '_other']" 
+                                                       :disabled="answers[question.questionId] !== 'OTHER'"
+                                                       placeholder="내용을 입력하세요"
+                                                       :style="{'--accent-color': survey.accentColor}">
+                                            </div>
                                         </div>
                                      </div>
 
@@ -169,10 +208,16 @@
                                             <label class="form-check-label" :for="'l_'+label.questionLabelId">{{ label.questionLabel }}</label>
                                         </div>
                                         <!-- Other (Checkbox) -->
-                                        <div v-if="question.otherAnswer === 'Y'" class="form-check d-flex align-items-center gap-2">
-                                            <input class="form-check-input" type="checkbox" value="OTHER" v-model="answers[question.questionId]">
-                                            <label class="form-check-label w-auto">기타:</label>
-                                            <input type="text" class="form-control form-control-sm border-0 border-bottom bg-transparent" v-model="answers[question.questionId + '_other']" :disabled="!answers[question.questionId].includes('OTHER')">
+                                        <div v-if="question.otherAnswer === 'Y'" class="form-check d-flex align-items-center">
+                                            <div class="other-input-group">
+                                                <input class="form-check-input" type="checkbox" value="OTHER" v-model="answers[question.questionId]" :id="'q_'+question.questionId+'_other_check'">
+                                                <label class="form-check-label w-auto mb-0" :for="'q_'+question.questionId+'_other_check'" style="white-space: nowrap;">기타:</label>
+                                                <input type="text" class="other-text-input" 
+                                                       v-model="answers[question.questionId + '_other']" 
+                                                       :disabled="!answers[question.questionId].includes('OTHER')"
+                                                       placeholder="내용을 입력하세요"
+                                                       :style="{'--accent-color': survey.accentColor}">
+                                            </div>
                                         </div>
                                      </div>
 
