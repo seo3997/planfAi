@@ -19,7 +19,7 @@
                  <button type="button" class="btn btn-outline-secondary" @click="goPreview">
                     <i class="bi bi-eye me-1"></i> 미리보기
                 </button>
-                <button type="button" class="btn btn-primary" @click="saveMaster" :disabled="isSaving || survey.opened === 'OPENED'">
+                <button type="button" class="btn btn-primary" @click="saveMaster">
                     <span v-if="isSaving" class="spinner-border spinner-border-sm me-1"></span>
                     저장
                 </button>
@@ -89,7 +89,7 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">마감일</label>
-                                <input type="date" class="form-control" v-model="survey.closed" :disabled="survey.opened === 'OPENED'">
+                                <input type="date" class="form-control" v-model="survey.closed">
                             </div>
                         </div>
 
@@ -136,17 +136,17 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label">결과 조회 암호</label>
-                                <input type="text" class="form-control" v-model="survey.resultsPassword" placeholder="입력 시 결과 조회 제한" :disabled="survey.opened === 'OPENED'">
+                                <input type="text" class="form-control" v-model="survey.resultsPassword" placeholder="입력 시 결과 조회 제한">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">참여 암호</label>
-                                <input type="text" class="form-control" v-model="survey.entryPassword" placeholder="입력 시 참여 제한" :disabled="survey.opened === 'OPENED'">
+                                <input type="text" class="form-control" v-model="survey.entryPassword" placeholder="입력 시 참여 제한">
                             </div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-12">
                                 <label class="form-label">IP 접근 제한</label>
-                                <input type="text" class="form-control" v-model="survey.ip" placeholder="허용 IP 목록 (콤마 구분)" :disabled="survey.opened === 'OPENED'">
+                                <input type="text" class="form-control" v-model="survey.ip" placeholder="허용 IP 목록 (콤마 구분)">
                             </div>
                         </div>
                         <div class="row mb-3">
