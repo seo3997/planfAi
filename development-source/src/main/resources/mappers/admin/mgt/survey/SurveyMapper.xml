@@ -356,4 +356,23 @@
         WHERE SURVEY_ID = #{surveyId} AND RESULTS_ID = #{resultsId}
     </delete>
 
+    <delete id="deleteResultsBySurveyId">
+        DELETE FROM tb_results WHERE SURVEY_ID = #{surveyId}
+    </delete>
+
+    <delete id="deleteResultsLabelBySurveyId">
+        DELETE FROM tb_results_label WHERE SURVEY_ID = #{surveyId}
+    </delete>
+
+    <select id="countRespondent" resultType="int">
+        SELECT COUNT(DISTINCT RESULTS_ID) FROM tb_results WHERE SURVEY_ID = #{surveyId}
+    </select>
+
+    <update id="updateSurveyStatus">
+        UPDATE tb_survey 
+        SET OPENED = #{status},
+            UPDT_DT = NOW()
+        WHERE SURVEY_ID = #{surveyId}
+    </update>
+
 </mapper>

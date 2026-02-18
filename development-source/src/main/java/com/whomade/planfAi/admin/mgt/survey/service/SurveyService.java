@@ -548,4 +548,27 @@ public class SurveyService {
         }
         return String.valueOf(lid);
     }
+
+    /**
+     * 설문 초기화 및 DRAFT 전환 (9-2 정책 대응)
+     */
+    @Transactional
+    public void resetSurveyForEdit(String surveyId) {
+        // 1. 응답 데이터 삭제
+        surveyMapper.deleteResultsLabelBySurveyId(surveyId);
+        surveyMapper.deleteResultsBySurveyId(surveyId);
+
+        // 2. 상태를 DRAFT로 변경
+        Map<String, Object> params = new HashMap<>();
+        params.put("surveyId", surveyId);
+        params.put("status", "DRAFT");
+        surveyMapper.updateSurveyStatus(params);
+    }
+
+    /**
+     * 설문 응답 건수 조회
+     */
+    public int getResponseCount(String surveyId) {
+        return surveyMapper.countRespondent(surveyId);
+    }
 }

@@ -283,4 +283,32 @@ public class SurveyController {
         response.getOutputStream().write(csvData.getBytes(java.nio.charset.StandardCharsets.UTF_8));
         response.getOutputStream().flush();
     }
+
+    /**
+     * 설문 응답 건수 조회 (API)
+     */
+    @GetMapping("/getResponseCount.do")
+    @org.springframework.web.bind.annotation.ResponseBody
+    public int getResponseCount(@org.springframework.web.bind.annotation.RequestParam String surveyId) {
+        return surveyService.getResponseCount(surveyId);
+    }
+
+    /**
+     * 설문 초기화 및 DRAFT 전환 (API)
+     */
+    @org.springframework.web.bind.annotation.PostMapping("/resetSurvey.do")
+    @org.springframework.web.bind.annotation.ResponseBody
+    public Map<String, Object> resetSurvey(@org.springframework.web.bind.annotation.RequestParam String surveyId) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            surveyService.resetSurveyForEdit(surveyId);
+            result.put("status", "success");
+            result.put("message", "설문이 초기화되어 수정 가능 상태(DRAFT)로 변경되었습니다.");
+        } catch (Exception e) {
+            log.error("Survey Reset Error", e);
+            result.put("status", "error");
+            result.put("message", "초기화 중 오류가 발생했습니다.");
+        }
+        return result;
+    }
 }

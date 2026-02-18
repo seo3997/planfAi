@@ -26,7 +26,11 @@
                  <button type="button" class="btn btn-outline-secondary" @click="goPreview">
                     <i class="bi bi-eye me-1"></i> 미리보기
                 </button>
-                <button type="button" class="btn btn-primary" @click="saveSurvey" :disabled="isSaving || survey.opened === 'OPENED'">
+                <button v-if="survey.opened === 'OPENED' || survey.opened === 'CLOSED'" 
+                        type="button" class="btn btn-warning" @click="requestUnlock">
+                    <i class="bi bi-unlock me-1"></i> 문항 수정 요청
+                </button>
+                <button v-else type="button" class="btn btn-primary" @click="saveSurvey" :disabled="isSaving">
                     <span v-if="isSaving" class="spinner-border spinner-border-sm me-1"></span>
                     저장
                 </button>
@@ -53,6 +57,16 @@
         </ul>
 
         <div class="mgmt-card border-top-0 pt-0">
+            <!-- Status Banner -->
+            <div v-if="survey.opened === 'OPENED' || survey.opened === 'CLOSED'" 
+                 class="alert alert-warning d-flex align-items-center mb-4 shadow-sm border-0">
+                <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+                <div>
+                    <strong class="d-block">현재 문항 수정이 제한된 상태입니다 ({{ survey.opened === 'OPENED' ? '수집중' : '마감됨' }})</strong>
+                    <span class="small">문항을 수정하려면 기존 응답 데이터를 삭제하고 '작성중' 상태로 전환해야 합니다. 상단의 '문항 수정 요청' 버튼을 클릭하세요.</span>
+                </div>
+            </div>
+
             <!-- Form Start -->
             <form @submit.prevent="saveSurvey">
                 
@@ -364,12 +378,39 @@
                         window.open(url, '_blank', 'width=1024,height=800,scrollbars=yes');
                     };
 
+                    const requestUnlock = async () => {
+                        try {
+                            const countRes = await axios.get('/mgt/survey/getResponseCount.do', { params: { surveyId: survey.value.surveyId } });
+                            const count = countRes.data;
+
+                            let confirmMsg = "";
+                            if (count > 0) {
+                                confirmMsg = `이미 수집된 응답 데이터가 ${count}건 존재하여 문항을 수정할 수 없습니다.\n\n문항을 수정하시려면 기존 응답을 모두 삭제하고 작성중 상태로 돌아가야 합니다.\n\n정말로 모든 데이터를 삭제하고 수정하시겠습니까?`;
+                            } else {
+                                confirmMsg = "설문 상태를 '작성중'으로 변경하여 문항을 수정하시겠습니까?";
+                            }
+
+                            if (confirm(confirmMsg)) {
+                                const resetRes = await axios.post('/mgt/survey/resetSurvey.do?surveyId=' + survey.value.surveyId);
+                                if (resetRes.data.status === 'success') {
+                                    alert(resetRes.data.message);
+                                    window.location.reload();
+                                } else {
+                                    alert(resetRes.data.message);
+                                }
+                            }
+                        } catch (e) {
+                            console.error('Unlock error:', e);
+                            alert('상태 변경 중 오류가 발생했습니다.');
+                        }
+                    };
+
                     onMounted(() => {
                         AdminMenu.init();
                     });
 
                     return {
-                        survey, isSaving,
+                        survey, isSaving, requestUnlock,
                         addSection, removeSection,
                         addQuestion, removeQuestion,
                         addLabel, removeLabel,

@@ -34,10 +34,9 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" :class="survey.opened === 'OPENED' ? 'disabled text-secondary opacity-50' : 'text-muted'" 
-                   :href="survey.opened === 'OPENED' ? 'javascript:void(0)' : '/mgt/survey/editEntryForm.do?surveyId=' + survey.surveyId">
+                <a class="nav-link text-muted" 
+                   :href="'/mgt/survey/editEntryForm.do?surveyId=' + survey.surveyId">
                     질문 (Questions)
-                    <i v-if="survey.opened === 'OPENED'" class="bi bi-lock-fill small ms-1"></i>
                 </a>
             </li>
              <li class="nav-item">
@@ -387,10 +386,26 @@
                         }
                     };
 
+                    const initialOpened = survey.value.opened;
+
                     const saveMaster = async () => {
                         if (!survey.value.surveyTitle) {
                             alert('설문 제목을 입력해주세요.');
                             return;
+                        }
+
+                        // 9-2 정책 대응: 설문중 -> 작성중 직접 변경 차단
+                        if (initialOpened === 'OPENED' && survey.value.opened === 'DRAFT') {
+                            try {
+                                const countRes = await axios.get('/mgt/survey/getResponseCount.do', { params: { surveyId: survey.value.surveyId } });
+                                if (countRes.data > 0) {
+                                    alert(`이미 수집된 응답 데이터가 ${countRes.data}건 존재하여 '작성중' 상태로 직접 변경할 수 없습니다.\n\n문항을 수정하시려면 '질문' 탭에서 '문항 수정 요청'을 통해 데이터를 삭제하고 진행해주세요.`);
+                                    survey.value.opened = 'OPENED'; // 원복
+                                    return;
+                                }
+                            } catch (e) {
+                                console.error('Count check error:', e);
+                            }
                         }
 
                         isSaving.value = true;

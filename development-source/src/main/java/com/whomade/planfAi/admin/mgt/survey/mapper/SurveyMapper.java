@@ -147,4 +147,24 @@ public interface SurveyMapper {
          * 특정 응답(ResultsId)의 라벨 선택 데이터 삭제
          */
         int deleteResultsLabelByResultsId(String surveyId, int resultsId);
+
+        /**
+         * 설문의 모든 응답 삭제
+         */
+        int deleteResultsBySurveyId(String surveyId);
+
+        /**
+         * 설문의 모든 라벨 응답 삭제
+         */
+        int deleteResultsLabelBySurveyId(String surveyId);
+
+        /**
+         * 설문 응답 건수 조회
+         */
+        int countRespondent(String surveyId);
+
+        /**
+         * 설문 상태 업데이트
+         */
+        int updateSurveyStatus(java.util.Map<String, Object> params);
 }
