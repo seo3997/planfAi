@@ -11,7 +11,15 @@
     </th:block>
 </head>
 <body>
-    <div id="admin-survey-stats">
+    <div id="admin-survey-stats" class="position-relative">
+        <!-- Hover Preview Image -->
+        <div v-if="hoverImage" 
+             class="position-fixed top-50 start-50 translate-middle shadow-lg border rounded p-2 bg-white anime-fade-in" 
+             style="z-index: 10000; max-width: 85vw; max-height: 85vh; pointer-events: none;">
+            <div class="text-center p-2 small text-muted border-bottom mb-2">프리뷰 (Preview)</div>
+            <img :src="hoverImage" class="img-fluid rounded" style="max-height: 75vh;">
+        </div>
+
         <!-- Workspace Header -->
         <div class="d-flex justify-content-between align-items-center mb-3 mt-3">
             <div class="d-flex align-items-center gap-3">
@@ -155,19 +163,40 @@
                                 </div>
                             </div>
 
-                            <!-- Image Based -->
+                            <!-- Image Based (List View with Hover) -->
                             <div v-else-if="question.questionType === 'inputImage'">
-                                 <div class="row g-3">
-                                    <div v-for="(img, iIdx) in getTextResponses(question.questionId)" :key="iIdx" class="col-6 col-md-3">
-                                        <div class="img-thumb-card border rounded overflow-hidden shadow-sm">
-                                            <a :href="img.questionResult" target="_blank">
-                                                <img :src="img.questionResult" class="img-fluid w-100" style="height: 120px; object-fit: cover;">
-                                            </a>
-                                            <div class="p-2 bg-light text-center">
-                                                <span class="small text-muted">{{ formatDate(img.registDt) }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <div class="table-responsive border rounded bg-white shadow-sm overflow-hidden" style="max-height: 480px;">
+                                    <table class="table table-hover align-middle m-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th style="width: 60px;" class="text-center">No.</th>
+                                                <th style="width: 80px;">이미지</th>
+                                                <th>응답 정보 (파일명/경로)</th>
+                                                <th class="text-end pe-4" style="width: 150px;">등록일</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="(img, iIdx) in getTextResponses(question.questionId)" 
+                                                :key="iIdx"
+                                                @mouseenter="hoverImage = img.questionResult"
+                                                @mouseleave="hoverImage = null">
+                                                <td class="text-center text-muted small">{{ iIdx + 1 }}</td>
+                                                <td>
+                                                    <img :src="img.questionResult" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover; cursor: zoom-in;">
+                                                </td>
+                                                <td class="small text-break">
+                                                    <a :href="img.questionResult" target="_blank" class="text-decoration-none text-primary">{{ img.questionResult }}</a>
+                                                </td>
+                                                <td class="text-end text-muted small pe-4">{{ formatDate(img.registDt) }}</td>
+                                            </tr>
+                                            <tr v-if="!getTextResponses(question.questionId).length">
+                                                <td colspan="4" class="text-center py-5 text-muted">
+                                                    <i class="bi bi-image fs-1 opacity-25 d-block mb-3"></i>
+                                                    등록된 이미지가 없습니다.
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -287,6 +316,7 @@
             setup() {
                 const survey = ref(serverSurvey);
                 const stats = ref(serverStats);
+                const hoverImage = ref(null);
                 const totalResponses = ref(0);
                 const viewMode = ref('summary'); // 'summary' or 'individual'
                 
@@ -435,6 +465,7 @@
                                         ...(q.otherAnswer === 'Y' ? ['기타'] : [])
                                     ],
                                     datasets: [{
+                                        label: '응답 수',
                                         data: [
                                             ...(q.labels || []).map(l => getLabelCount(q.questionId, l.questionLabelId)),
                                             ...(q.otherAnswer === 'Y' ? [getOtherCount(q.questionId)] : [])
@@ -444,7 +475,12 @@
                                 },
                                 options: {
                                     responsive: true, maintainAspectRatio: false,
-                                    plugins: { legend: { position: 'right' } },
+                                    plugins: { 
+                                        legend: { 
+                                            display: q.questionType === 'inputRadio', 
+                                            position: 'right' 
+                                        } 
+                                    },
                                     indexAxis: q.questionType === 'inputCheckbox' ? 'y' : 'x'
                                 }
                             });
@@ -473,7 +509,7 @@
 
                 return {
                     survey, stats, totalResponses, viewMode, getTypeName, getLabelCount, getLabelPercent,
-                    getOtherCount, getOtherTexts,
+                    getOtherCount, getOtherTexts, hoverImage,
                     getTextResponses, getLocationResponses, formatDate,
                     goMaster, downloadExcel, focusMap,
                     respondentList, selectedResId, individualAnswers, switchToSummary, switchToIndividual, fetchIndividualDetail, isItemSelected, deleteResponse
