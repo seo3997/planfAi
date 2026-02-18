@@ -282,6 +282,27 @@
         ORDER BY L.QUESTION_LABEL_ID ASC
     </select>
 
+    <!-- 통계: 객관식 기타 응답 수 -->
+    <select id="countOtherResults" resultType="int">
+        SELECT COUNT(*) 
+        FROM tb_results 
+        WHERE SURVEY_ID = #{surveyId} 
+          AND QUESTION_ID = #{questionId} 
+          AND QUESTION_RESULT = 'OTHER'
+    </select>
+
+    <!-- 통계: 객관식 기타 응답 텍스트 목록 -->
+    <select id="selectOtherTextResults" resultType="com.whomade.planfAi.admin.mgt.survey.vo.TbResults">
+        SELECT * 
+        FROM tb_results 
+        WHERE SURVEY_ID = #{surveyId} 
+          AND QUESTION_ID = #{questionId} 
+          AND QUESTION_RESULT = 'OTHER'
+          AND OTHERANSWER_RESULT IS NOT NULL 
+          AND OTHERANSWER_RESULT != ''
+        ORDER BY REGIST_DT DESC
+    </select>
+    
     <!-- 통계: 주관식 응답 목록 -->
     <select id="selectTextResults" parameterType="map" resultType="com.whomade.planfAi.admin.mgt.survey.vo.TbResults">
         SELECT * FROM tb_results

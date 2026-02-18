@@ -94,10 +94,28 @@
                                             </div>
                                         </li>
                                         <li v-if="question.otherAnswer === 'Y'" class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
-                                            <span class="text-info">기타 (입력값)</span>
-                                            <span class="fw-bold">{{ getOtherCount(question.questionId) }}명</span>
+                                            <span class="text-info cursor-pointer" :title="getOtherCount(question.questionId) > 0 ? '기타 답변 보기' : ''" @click="showOtherDetails(question.questionId)">
+                                                기타 (입력값) <i v-if="getOtherCount(question.questionId) > 0" class="bi bi-chat-dots ms-1"></i>
+                                            </span>
+                                            <div class="text-end">
+                                                <span class="fw-bold">{{ getOtherCount(question.questionId) }}명</span>
+                                                <span class="text-muted small ms-2">({{ getLabelPercent(question.questionId, 'OTHER') }}%)</span>
+                                            </div>
                                         </li>
                                     </ul>
+                                    <!-- 기타 답변 리스트 (조건부 노출) -->
+                                    <div v-if="selectedOtherQId === question.questionId" class="mt-3 p-3 bg-light rounded shadow-sm anim-fade-in">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6 class="small fw-bold m-0">기타 답변 내용</h6>
+                                            <button type="button" class="btn-close small" style="padding: 0.25rem 0.25rem;" @click="selectedOtherQId = null"></button>
+                                        </div>
+                                        <div class="overflow-auto" style="max-height: 150px;">
+                                            <div v-for="(item, idx) in getOtherTexts(question.questionId)" :key="idx" class="small py-1 border-bottom last-border-0">
+                                                - {{ item.otherAnswerResult }}
+                                            </div>
+                                            <div v-if="!getOtherTexts(question.questionId).length" class="small text-muted italic">입력된 내용이 없습니다.</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -223,6 +241,14 @@
                                                         <i class="bi" :class="isItemSelected(question.questionId, label.questionLabelId) ? 'bi-check-circle-fill text-success' : 'bi-circle text-muted'"></i>
                                                         <span class="ms-2" :class="{'fw-bold text-dark': isItemSelected(question.questionId, label.questionLabelId)}">{{ label.questionLabel }}</span>
                                                     </div>
+                                                    <!-- Other Option Display -->
+                                                    <div v-if="question.otherAnswer === 'Y'" class="mb-1">
+                                                        <i class="bi" :class="isItemSelected(question.questionId, 'OTHER') ? 'bi-check-circle-fill text-success' : 'bi-circle text-muted'"></i>
+                                                        <span class="ms-2" :class="{'fw-bold text-dark': isItemSelected(question.questionId, 'OTHER')}">
+                                                            기타: <span v-if="isItemSelected(question.questionId, 'OTHER')" class="text-primary">{{ individualAnswers[question.questionId + '_other'] }}</span>
+                                                            <span v-else class="text-muted small italic">(미선택)</span>
+                                                        </span>
+                                                    </div>
                                                 </div>
                                                 <!-- Text -->
                                                 <div v-else-if="['inputTextline', 'inputTextarea'].includes(question.questionType)" class="bg-light p-3 rounded-3 text-break">
@@ -277,6 +303,7 @@
                 const respondentList = ref([]);
                 const selectedResId = ref(null);
                 const individualAnswers = ref({});
+                const selectedOtherQId = ref(null);
                 
                 const mapInstances = {};
                 const individualMapInstances = {};
@@ -305,9 +332,14 @@
                 const getLabelPercent = (qId, lId) => {
                     const qStats = stats.value[qId] || {};
                     const total = Object.values(qStats).reduce((a, b) => a + (typeof b === 'number' ? b : 0), 0);
-                    return total === 0 ? 0 : ((getLabelCount(qId, lId) / total) * 100).toFixed(1);
+                    return total === 0 ? 0 : (( ( (lId === 'OTHER') ? getOtherCount(qId) : getLabelCount(qId, lId) ) / total) * 100).toFixed(1);
                 };
                 const getOtherCount = (qId) => (stats.value[qId] && stats.value[qId]['OTHER']) || 0;
+                const getOtherTexts = (qId) => stats.value[qId + '_other_texts'] || [];
+                const showOtherDetails = (qId) => {
+                    if (selectedOtherQId.value === qId) selectedOtherQId.value = null;
+                    else if (getOtherCount(qId) > 0) selectedOtherQId.value = qId;
+                };
                 const getTextResponses = (qId) => (stats.value[qId] && Array.isArray(stats.value[qId])) ? stats.value[qId] : [];
                 const getLocationResponses = (qId) => (stats.value[qId] && Array.isArray(stats.value[qId])) ? stats.value[qId] : [];
                 const formatDate = (dateStr) => dateStr ? dateStr.substring(0, 10) : '-';
@@ -372,10 +404,16 @@
                             new Chart(ctx, {
                                 type: q.questionType === 'inputRadio' ? 'pie' : 'bar',
                                 data: {
-                                    labels: q.labels.map(l => l.questionLabel),
+                                    labels: [
+                                        ...q.labels.map(l => l.questionLabel),
+                                        ...(q.otherAnswer === 'Y' ? ['기타'] : [])
+                                    ],
                                     datasets: [{
-                                        data: q.labels.map(l => getLabelCount(q.questionId, l.questionLabelId)),
-                                        backgroundColor: ['#49a7b0', '#2b4b8a', '#ffc107', '#fd7e14', '#198754', '#0dcaf0']
+                                        data: [
+                                            ...q.labels.map(l => getLabelCount(q.questionId, l.questionLabelId)),
+                                            ...(q.otherAnswer === 'Y' ? [getOtherCount(q.questionId)] : [])
+                                        ],
+                                        backgroundColor: ['#49a7b0', '#2b4b8a', '#ffc107', '#fd7e14', '#198754', '#0dcaf0', '#adb5bd']
                                     }]
                                 },
                                 options: {
@@ -406,7 +444,8 @@
 
                 return {
                     survey, stats, totalResponses, viewMode, getTypeName, getLabelCount, getLabelPercent,
-                    getOtherCount, getTextResponses, getLocationResponses, formatDate,
+                    getOtherCount, getOtherTexts, selectedOtherQId, showOtherDetails,
+                    getTextResponses, getLocationResponses, formatDate,
                     goMaster, downloadExcel, focusMap,
                     respondentList, selectedResId, individualAnswers, switchToIndividual, fetchIndividualDetail, isItemSelected
                 };

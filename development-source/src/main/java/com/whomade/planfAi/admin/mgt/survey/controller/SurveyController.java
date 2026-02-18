@@ -213,7 +213,7 @@ public class SurveyController {
         }
 
         // 전체 통계 데이터 조회
-        Map<Integer, Object> stats = surveyService.getQuestionStats(searchVO.getSurveyId());
+        Map<String, Object> stats = surveyService.getQuestionStats(searchVO.getSurveyId());
 
         model.addAttribute("survey", surveyForm);
         model.addAttribute("stats", stats);
@@ -236,7 +236,7 @@ public class SurveyController {
      */
     @GetMapping("/getRespondentDetail.do")
     @org.springframework.web.bind.annotation.ResponseBody
-    public Map<Integer, Object> getRespondentDetail(
+    public Map<String, Object> getRespondentDetail(
             @org.springframework.web.bind.annotation.RequestParam String surveyId,
             @org.springframework.web.bind.annotation.RequestParam String resultsId) {
         return surveyService.getRespondentDetail(surveyId, resultsId);

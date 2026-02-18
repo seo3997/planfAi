@@ -277,8 +277,8 @@ public class SurveyService {
     /**
      * 설문 전체 통계 데이터 조회
      */
-    public Map<Integer, Object> getQuestionStats(String surveyId) {
-        Map<Integer, Object> allStats = new HashMap<>();
+    public Map<String, Object> getQuestionStats(String surveyId) {
+        Map<String, Object> allStats = new HashMap<>();
 
         // 1. 설문 구조 가져오기
         TbSurvey searchVO = new TbSurvey();
@@ -320,7 +320,19 @@ public class SurveyService {
                                     countMap.put(labelIdStr, count);
                                 }
                             }
-                            allStats.put(qId, countMap);
+
+                            // '기타' 응답 카운트 추가
+                            if ("Y".equals(question.getOtherAnswer())) {
+                                int otherCount = surveyMapper.countOtherResults(surveyId, qId);
+                                countMap.put("OTHER", otherCount);
+
+                                // 기타 텍스트 응답 목록도 별도 키로 저장 (필요시)
+                                List<com.whomade.planfAi.admin.mgt.survey.vo.TbResults> otherTexts = surveyMapper
+                                        .selectOtherTextResults(surveyId, qId);
+                                allStats.put(qId + "_other_texts", otherTexts);
+                            }
+
+                            allStats.put(String.valueOf(qId), countMap);
                         } else if ("inputLocation".equals(type)) {
                             // 위경도 리스트
                             List<Map<String, Object>> locResults = surveyMapper.selectLocationResults(surveyId, qId);
@@ -334,10 +346,10 @@ public class SurveyService {
                                 } catch (Exception e) {
                                 }
                             }
-                            allStats.put(qId, formattedLocs);
+                            allStats.put(String.valueOf(qId), formattedLocs);
                         } else {
                             // 텍스트/이미지 리스트
-                            allStats.put(qId, surveyMapper.selectTextResults(surveyId, qId));
+                            allStats.put(String.valueOf(qId), surveyMapper.selectTextResults(surveyId, qId));
                         }
                     }
                 }
@@ -373,8 +385,8 @@ public class SurveyService {
     /**
      * 특정 응답자의 상세 답변 조회
      */
-    public Map<Integer, Object> getRespondentDetail(String surveyId, String resultsId) {
-        Map<Integer, Object> detail = new HashMap<>();
+    public Map<String, Object> getRespondentDetail(String surveyId, String resultsId) {
+        Map<String, Object> detail = new HashMap<>();
 
         Map<String, Object> params = new HashMap<>();
         params.put("surveyId", surveyId);
@@ -383,26 +395,31 @@ public class SurveyService {
         // 1. 일반 응답 (주관식, 위치, 이미지 등)
         List<com.whomade.planfAi.admin.mgt.survey.vo.TbResults> resList = surveyMapper.selectRespondentDetail(params);
         for (com.whomade.planfAi.admin.mgt.survey.vo.TbResults res : resList) {
-            detail.put(res.getQuestionId(), res.getQuestionResult());
+            String qId = String.valueOf(res.getQuestionId());
+            detail.put(qId, res.getQuestionResult());
+
+            // '기타' 입력값 처리
+            if ("OTHER".equals(res.getQuestionResult())) {
+                detail.put(qId + "_other", res.getOtherAnswerResult());
+            }
         }
 
         // 2. 객관식 응답 (라벨 아이디들)
         List<com.whomade.planfAi.admin.mgt.survey.vo.TbResultsLabel> labelList = surveyMapper
                 .selectRespondentLabelDetail(params);
         for (com.whomade.planfAi.admin.mgt.survey.vo.TbResultsLabel rl : labelList) {
-            int qId = rl.getQuestionId();
-            if (!detail.containsKey(qId)) {
-                detail.put(qId, new ArrayList<Integer>());
-            }
-            // If it was already a String (from step 1), it shouldn't be, but let's be safe
-            Object val = detail.get(qId);
-            if (val instanceof List) {
-                ((List<Integer>) val).add(rl.getQuestionLabelId());
+            String qId = String.valueOf(rl.getQuestionId());
+            Object existing = detail.get(qId);
+            List<Object> list;
+            if (existing instanceof List) {
+                list = (List<Object>) existing;
             } else {
-                List<Integer> newList = new ArrayList<>();
-                newList.add(rl.getQuestionLabelId());
-                detail.put(qId, newList);
+                list = new ArrayList<>();
+                if (existing != null)
+                    list.add(existing);
+                detail.put(qId, list);
             }
+            list.add(rl.getQuestionLabelId());
         }
 
         return detail;
