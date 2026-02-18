@@ -47,113 +47,208 @@
             </li>
         </ul>
 
-        <div class="stats-container">
-            <!-- Question Stats Iteration -->
-            <div v-for="(section, sIdx) in survey.sections" :key="sIdx" class="mb-5">
-                <h5 class="fw-bold mb-4 text-secondary border-start border-4 border-primary ps-3">{{ section.sectionTitle || '섹션 ' + (sIdx+1) }}</h5>
-                
-                <div v-for="(question, qIdx) in section.questions" :key="qIdx" class="card mb-4 border-0 shadow-sm overflow-hidden">
-                    <div class="card-header bg-white border-bottom-0 pt-4 px-4">
-                        <h6 class="fw-bold mb-1">
-                            <span class="text-primary me-2">Q{{ qIdx + 1 }}.</span>
-                            {{ question.questionText }}
-                        </h6>
-                        <span class="badge bg-light text-dark">{{ getTypeName(question.questionType) }}</span>
-                    </div>
+        <!-- View Mode Switcher -->
+        <div class="d-flex justify-content-center mb-4">
+            <div class="btn-group p-1 bg-light rounded-pill shadow-sm">
+                <button type="button" class="btn rounded-pill px-4" :class="viewMode === 'summary' ? 'btn-primary shadow' : 'btn-light'" @click="viewMode = 'summary'">
+                    <i class="bi bi-pie-chart-fill me-1"></i> 통계 요약
+                </button>
+                <button type="button" class="btn rounded-pill px-4" :class="viewMode === 'individual' ? 'btn-primary shadow' : 'btn-light'" @click="switchToIndividual">
+                    <i class="bi bi-person-lines-fill me-1"></i> 개별 응답 확인
+                </button>
+            </div>
+        </div>
+
+        <div class="stats-container pb-5">
+            <!-- 1. SUMMARY VIEW -->
+            <div v-if="viewMode === 'summary'" class="anim-fade-in">
+                <div v-for="(section, sIdx) in survey.sections" :key="sIdx" class="mb-5">
+                    <h5 class="fw-bold mb-4 text-secondary border-start border-4 border-primary ps-3">{{ section.sectionTitle || '섹션 ' + (sIdx+1) }}</h5>
                     
-                    <div class="card-body p-4">
-                        <!-- Label Based (Radio/Checkbox) -->
-                        <div v-if="['inputRadio', 'inputCheckbox'].includes(question.questionType)" class="row align-items-center">
-                            <div class="col-md-5">
-                                <div class="chart-wrapper" style="height: 300px;">
-                                    <canvas :id="'chart-' + question.questionId"></canvas>
+                    <div v-for="(question, qIdx) in section.questions" :key="qIdx" class="card mb-4 border-0 shadow-sm overflow-hidden">
+                        <div class="card-header bg-white border-bottom-0 pt-4 px-4">
+                            <h6 class="fw-bold mb-1">
+                                <span class="text-primary me-2">Q{{ qIdx + 1 }}.</span>
+                                {{ question.questionText }}
+                            </h6>
+                            <span class="badge bg-light text-dark small">{{ getTypeName(question.questionType) }}</span>
+                        </div>
+                        
+                        <div class="card-body p-4">
+                            <!-- Label Based (Radio/Checkbox) -->
+                            <div v-if="['inputRadio', 'inputCheckbox'].includes(question.questionType)" class="row align-items-center">
+                                <div class="col-md-5">
+                                    <div class="chart-wrapper" style="height: 300px;">
+                                        <canvas :id="'chart-' + question.questionId"></canvas>
+                                    </div>
+                                </div>
+                                <div class="col-md-7">
+                                    <ul class="list-group list-group-flush">
+                                        <li v-for="label in question.labels" :key="label.questionLabelId" class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                                            <span>{{ label.questionLabel }}</span>
+                                            <div class="text-end">
+                                                <span class="fw-bold">{{ getLabelCount(question.questionId, label.questionLabelId) }}명</span>
+                                                <span class="text-muted small ms-2">({{ getLabelPercent(question.questionId, label.questionLabelId) }}%)</span>
+                                            </div>
+                                        </li>
+                                        <li v-if="question.otherAnswer === 'Y'" class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                                            <span class="text-info">기타 (입력값)</span>
+                                            <span class="fw-bold">{{ getOtherCount(question.questionId) }}명</span>
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
-                            <div class="col-md-7">
-                                <ul class="list-group list-group-flush">
-                                    <li v-for="label in question.labels" :key="label.questionLabelId" class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
-                                        <span>{{ label.questionLabel }}</span>
-                                        <div class="text-end">
-                                            <span class="fw-bold">{{ getLabelCount(question.questionId, label.questionLabelId) }}명</span>
-                                            <span class="text-muted small ms-2">({{ getLabelPercent(question.questionId, label.questionLabelId) }}%)</span>
-                                        </div>
-                                    </li>
-                                    <!-- Other Answer Stats -->
-                                    <li v-if="question.otherAnswer === 'Y'" class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
-                                        <span class="text-info">기타 (입력값)</span>
-                                        <span class="fw-bold">{{ getOtherCount(question.questionId) }}명</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
 
-                        <!-- Text Based (Line/Area) -->
-                        <div v-else-if="['inputTextline', 'inputTextarea'].includes(question.questionType)">
-                            <div class="table-responsive" style="max-height: 300px;">
-                                <table class="table table-hover align-middle">
-                                    <thead class="table-light sticky-top">
-                                        <tr>
-                                            <th>#</th>
-                                            <th>답변 내용</th>
-                                            <th class="text-end">작성일</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="(res, rIdx) in getTextResponses(question.questionId)" :key="rIdx">
-                                            <td class="text-muted small">{{ rIdx + 1 }}</td>
-                                            <td class="text-wrap">{{ res.questionResult }}</td>
-                                            <td class="text-end text-muted small">{{ formatDate(res.registDt) }}</td>
-                                        </tr>
-                                        <tr v-if="!getTextResponses(question.questionId).length">
-                                            <td colspan="3" class="text-center py-4 text-muted">등록된 응답이 없습니다.</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <!-- Location Based -->
-                        <div v-else-if="question.questionType === 'inputLocation'">
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <div :id="'map-' + question.questionId" class="rounded border" style="height: 400px; z-index: 1;"></div>
-                                </div>
-                                <div class="col-md-4">
-                                     <div class="table-responsive" style="max-height: 400px;">
-                                        <table class="table table-sm table-hover">
-                                            <thead class="table-light">
-                                                <tr><th>위도/경도</th></tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr v-for="(loc, lIdx) in getLocationResponses(question.questionId)" :key="lIdx" class="cursor-pointer" @click="focusMap(question.questionId, loc)">
-                                                    <td class="small">{{ loc.lat.toFixed(4) }}, {{ loc.lng.toFixed(4) }}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                     </div>
+                            <!-- Text Based -->
+                            <div v-else-if="['inputTextline', 'inputTextarea'].includes(question.questionType)">
+                                <div class="table-responsive" style="max-height: 300px;">
+                                    <table class="table table-hover align-middle">
+                                        <thead class="table-light sticky-top">
+                                            <tr>
+                                                <th>#</th>
+                                                <th>답변 내용</th>
+                                                <th class="text-end">작성일</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="(res, rIdx) in getTextResponses(question.questionId)" :key="rIdx">
+                                                <td class="text-muted small">{{ rIdx + 1 }}</td>
+                                                <td class="text-wrap">{{ res.questionResult }}</td>
+                                                <td class="text-end text-muted small">{{ formatDate(res.registDt) }}</td>
+                                            </tr>
+                                            <tr v-if="!getTextResponses(question.questionId).length">
+                                                <td colspan="3" class="text-center py-4 text-muted">등록된 응답이 없습니다.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Image Based -->
-                        <div v-else-if="question.questionType === 'inputImage'">
-                             <div class="row g-3">
-                                <div v-for="(img, iIdx) in getTextResponses(question.questionId)" :key="iIdx" class="col-6 col-md-3">
-                                    <div class="img-thumb-card border rounded overflow-hidden">
-                                        <a :href="img.questionResult" target="_blank">
-                                            <img :src="img.questionResult" class="img-fluid w-100" style="height: 120px; object-fit: cover;">
-                                        </a>
-                                        <div class="p-2 bg-light text-center">
-                                            <span class="small text-muted">{{ formatDate(img.registDt) }}</span>
+                            <!-- Location Based -->
+                            <div v-else-if="question.questionType === 'inputLocation'">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div :id="'map-' + question.questionId" class="rounded border shadow-sm" style="height: 400px; z-index: 1;"></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                         <div class="table-responsive" style="max-height: 400px;">
+                                            <table class="table table-sm table-hover">
+                                                <thead class="table-light">
+                                                    <tr><th>응답 위치 목록</th></tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="(loc, lIdx) in getLocationResponses(question.questionId)" :key="lIdx" class="cursor-pointer" @click="focusMap(question.questionId, loc)">
+                                                        <td class="small py-2 border-bottom">
+                                                            <i class="bi bi-geo-alt-fill text-danger me-1"></i>
+                                                            {{ loc.lat.toFixed(5) }}, {{ loc.lng.toFixed(5) }}
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Image Based -->
+                            <div v-else-if="question.questionType === 'inputImage'">
+                                 <div class="row g-3">
+                                    <div v-for="(img, iIdx) in getTextResponses(question.questionId)" :key="iIdx" class="col-6 col-md-3">
+                                        <div class="img-thumb-card border rounded overflow-hidden shadow-sm">
+                                            <a :href="img.questionResult" target="_blank">
+                                                <img :src="img.questionResult" class="img-fluid w-100" style="height: 120px; object-fit: cover;">
+                                            </a>
+                                            <div class="p-2 bg-light text-center">
+                                                <span class="small text-muted">{{ formatDate(img.registDt) }}</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div v-if="!getTextResponses(question.questionId).length" class="col-12 text-center py-4 text-muted">등록된 응답 이미지가 없습니다.</div>
-                             </div>
+                            </div>
                         </div>
+                    </div>
+                </div>
+            </div>
 
-                        <!-- Others (Comment) -->
-                        <div v-else class="text-muted small">이 유형은 통계를 제공하지 않습니다.</div>
+            <!-- 2. INDIVIDUAL VIEW -->
+            <div v-if="viewMode === 'individual'" class="anim-fade-in">
+                <div class="row">
+                    <!-- Respondent List -->
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm sticky-top" style="top: 20px;">
+                            <div class="card-header bg-white py-3 border-bottom-0">
+                                <h6 class="fw-bold m-0">응답자 목록</h6>
+                            </div>
+                            <div class="list-group list-group-flush overflow-auto" style="max-height: calc(100vh - 250px);">
+                                <button v-for="res in respondentList" :key="res.resultsId" 
+                                    type="button" 
+                                    class="list-group-item list-group-item-action py-3 border-start-0 border-end-0"
+                                    :class="{'active bg-primary border-primary': selectedResId === res.resultsId}"
+                                    @click="fetchIndividualDetail(res.resultsId)">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="small fw-bold">{{ String(res.resultsId).substring(0, 8) }}...</div>
+                                        <span class="small" :class="selectedResId === res.resultsId ? 'text-white-50' : 'text-muted'">{{ res.registDt }}</span>
+                                    </div>
+                                </button>
+                                <div v-if="!respondentList.length" class="p-5 text-center text-muted">응답 데이터가 없습니다.</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Response Detail -->
+                    <div class="col-md-8">
+                        <div v-if="selectedResId" class="card border-0 shadow-sm anim-fade-in">
+                            <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                                <h6 class="fw-bold m-0"><i class="bi bi-file-earmark-text me-2"></i>개별 응답 상세</h6>
+                                <span class="badge bg-light text-dark">ID: {{ selectedResId }}</span>
+                            </div>
+                            <div class="card-body p-4">
+                                <div v-for="(section, sIdx) in survey.sections" :key="'s-'+sIdx" class="mb-5">
+                                    <h6 class="fw-bold text-main mb-3">{{ section.sectionTitle }}</h6>
+                                    
+                                    <div v-for="(question, qIdx) in section.questions" :key="'q-'+qIdx" class="mb-4 pb-3 border-bottom">
+                                        <div class="d-flex mb-2">
+                                            <span class="fw-bold text-muted me-2">Q.</span>
+                                            <span class="fw-bold">{{ question.questionText }}</span>
+                                        </div>
+                                        
+                                        <!-- Answer Display based on type -->
+                                        <div class="ps-4">
+                                            <div v-if="individualAnswers[question.questionId] !== undefined">
+                                                <!-- Radio / Choice -->
+                                                <div v-if="['inputRadio', 'inputCheckbox'].includes(question.questionType)">
+                                                    <div v-for="label in question.labels" :key="label.questionLabelId" class="mb-1">
+                                                        <i class="bi" :class="isItemSelected(question.questionId, label.questionLabelId) ? 'bi-check-circle-fill text-success' : 'bi-circle text-muted'"></i>
+                                                        <span class="ms-2" :class="{'fw-bold text-dark': isItemSelected(question.questionId, label.questionLabelId)}">{{ label.questionLabel }}</span>
+                                                    </div>
+                                                </div>
+                                                <!-- Text -->
+                                                <div v-else-if="['inputTextline', 'inputTextarea'].includes(question.questionType)" class="bg-light p-3 rounded-3 text-break">
+                                                    {{ individualAnswers[question.questionId] }}
+                                                </div>
+                                                <!-- Image -->
+                                                <div v-else-if="question.questionType === 'inputImage'">
+                                                    <img :src="individualAnswers[question.questionId]" class="img-fluid rounded shadow-sm border" style="max-height: 300px;">
+                                                </div>
+                                                <!-- Location -->
+                                                <div v-else-if="question.questionType === 'inputLocation'">
+                                                    <div class="bg-light p-3 rounded-3 mb-2">
+                                                        <i class="bi bi-geo-alt-fill text-danger me-1"></i>
+                                                        {{ individualAnswers[question.questionId] }}
+                                                    </div>
+                                                    <div :id="'ind-map-' + question.questionId" class="rounded border shadow-sm" style="height: 250px;"></div>
+                                                </div>
+                                            </div>
+                                            <div v-else class="text-muted small italic">답변 없음</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-else class="h-100 d-flex flex-column align-items-center justify-content-center text-muted card border-0 shadow-sm p-5">
+                            <i class="bi bi-arrow-left-circle fs-1 mb-3 opacity-25"></i>
+                            <p>왼쪽 목록에서 응답자를 선택해주세요.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -168,14 +263,21 @@
         /*]]>*/
 
         const initVueApp = true;
-        const { createApp, ref, onMounted } = Vue;
+        const { createApp, ref, onMounted, nextTick } = Vue;
 
         const app = createApp({
             setup() {
                 const survey = ref(serverSurvey);
                 const stats = ref(serverStats);
                 const totalResponses = ref(0);
+                const viewMode = ref('summary'); // 'summary' or 'individual'
+                
+                const respondentList = ref([]);
+                const selectedResId = ref(null);
+                const individualAnswers = ref({});
+                
                 const mapInstances = {};
+                const individualMapInstances = {};
 
                 // Find total responses (approx)
                 if (Object.keys(stats.value).length > 0) {
@@ -189,94 +291,105 @@
 
                 const getTypeName = (type) => {
                     const names = {
-                        'inputRadio': '단일 선택(객관식)',
-                        'inputCheckbox': '다중 선택(객관식)',
-                        'inputTextline': '단답형(주관식)',
-                        'inputTextarea': '서술형(주관식)',
-                        'inputLocation': '위치 정보',
-                        'inputImage': '이미지 첨부',
+                        'inputRadio': '단일 선택', 'inputCheckbox': '다중 선택',
+                        'inputTextline': '단답형', 'inputTextarea': '서술형',
+                        'inputLocation': '위치 정보', 'inputImage': '이미지 첨부',
                         'inputComment': '안내 문구'
                     };
                     return names[type] || type;
                 };
 
-                const getLabelCount = (qId, lId) => {
-                    return (stats.value[qId] && stats.value[qId][lId]) || 0;
-                };
-
+                const getLabelCount = (qId, lId) => (stats.value[qId] && stats.value[qId][lId]) || 0;
                 const getLabelPercent = (qId, lId) => {
                     const qStats = stats.value[qId] || {};
                     const total = Object.values(qStats).reduce((a, b) => a + (typeof b === 'number' ? b : 0), 0);
-                    if (total === 0) return 0;
-                    return ((getLabelCount(qId, lId) / total) * 100).toFixed(1);
+                    return total === 0 ? 0 : ((getLabelCount(qId, lId) / total) * 100).toFixed(1);
                 };
+                const getOtherCount = (qId) => (stats.value[qId] && stats.value[qId]['OTHER']) || 0;
+                const getTextResponses = (qId) => (stats.value[qId] && Array.isArray(stats.value[qId])) ? stats.value[qId] : [];
+                const getLocationResponses = (qId) => (stats.value[qId] && Array.isArray(stats.value[qId])) ? stats.value[qId] : [];
+                const formatDate = (dateStr) => dateStr ? dateStr.substring(0, 10) : '-';
 
-                const getOtherCount = (qId) => {
-                    return (stats.value[qId] && stats.value[qId]['OTHER']) || 0;
-                };
-
-                const getTextResponses = (qId) => {
-                    return (stats.value[qId] && Array.isArray(stats.value[qId])) ? stats.value[qId] : [];
-                };
-
-                const getLocationResponses = (qId) => {
-                    return (stats.value[qId] && Array.isArray(stats.value[qId])) ? stats.value[qId] : [];
-                };
-
-                const formatDate = (dateStr) => {
-                    if (!dateStr) return '-';
-                    return dateStr.substring(0, 10);
-                };
-
-                const goMaster = () => {
-                    location.href = '/mgt/survey/manageSurveyMenu.do?surveyId=' + survey.value.surveyId;
-                };
-
+                const goMaster = () => location.href = '/mgt/survey/manageSurveyMenu.do?surveyId=' + survey.value.surveyId;
                 const downloadExcel = () => alert('엑셀 다운로드 기능은 준비 중입니다.');
+
+                const switchToIndividual = async () => {
+                    viewMode.value = 'individual';
+                    if (respondentList.value.length === 0) {
+                        try {
+                            const res = await axios.get('/mgt/survey/getRespondentList.do', { params: { surveyId: survey.value.surveyId } });
+                            respondentList.value = res.data;
+                            if (respondentList.value.length > 0) {
+                                fetchIndividualDetail(respondentList.value[0].resultsId);
+                            }
+                        } catch (e) { console.error(e); }
+                    }
+                };
+
+                const fetchIndividualDetail = async (rid) => {
+                    selectedResId.value = rid;
+                    try {
+                        const res = await axios.get('/mgt/survey/getRespondentDetail.do', { 
+                            params: { surveyId: survey.value.surveyId, resultsId: rid } 
+                        });
+                        individualAnswers.value = res.data;
+                        
+                        // Render maps for individual detail if any
+                        await nextTick();
+                        survey.value.sections.forEach(s => s.questions.forEach(q => {
+                            if (q.questionType === 'inputLocation' && individualAnswers.value[q.questionId]) {
+                                const mapId = 'ind-map-' + q.questionId;
+                                const coords = individualAnswers.value[q.questionId].split(',').map(Number);
+                                if (coords.length === 2 && !isNaN(coords[0])) {
+                                    if (individualMapInstances[q.questionId]) {
+                                        individualMapInstances[q.questionId].remove();
+                                    }
+                                    const mapContainer = document.getElementById(mapId);
+                                    if (!mapContainer) return;
+                                    const imap = L.map(mapId).setView([coords[0], coords[1]], 15);
+                                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(imap);
+                                    L.marker([coords[0], coords[1]]).addTo(imap);
+                                    individualMapInstances[q.questionId] = imap;
+                                }
+                            }
+                        }));
+                    } catch (e) { console.error(e); }
+                };
+
+                const isItemSelected = (qId, lId) => {
+                    const ans = individualAnswers.value[qId];
+                    if (Array.isArray(ans)) return ans.includes(lId);
+                    return ans == lId;
+                };
 
                 const initCharts = () => {
                     survey.value.sections.forEach(s => s.questions.forEach(q => {
                         if (['inputRadio', 'inputCheckbox'].includes(q.questionType)) {
                             const ctx = document.getElementById('chart-' + q.questionId);
                             if (!ctx) return;
-
-                            const labels = q.labels.map(l => l.questionLabel);
-                            const data = q.labels.map(l => getLabelCount(q.questionId, l.questionLabelId));
-                            
-                            if (q.otherAnswer === 'Y') {
-                                labels.push('기타');
-                                data.push(getOtherCount(q.questionId));
-                            }
-
                             new Chart(ctx, {
                                 type: q.questionType === 'inputRadio' ? 'pie' : 'bar',
                                 data: {
-                                    labels: labels,
+                                    labels: q.labels.map(l => l.questionLabel),
                                     datasets: [{
-                                        data: data,
-                                        backgroundColor: [
-                                            '#49a7b0', '#2b4b8a', '#ffc107', '#fd7e14', '#198754', '#0dcaf0'
-                                        ]
+                                        data: q.labels.map(l => getLabelCount(q.questionId, l.questionLabelId)),
+                                        backgroundColor: ['#49a7b0', '#2b4b8a', '#ffc107', '#fd7e14', '#198754', '#0dcaf0']
                                     }]
                                 },
                                 options: {
-                                    responsive: true,
-                                    maintainAspectRatio: false,
+                                    responsive: true, maintainAspectRatio: false,
                                     plugins: { legend: { position: 'right' } },
                                     indexAxis: q.questionType === 'inputCheckbox' ? 'y' : 'x'
                                 }
                             });
                         }
-
                         if (q.questionType === 'inputLocation') {
                             const mapId = 'map-' + q.questionId;
                             const responses = getLocationResponses(q.questionId);
-                            if (responses.length > 0) {
+                            if (responses.length > 0 && document.getElementById(mapId)) {
                                 const lMap = L.map(mapId).setView([responses[0].lat, responses[0].lng], 12);
                                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(lMap);
-                                responses.forEach(loc => {
-                                    L.marker([loc.lat, loc.lng]).addTo(lMap);
-                                });
+                                responses.forEach(loc => L.marker([loc.lat, loc.lng]).addTo(lMap));
                                 mapInstances[q.questionId] = lMap;
                             }
                         }
@@ -284,28 +397,21 @@
                 };
 
                 const focusMap = (qId, loc) => {
-                    if (mapInstances[qId]) {
-                        mapInstances[qId].setView([loc.lat, loc.lng], 16);
-                    }
+                    if (mapInstances[qId]) mapInstances[qId].setView([loc.lat, loc.lng], 16);
                 };
 
-                onMounted(() => {
-                    // Start after libraries loaded
-                    setTimeout(initCharts, 500);
-                });
+                onMounted(() => setTimeout(initCharts, 500));
 
                 return {
-                    survey, stats, totalResponses, getTypeName, getLabelCount, getLabelPercent,
+                    survey, stats, totalResponses, viewMode, getTypeName, getLabelCount, getLabelPercent,
                     getOtherCount, getTextResponses, getLocationResponses, formatDate,
-                    goMaster, downloadExcel, focusMap
+                    goMaster, downloadExcel, focusMap,
+                    respondentList, selectedResId, individualAnswers, switchToIndividual, fetchIndividualDetail, isItemSelected
                 };
             }
         });
 
-        // Register AdminLayout if available or mount directly
-        if (typeof AdminLayout !== 'undefined') {
-            AdminLayout.register(app);
-        }
+        if (typeof AdminLayout !== 'undefined') AdminLayout.register(app);
         app.mount('#app');
     </script>
 
@@ -314,6 +420,10 @@
         .cursor-pointer { cursor: pointer; }
         .img-thumb-card:hover { transform: scale(1.02); transition: 0.2s; }
         .chart-wrapper { position: relative; }
+        .anim-fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .text-main { color: #2b4b8a !important; }
+        .list-group-item.active { border-color: #2b4b8a; background-color: #2b4b8a; }
     </style>
 </body>
 </html>

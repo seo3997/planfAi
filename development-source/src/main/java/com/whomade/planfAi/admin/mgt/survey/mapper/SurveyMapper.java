@@ -110,4 +110,21 @@ public interface SurveyMapper {
      * 위치 정보 응답 목록 (지도 마커용)
      */
     List<java.util.Map<String, Object>> selectLocationResults(String surveyId, int questionId);
+
+    /**
+     * 설문 응답자 목록 조회
+     */
+    List<java.util.Map<String, Object>> selectRespondentList(String surveyId);
+
+    /**
+     * 특정 응답자의 전체 답변 조회
+     */
+    List<com.whomade.planfAi.admin.mgt.survey.vo.TbResults> selectRespondentDetail(
+            java.util.Map<String, Object> params);
+
+    /**
+     * 특정 응답자의 객관식 선택 결과 조회
+     */
+    List<com.whomade.planfAi.admin.mgt.survey.vo.TbResultsLabel> selectRespondentLabelDetail(
+            java.util.Map<String, Object> params);
 }

@@ -301,4 +301,27 @@
         AND QUESTION_RESULT LIKE '%,%'
     </select>
 
+    <!-- 개별 응답자 목록 조회 -->
+    <select id="selectRespondentList" parameterType="string" resultType="map">
+        SELECT 
+            RESULTS_ID as resultsId,
+            DATE_FORMAT(MIN(REGIST_DT), '%Y-%m-%d %H:%i:%s') as registDt
+        FROM tb_results
+        WHERE SURVEY_ID = #{surveyId}
+        GROUP BY RESULTS_ID
+        ORDER BY MIN(REGIST_DT) DESC
+    </select>
+
+    <!-- 특정 응답자의 전체 답변 조회 -->
+    <select id="selectRespondentDetail" parameterType="map" resultType="com.whomade.planfAi.admin.mgt.survey.vo.TbResults">
+        SELECT * FROM tb_results
+        WHERE SURVEY_ID = #{surveyId} AND RESULTS_ID = #{resultsId}
+    </select>
+
+    <!-- 특정 응답자의 객관식 선택 결과 조회 -->
+    <select id="selectRespondentLabelDetail" parameterType="map" resultType="com.whomade.planfAi.admin.mgt.survey.vo.TbResultsLabel">
+        SELECT * FROM tb_results_label
+        WHERE SURVEY_ID = #{surveyId} AND RESULTS_ID = #{resultsId}
+    </select>
+
 </mapper>

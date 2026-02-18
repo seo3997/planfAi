@@ -220,4 +220,25 @@ public class SurveyController {
 
         return "admin/mgt/survey/surveyStats";
     }
+
+    /**
+     * 설문 응답자 목록 조회 (API)
+     */
+    @GetMapping("/getRespondentList.do")
+    @org.springframework.web.bind.annotation.ResponseBody
+    public List<Map<String, Object>> getRespondentList(
+            @org.springframework.web.bind.annotation.RequestParam String surveyId) {
+        return surveyService.getRespondentList(surveyId);
+    }
+
+    /**
+     * 특정 응답자의 상세 답변 조회 (API)
+     */
+    @GetMapping("/getRespondentDetail.do")
+    @org.springframework.web.bind.annotation.ResponseBody
+    public Map<Integer, Object> getRespondentDetail(
+            @org.springframework.web.bind.annotation.RequestParam String surveyId,
+            @org.springframework.web.bind.annotation.RequestParam String resultsId) {
+        return surveyService.getRespondentDetail(surveyId, resultsId);
+    }
 }

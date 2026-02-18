@@ -362,4 +362,49 @@ public class SurveyService {
 
         return stats;
     }
+
+    /**
+     * 설문 응답자 목록 조회
+     */
+    public List<Map<String, Object>> getRespondentList(String surveyId) {
+        return surveyMapper.selectRespondentList(surveyId);
+    }
+
+    /**
+     * 특정 응답자의 상세 답변 조회
+     */
+    public Map<Integer, Object> getRespondentDetail(String surveyId, String resultsId) {
+        Map<Integer, Object> detail = new HashMap<>();
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("surveyId", surveyId);
+        params.put("resultsId", resultsId);
+
+        // 1. 일반 응답 (주관식, 위치, 이미지 등)
+        List<com.whomade.planfAi.admin.mgt.survey.vo.TbResults> resList = surveyMapper.selectRespondentDetail(params);
+        for (com.whomade.planfAi.admin.mgt.survey.vo.TbResults res : resList) {
+            detail.put(res.getQuestionId(), res.getQuestionResult());
+        }
+
+        // 2. 객관식 응답 (라벨 아이디들)
+        List<com.whomade.planfAi.admin.mgt.survey.vo.TbResultsLabel> labelList = surveyMapper
+                .selectRespondentLabelDetail(params);
+        for (com.whomade.planfAi.admin.mgt.survey.vo.TbResultsLabel rl : labelList) {
+            int qId = rl.getQuestionId();
+            if (!detail.containsKey(qId)) {
+                detail.put(qId, new ArrayList<Integer>());
+            }
+            // If it was already a String (from step 1), it shouldn't be, but let's be safe
+            Object val = detail.get(qId);
+            if (val instanceof List) {
+                ((List<Integer>) val).add(rl.getQuestionLabelId());
+            } else {
+                List<Integer> newList = new ArrayList<>();
+                newList.add(rl.getQuestionLabelId());
+                detail.put(qId, newList);
+            }
+        }
+
+        return detail;
+    }
 }
