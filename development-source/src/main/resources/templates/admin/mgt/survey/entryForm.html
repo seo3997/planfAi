@@ -26,7 +26,7 @@
                  <button type="button" class="btn btn-outline-secondary" @click="goPreview">
                     <i class="bi bi-eye me-1"></i> 미리보기
                 </button>
-                <button type="button" class="btn btn-primary" @click="saveSurvey" :disabled="isSaving">
+                <button type="button" class="btn btn-primary" @click="saveSurvey" :disabled="isSaving || survey.opened === 'OPENED'">
                     <span v-if="isSaving" class="spinner-border spinner-border-sm me-1"></span>
                     저장
                 </button>
@@ -46,7 +46,7 @@
                 </a>
             </li>
              <li class="nav-item">
-                <a class="nav-link disabled text-muted" href="#">
+                <a class="nav-link text-muted" :href="'/mgt/survey/surveyStats.do?surveyId=' + survey.surveyId">
                     응답 (Responses)
                 </a>
             </li>
@@ -62,7 +62,7 @@
                 <!-- 2. 섹션 및 문항 관리 -->
                 <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
                     <h5 class="mb-0">문항 구성</h5>
-                    <button type="button" class="btn btn-sm btn-outline-main" @click="addSection">
+                    <button type="button" class="btn btn-sm btn-outline-main" @click="addSection" :disabled="survey.opened === 'OPENED'">
                         <i class="bi bi-plus-lg"></i> 섹션 추가
                     </button>
                 </div>
@@ -80,15 +80,16 @@
                         <div class="card mb-4 border-main section-item">
                             <div class="card-header bg-light d-flex justify-content-between align-items-center">
                                 <div class="d-flex align-items-center gap-2 w-75">
-                                    <i class="bi bi-grip-vertical section-drag-handle fs-5 cursor-move text-muted"></i>
+                                    <i v-if="survey.opened !== 'OPENED'" class="bi bi-grip-vertical section-drag-handle fs-5 cursor-move text-muted"></i>
+                                    <i v-else class="bi bi-lock-fill text-muted ms-2"></i>
                                     <button type="button" class="btn btn-link btn-sm text-dark p-0 me-2" @click="section._collapsed = !section._collapsed">
                                         <i class="bi" :class="section._collapsed ? 'bi-chevron-right' : 'bi-chevron-down'"></i>
                                     </button>
                                     <span class="badge bg-main">Section {{ sIdx + 1 }}</span>
-                                    <input type="text" class="form-control form-control-sm" v-model="section.sectionTitle" placeholder="섹션 제목을 입력하세요">
+                                    <input type="text" class="form-control form-control-sm" v-model="section.sectionTitle" placeholder="섹션 제목을 입력하세요" :disabled="survey.opened === 'OPENED'">
                                 </div>
                                 <div class="d-flex gap-2">
-                                    <button type="button" class="btn btn-sm btn-outline-danger" @click="removeSection(sIdx)">
+                                    <button type="button" class="btn btn-sm btn-outline-danger" @click="removeSection(sIdx)" :disabled="survey.opened === 'OPENED'">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
@@ -110,10 +111,10 @@
                                             <div class="card-body p-3">
                                                 <div class="row mb-2 align-items-center">
                                                     <div class="col-auto">
-                                                        <i class="bi bi-grip-vertical question-drag-handle cursor-move text-muted"></i>
+                                                        <i v-if="survey.opened !== 'OPENED'" class="bi bi-grip-vertical question-drag-handle cursor-move text-muted"></i>
                                                     </div>
                                                     <div class="col-md-2">
-                                                        <select class="form-select form-select-sm" v-model="question.questionType">
+                                                        <select class="form-select form-select-sm" v-model="question.questionType" :disabled="survey.opened === 'OPENED'">
                                                             <option value="inputRadio">단일 선택 (Radio)</option>
                                                             <option value="inputCheckbox">다중 선택 (Checkbox)</option>
                                                             <option value="inputTextline">단답형 (Text)</option>
@@ -124,14 +125,14 @@
                                                         </select>
                                                     </div>
                                                     <div class="col-md-7">
-                                                        <input type="text" class="form-control form-control-sm" v-model="question.questionText" placeholder="질문 내용을 입력하세요">
+                                                        <input type="text" class="form-control form-control-sm" v-model="question.questionText" placeholder="질문 내용을 입력하세요" :disabled="survey.opened === 'OPENED'">
                                                         
                                                         <!-- Detail Settings per Type -->
                                                         <div class="mt-2 d-flex flex-wrap gap-4 align-items-start bg-light p-2 rounded">
                                                             <!-- Textarea Rows -->
                                                             <div v-if="question.questionType === 'inputTextarea'" class="d-flex align-items-center gap-2">
                                                                 <label class="small text-muted mb-0">줄 수(Rows):</label>
-                                                                <input type="number" class="form-control form-control-sm" style="width: 80px;" v-model="question.textRows" placeholder="4">
+                                                                <input type="number" class="form-control form-control-sm" style="width: 80px;" v-model="question.textRows" placeholder="4" :disabled="survey.opened === 'OPENED'">
                                                             </div>
                                                             
                                                             <!-- Checkbox/Radio Options -->
@@ -139,24 +140,24 @@
                                                                 <div class="d-flex align-items-center gap-3">
                                                                     <span class="small fw-bold text-muted">기타(Other) 필드:</span>
                                                                     <div class="form-check form-check-inline mb-0">
-                                                                        <input class="form-check-input" type="radio" :name="'other_yn_' + sIdx + '_' + qIdx" :id="'other_y_' + sIdx + '_' + qIdx" value="Y" v-model="question.otherAnswer">
+                                                                        <input class="form-check-input" type="radio" :name="'other_yn_' + sIdx + '_' + qIdx" :id="'other_y_' + sIdx + '_' + qIdx" value="Y" v-model="question.otherAnswer" :disabled="survey.opened === 'OPENED'">
                                                                         <label class="form-check-label small" :for="'other_y_' + sIdx + '_' + qIdx">사용</label>
                                                                     </div>
                                                                     <div class="form-check form-check-inline mb-0">
-                                                                        <input class="form-check-input" type="radio" :name="'other_yn_' + sIdx + '_' + qIdx" :id="'other_n_' + sIdx + '_' + qIdx" value="N" v-model="question.otherAnswer">
+                                                                        <input class="form-check-input" type="radio" :name="'other_yn_' + sIdx + '_' + qIdx" :id="'other_n_' + sIdx + '_' + qIdx" value="N" v-model="question.otherAnswer" :disabled="survey.opened === 'OPENED'">
                                                                         <label class="form-check-label small" :for="'other_n_' + sIdx + '_' + qIdx">미사용</label>
                                                                     </div>
-                                                                    <input v-if="question.otherAnswer === 'Y'" type="text" class="form-control form-control-sm" style="width: 150px;" v-model="question.questionLabel" placeholder="내용 (예: 기타:)">
+                                                                    <input v-if="question.otherAnswer === 'Y'" type="text" class="form-control form-control-sm" style="width: 150px;" v-model="question.questionLabel" placeholder="내용 (예: 기타:)" :disabled="survey.opened === 'OPENED'">
                                                                 </div>
                                                                 
                                                                 <div class="d-flex align-items-center gap-3">
                                                                     <span class="small fw-bold text-muted">배치(Layout):</span>
                                                                     <div class="form-check form-check-inline mb-0">
-                                                                        <input class="form-check-input" type="radio" :name="'layout_' + sIdx + '_' + qIdx" :id="'layout_v_' + sIdx + '_' + qIdx" value="vertical" v-model="question.questionLayout">
+                                                                        <input class="form-check-input" type="radio" :name="'layout_' + sIdx + '_' + qIdx" :id="'layout_v_' + sIdx + '_' + qIdx" value="vertical" v-model="question.questionLayout" :disabled="survey.opened === 'OPENED'">
                                                                         <label class="form-check-label small" :for="'layout_v_' + sIdx + '_' + qIdx">한 줄에 하나씩 (Vertical)</label>
                                                                     </div>
                                                                     <div class="form-check form-check-inline mb-0">
-                                                                        <input class="form-check-input" type="radio" :name="'layout_' + sIdx + '_' + qIdx" :id="'layout_h_' + sIdx + '_' + qIdx" value="horizontal" v-model="question.questionLayout">
+                                                                        <input class="form-check-input" type="radio" :name="'layout_' + sIdx + '_' + qIdx" :id="'layout_h_' + sIdx + '_' + qIdx" value="horizontal" v-model="question.questionLayout" :disabled="survey.opened === 'OPENED'">
                                                                         <label class="form-check-label small" :for="'layout_h_' + sIdx + '_' + qIdx">한 줄에 모두 (Horizontal)</label>
                                                                     </div>
                                                                 </div>
@@ -171,7 +172,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="col text-end">
-                                                        <button type="button" class="btn btn-xs btn-outline-danger" @click="removeQuestion(section, qIdx)">
+                                                        <button type="button" class="btn btn-xs btn-outline-danger" @click="removeQuestion(section, qIdx)" :disabled="survey.opened === 'OPENED'">
                                                             <i class="bi bi-x-lg"></i>
                                                         </button>
                                                     </div>
@@ -181,12 +182,12 @@
                                                 <div v-if="['inputRadio', 'inputCheckbox'].includes(question.questionType)" class="ps-4 mt-2 border-start border-3">
                                                     <div v-for="(label, lIdx) in question.labels" :key="lIdx" class="d-flex align-items-center gap-2 mb-1">
                                                         <i class="bi" :class="question.questionType === 'inputRadio' ? 'bi-circle' : 'bi-square'"></i>
-                                                        <input type="text" class="form-control form-control-sm w-50" v-model="label.questionLabel" placeholder="보기 내용">
-                                                        <button type="button" class="btn btn-xs btn-light text-danger" @click="removeLabel(question, lIdx)">
+                                                        <input type="text" class="form-control form-control-sm w-50" v-model="label.questionLabel" placeholder="보기 내용" :disabled="survey.opened === 'OPENED'">
+                                                        <button type="button" class="btn btn-xs btn-light text-danger" @click="removeLabel(question, lIdx)" :disabled="survey.opened === 'OPENED'">
                                                             <i class="bi bi-trash"></i>
                                                         </button>
                                                     </div>
-                                                    <button type="button" class="btn btn-xs btn-link text-decoration-none" @click="addLabel(question)">
+                                                    <button type="button" class="btn btn-xs btn-link text-decoration-none" @click="addLabel(question)" :disabled="survey.opened === 'OPENED'">
                                                         <i class="bi bi-plus"></i> 보기 추가
                                                     </button>
                                                 </div>
@@ -196,7 +197,7 @@
                                 </draggable>
 
                                 <div class="text-center mt-3">
-                                    <button type="button" class="btn btn-sm btn-outline-secondary dashed-border w-100" @click="addQuestion(section)">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary dashed-border w-100" @click="addQuestion(section)" :disabled="survey.opened === 'OPENED'">
                                         <i class="bi bi-plus-circle"></i> 질문 추가
                                     </button>
                                 </div>
