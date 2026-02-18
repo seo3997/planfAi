@@ -136,6 +136,19 @@
                          <div class="mb-4">
                             <label class="form-label fw-bold">기본 테마 선택</label>
                             <div class="row g-3">
+                                <!-- Reset Theme -->
+                                <div class="col-md-2">
+                                    <div class="theme-card-simple border rounded p-2 text-center" 
+                                         :class="{'border-primary bg-light shadow-sm': !survey.themeSeq}"
+                                         @click="resetTheme"
+                                         style="cursor: pointer;">
+                                        <div class="d-flex align-items-center justify-content-center bg-white rounded mb-2" style="height: 60px; border: 1px dashed #dee2e6;">
+                                            <i class="bi bi-arrow-counterclockwise fs-4 text-muted"></i>
+                                        </div>
+                                        <div class="small fw-bold">테마 해제</div>
+                                    </div>
+                                </div>
+                                <!-- Theme List -->
                                 <div class="col-md-2" v-for="theme in themeList" :key="theme.themeSeq">
                                     <div class="theme-card-simple border rounded p-2 text-center" 
                                          :class="{'border-primary bg-light shadow-sm': survey.themeSeq === theme.themeSeq}"
@@ -273,6 +286,15 @@
                          survey.value.closed = survey.value.closed.substring(0, 10);
                     }
 
+                    const resetTheme = () => {
+                        survey.value.themeSeq = null;
+                        survey.value.bgImagePath = '';
+                        survey.value.bgColor = '#ffffff';
+                        survey.value.textColor = '#212529';
+                        survey.value.accentColor = '#2b4b8a';
+                        survey.value.layoutType = 'CENTER';
+                    };
+
                     const applyTheme = (theme) => {
                         survey.value.themeSeq = theme.themeSeq;
                         survey.value.bgColor = theme.bgColor;
@@ -346,7 +368,7 @@
 
                     return {
                         survey, themeList, isSaving,
-                        saveMaster, goList, goEntryForm, goPreview, applyTheme
+                        saveMaster, goList, goEntryForm, goPreview, applyTheme, resetTheme
                     };
                 }
             });

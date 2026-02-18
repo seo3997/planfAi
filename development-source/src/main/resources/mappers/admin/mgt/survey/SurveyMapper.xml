@@ -127,7 +127,7 @@
             <if test="exitPageTextIsHtml != null">EXITPAGETEXT_ISHTML = #{exitPageTextIsHtml},</if>
             <if test="exitPageText != null">EXITPAGETEXT = #{exitPageText},</if>
             <if test="numberRoductionText != null">NUMBERRODUCTIONTEXT = #{numberRoductionText},</if>
-            <if test="themeSeq != null">THEME_SEQ = #{themeSeq},</if>
+            THEME_SEQ = #{themeSeq},
             <if test="logoImagePath != null">LOGO_IMAGE_PATH = #{logoImagePath},</if>
             <if test="logoAlign != null">LOGO_ALIGN = #{logoAlign},</if>
             <if test="showFooterLogo != null">SHOW_FOOTER_LOGO = #{showFooterLogo},</if>
