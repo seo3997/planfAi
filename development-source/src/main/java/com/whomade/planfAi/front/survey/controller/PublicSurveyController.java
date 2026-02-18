@@ -20,7 +20,7 @@ public class PublicSurveyController {
 
     private final SurveyService surveyService;
 
-    @Value("${survey.domain}")
+    @Value("${app.domain}")
     private String surveyDomain;
 
     /**

@@ -22,7 +22,7 @@ public class SurveyController {
 
     private final SurveyService surveyService;
 
-    @org.springframework.beans.factory.annotation.Value("${survey.domain}")
+    @org.springframework.beans.factory.annotation.Value("${app.domain}")
     private String surveyDomain;
 
     /**
@@ -261,5 +261,26 @@ public class SurveyController {
             result.put("message", "삭제 중 오류가 발생했습니다: " + e.getMessage());
         }
         return result;
+    }
+
+    /**
+     * 설문 응답 데이터 CSV 다운로드
+     */
+    @GetMapping("/downloadCsv.do")
+    public void downloadCsv(@org.springframework.web.bind.annotation.RequestParam String surveyId,
+            jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
+        String csvData = surveyService.getSurveyDataAsCsv(surveyId);
+
+        String fileName = "survey_results_" + surveyId + ".csv";
+        response.setContentType("text/csv; charset=UTF-8");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+
+        // Excel 인식용 UTF-8 BOM 추가
+        response.getOutputStream().write(0xEF);
+        response.getOutputStream().write(0xBB);
+        response.getOutputStream().write(0xBF);
+
+        response.getOutputStream().write(csvData.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        response.getOutputStream().flush();
     }
 }

@@ -30,8 +30,8 @@
                 <span class="badge bg-primary rounded-pill">Total: {{ totalResponses }}</span>
             </div>
             <div class="d-flex gap-2">
-                 <button type="button" class="btn btn-outline-secondary" @click="downloadExcel">
-                    <i class="bi bi-download me-1"></i> 엑셀 다운로드
+                 <button type="button" class="btn btn-outline-secondary" @click="downloadCsv">
+                    <i class="bi bi-download me-1"></i> 응답 데이터 내보내기
                 </button>
             </div>
         </div>
@@ -364,7 +364,25 @@
                 const formatDate = (dateStr) => dateStr ? dateStr.substring(0, 10) : '-';
 
                 const goMaster = () => location.href = '/mgt/survey/manageSurveyMenu.do?surveyId=' + survey.value.surveyId;
-                const downloadExcel = () => alert('엑셀 다운로드 기능은 준비 중입니다.');
+                const downloadCsv = async () => {
+                    try {
+                        const res = await axios.get('/mgt/survey/downloadCsv.do', {
+                            params: { surveyId: survey.value.surveyId },
+                            responseType: 'blob'
+                        });
+                        const url = window.URL.createObjectURL(new Blob([res.data]));
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.setAttribute('download', 'survey_results_' + survey.value.surveyId + '.csv');
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        window.URL.revokeObjectURL(url);
+                    } catch (e) {
+                        console.error('CSV Download Error:', e);
+                        alert('다운로드 도중 오류가 발생했습니다.');
+                    }
+                };
 
                 const switchToSummary = async () => {
                     viewMode.value = 'summary';
@@ -511,7 +529,7 @@
                     survey, stats, totalResponses, viewMode, getTypeName, getLabelCount, getLabelPercent,
                     getOtherCount, getOtherTexts, hoverImage,
                     getTextResponses, getLocationResponses, formatDate,
-                    goMaster, downloadExcel, focusMap,
+                    goMaster, downloadCsv, focusMap,
                     respondentList, selectedResId, individualAnswers, switchToSummary, switchToIndividual, fetchIndividualDetail, isItemSelected, deleteResponse
                 };
             }

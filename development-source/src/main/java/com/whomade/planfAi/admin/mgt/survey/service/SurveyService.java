@@ -433,4 +433,119 @@ public class SurveyService {
         surveyMapper.deleteResultsLabelByResultsId(surveyId, resultsId);
         surveyMapper.deleteResultsByResultsId(surveyId, resultsId);
     }
+
+    /**
+     * 설문 응답 데이터 CSV 생성
+     */
+    public String getSurveyDataAsCsv(String surveyId) {
+        // 1. 설문 구조 조회 (질문 목록 추출을 위함)
+        TbSurvey searchVO = new TbSurvey();
+        searchVO.setSurveyId(surveyId);
+        TbSurvey survey = selectSurveyEntryForm(searchVO);
+        if (survey == null)
+            return "";
+
+        List<TbQuestion> allQuestions = new ArrayList<>();
+        if (survey.getSections() != null) {
+            for (TbSection s : survey.getSections()) {
+                if (s.getQuestions() != null) {
+                    allQuestions.addAll(s.getQuestions());
+                }
+            }
+        }
+
+        // 2. CSV 헤더 생성 (첫 행: 질문 내용)
+        StringBuilder sb = new StringBuilder();
+        sb.append("응답시간,응답ID");
+        for (TbQuestion q : allQuestions) {
+            String title = (q.getQuestionText() != null ? q.getQuestionText() : "질문 " + q.getQuestionId())
+                    .replace("\"", "\"\"");
+            sb.append(",\"").append(title).append("\"");
+        }
+        sb.append("\n");
+
+        // 3. 응답자 목록 조회
+        List<Map<String, Object>> respondents = getRespondentList(surveyId);
+
+        // 4. 응답 데이터 채우기
+        for (Map<String, Object> r : respondents) {
+            String rId = String.valueOf(r.get("resultsId"));
+            String registDt = String.valueOf(r.get("registDt"));
+
+            sb.append(registDt).append(",").append(rId);
+
+            // 해당 응답자의 상세 답변 데이터 조회
+            Map<String, Object> detail = getRespondentDetail(surveyId, rId);
+
+            for (TbQuestion q : allQuestions) {
+                sb.append(",");
+                String qId = String.valueOf(q.getQuestionId());
+                Object ans = detail.get(qId);
+
+                String cellValue = "";
+                if (ans != null) {
+                    if (ans instanceof List) {
+                        // 다중 선택 (Checkbox)
+                        List<?> labelIds = (List<?>) ans;
+                        List<String> labels = new ArrayList<>();
+                        for (Object lid : labelIds) {
+                            String labelText = findLabelText(q, lid);
+                            if (labelText != null)
+                                labels.add(labelText);
+                        }
+
+                        // '기타' 처리 (결과 본문에 'OTHER'가 있을 경우)
+                        String rawRes = getRawResult(surveyId, rId, q.getQuestionId());
+                        if ("OTHER".equals(rawRes)) {
+                            String other = (String) detail.get(qId + "_other");
+                            labels.add("기타: " + (other != null ? other : ""));
+                        }
+
+                        cellValue = String.join("; ", labels);
+                    } else {
+                        // 단일 선택 (Radio) 또는 기타 주관식
+                        if ("OTHER".equals(ans)) {
+                            String other = (String) detail.get(qId + "_other");
+                            cellValue = "기타: " + (other != null ? other : "");
+                        } else if ("inputRadio".equals(q.getQuestionType())) {
+                            cellValue = findLabelText(q, ans);
+                        } else {
+                            cellValue = String.valueOf(ans);
+                        }
+                    }
+                }
+
+                // CSV 특수문자 이스케이프
+                cellValue = cellValue.replace("\"", "\"\"");
+                sb.append("\"").append(cellValue).append("\"");
+            }
+            sb.append("\n");
+        }
+
+        return sb.toString();
+    }
+
+    private String getRawResult(String surveyId, String rId, Integer qId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("surveyId", surveyId);
+        params.put("resultsId", rId);
+        List<com.whomade.planfAi.admin.mgt.survey.vo.TbResults> resList = surveyMapper.selectRespondentDetail(params);
+        for (com.whomade.planfAi.admin.mgt.survey.vo.TbResults r : resList) {
+            if (r.getQuestionId().equals(qId)) {
+                return r.getQuestionResult();
+            }
+        }
+        return null;
+    }
+
+    private String findLabelText(TbQuestion q, Object lid) {
+        if (q.getLabels() == null)
+            return String.valueOf(lid);
+        for (TbQuestionLabel l : q.getLabels()) {
+            if (String.valueOf(l.getQuestionLabelId()).equals(String.valueOf(lid))) {
+                return l.getQuestionLabel();
+            }
+        }
+        return String.valueOf(lid);
+    }
 }

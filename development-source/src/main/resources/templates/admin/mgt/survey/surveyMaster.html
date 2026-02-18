@@ -93,12 +93,13 @@
                             </div>
                         </div>
 
-                        <!-- 8-1. Survey Deployment URL: Shown only when OPENED -->
-                        <div class="row mb-4" v-if="survey.opened === 'OPENED' && survey.surveyId">
+                        <!-- 8-1. Survey Deployment URL: Shown when OPENED or CLOSED -->
+                        <div class="row mb-4" v-if="(survey.opened === 'OPENED' || survey.opened === 'CLOSED') && survey.surveyId">
                             <div class="col-md-12">
-                                <div class="bg-light p-3 rounded border border-success border-opacity-25">
-                                    <label class="form-label fw-bold text-success d-flex align-items-center gap-2">
-                                        <i class="bi bi-broadcast fs-5"></i> 설문 배포 URL (수집 중)
+                                <div class="bg-light p-3 rounded border" :class="survey.opened === 'OPENED' ? 'border-success border-opacity-25' : 'border-warning border-opacity-25'">
+                                    <label class="form-label fw-bold d-flex align-items-center gap-2" :class="survey.opened === 'OPENED' ? 'text-success' : 'text-warning'">
+                                        <i class="bi bi-broadcast fs-5"></i> 
+                                        설문 배포 URL <span v-if="survey.opened === 'OPENED'">(수집 중)</span><span v-else>(마감됨)</span>
                                     </label>
                                     <div class="input-group">
                                         <input type="text" class="form-control bg-white fw-bold" 
@@ -111,7 +112,9 @@
                                         </a>
                                     </div>
                                     <p class="small text-muted mt-2 mb-0">
-                                        <i class="bi bi-info-circle me-1"></i> 현재 설문이 활성화 상태입니다. 위 주소를 응답자에게 공유하여 데이터를 수집하세요.
+                                        <i class="bi bi-info-circle me-1"></i> 
+                                        <span v-if="survey.opened === 'OPENED'">현재 설문이 활성화 상태입니다. 위 주소를 응답자에게 공유하여 데이터를 수집하세요.</span>
+                                        <span v-else>현재 설문이 마감되었습니다. 기존 URL 확인을 위해 정보를 유지합니다.</span>
                                     </p>
                                 </div>
                             </div>

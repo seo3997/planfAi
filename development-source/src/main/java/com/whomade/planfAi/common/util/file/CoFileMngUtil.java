@@ -52,10 +52,10 @@ public class CoFileMngUtil {
     }
 
     /* ========= 업로드 용량 제한 (Spring 설정) ========= */
-    @Value("${file.max-size-total:50MB}")
+    @Value("${spring.servlet.multipart.max-request-size:50MB}")
     private String maxSizeTotalConf; // 요청 내 모든 파일 합계
 
-    @Value("${file.max-size-each:10MB}")
+    @Value("${spring.servlet.multipart.max-file-size:10MB}")
     private String maxSizeEachConf; // 개별 파일 최대
 
     private long toBytes(String v) {
