@@ -184,3 +184,89 @@ HTML 헤더/푸터 (HEADER, FOOTER): 단순 텍스트가 아닌 HTML 태그를 �
 우선순위: THEME_SEQ로 선택된 기본 테마 값이 로드된 후, BGCOLOR, TEXTCOLOR 등 개별 필드에 저장된 값이 있다면 해당 값이 테마 값을 덮어쓰도록(Override) 구현한다.
 
 미리보기: 관리자 페이지 내에서 디자인 변경 시, 우측 영역에 실시간으로 반영되는 'Live Preview' 기능을 구현하여 사용자 편의성을 극대화한다.
+
+7-5 설문지 외형 설정
+설문 제작자가 설문의 시각적 요소와 구조적 배치를 자유롭게 구성하여 브랜드 정체성을 반영하고 응답률을 높일 수 있도록 지원한다.
+
+1. 테이블 구성
+   [신규 마스터 테이블] tb_survey_theme
+   사용자가 선택할 수 있는 디자인 프리셋(Pre-set) 목록을 관리하는 테이블이다.
+   resources/schema/admin/mgt/survey/schema.sql tb_survey_theme 테이블을 참고한다.
+2. tb_survey 테이블 추가/변경 컬럼 상세
+   기존 스타일 필드 외에, 고도화된 설문 설정을 위해 아래 필드들을 추가 및 확장한다.
+   resources/schema/admin/mgt/survey/schema.sql tb_survey 테이블을 참고한다.
+
+① 시각적 테마 및 레이아웃 관련
+THEME_SEQ (INT): tb_survey_theme와 연결되는 외래키. 사용자가 선택한 기본 테마 세트를 결정한다.
+
+LAYOUT_TYPE (VARCHAR): 설문지 배치 구조. (값 예시: CENTER, LEFT_1_3, RIGHT_1_2, TOP_BANNER)
+
+SHOWBORDER (CHAR): 설문 본문 영역의 테두리 노출 여부 (이미지 속 '테두리 표시' 스위치).
+
+DIVIDER (VARCHAR): 질문 문항 간 구분선의 디자인 스타일(실선, 점선, 여백 등).
+
+② 로고 및 브랜드 설정 (Branding)
+LOGO_IMAGE_PATH (VARCHAR): 사용자 업로드 로고 이미지 경로.
+
+LOGO_ALIGN (VARCHAR): 로고 정렬 위치 (LEFT, CENTER, RIGHT).
+
+SHOW_FOOTER_LOGO (CHAR): 하단 푸터 영역에 시스템/회사 로고 노출 여부.
+
+③ 상세 스타일 (Custom CSS/Font)
+FONT_FAMILY (VARCHAR): 설문에 적용할 서체 명칭.
+
+ACCENT_COLOR (VARCHAR): 버튼, 체크박스 등 상호작용 요소에 적용될 강조 색상.
+
+USERCSS (TEXT): 사용자가 직접 입력하는 오버라이딩 CSS 코드. (기존 VARCHAR에서 TEXT로 확장 권장)
+
+④ 콘텐츠 및 종료 페이지
+HEADER / FOOTER (TEXT): 상/하단 안내 문구. HTML 태그 삽입을 허용하여 이미지나 링크 구성이 가능하도록 한다.
+
+EXITPAGETEXT (TEXT): 설문 완료 시 노출되는 문구.
+
+EXITPAGETEXT_ISHTML (CHAR): 완료 문구의 HTML 렌더링 여부.
+
+3. 주요 구현 로직 요구사항
+   테마-개별 스타일 우선순위: THEME_SEQ를 선택하면 해당 테마의 기본값이 로드되지만, 사용자가 BGCOLOR나 TEXTCOLOR를 직접 수정할 경우 개별 설정값이 테마값보다 우선하여 적용되어야 한다.
+
+실시간 미리보기(Live Preview): 관리자 화면에서 로고를 업로드하거나 레이아웃을 바꿀 때, 우측 미리보기 패널에 즉시 반영되어야 한다.
+
+반응형 레이아웃: LAYOUT_TYPE이 LEFT_1_3 등으로 설정되더라도, 모바일 기기 접속 시에는 자동으로 1컬럼(중앙 정렬)으로 전환되는 반응형 로직이 포함되어야 한다.
+
+4. 몽키서베이 설문지 생성 에서 테마별로 설문지 생성 과 스타일 적요을 참조한다.
+
+7) 설문 오픈 및 접속 경로 설계
+   설문 상태가 **'수집중(OPEN)'**으로 변경되는 시점을 기준으로 서비스의 흐름이 전환됩니다.
+
+접속 경로 (URL)
+엔드포인트: https://{domain}/survey/v/{SURVEY_ID}
+
+{domain} 은 application.yam의 survey.domain을 사용한다.
+
+접근 제어: \* 상태가 수집중일 때만 페이지 렌더링 허용.
+작성중이나 종료 상태일 경우 "접근할 수 없는 설문입니다" 안내 페이지로 리다이렉트.
+
+비로그인 사용자 식별 전략
+RESULTS_ID 발급: 사용자가 설문 페이지에 접속하거나 제출하는 시점에 고유한 고유 번호(Sequence 또는 UUID 기반 정수)를 생성합니다.
+
+중복 방지 (선택 사항): \* 브라우저 LocalStorage에 survey*completed*{SURVEY_ID}: true 값을 저장하여 재참여를 방지합니다.
+
+7-1. 응답 데이터 저장 구조 (Data Flow)
+사용자가 저장 버튼을 클릭했을 때, 화면에서 넘어온 데이터는 질문 유형에 따라 두 갈래로 나뉘어 저장됩니다.
+
+A. 기본 응답 내역 (tb_results)
+역할: 설문의 핵심 답변(주관식, 단일 선택)을 저장하는 마스터 테이블입니다.
+
+주요 데이터 필드:
+RESULTS_ID: 한 명의 응답자를 식별하는 키 (모든 응답 묶음의 공통 ID).
+QUESTION_RESULT: 주관식 입력 텍스트 또는 단일 선택된 값.
+OTHERANSWER_RESULT: '기타' 항목을 선택하고 직접 입력한 텍스트.
+REGISTER_NO: 로그인하지 않았으므로 NULL 처리.
+
+B. 상세 라벨 응답 (tb_results_label)
+역할: 다중 선택(Checkbox)이나 매트릭스형 질문처럼 하나의 질문에 여러 응답이 발생하는 경우를 처리합니다.
+
+주요 데이터 필드:
+QUESTION_LABEL_ID: 선택된 각 보기(옵션)의 고유 ID.
+QUESTION_LABEL_RESULT: 해당 옵션에 대한 값 (예: 'Y', '1', '5점' 등).
+RESULTS_ID: 위 tb_results와 동일한 ID를 사용하여 매핑.
