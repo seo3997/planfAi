@@ -52,7 +52,7 @@
         <!-- View Mode Switcher -->
         <div class="d-flex justify-content-center mb-4">
             <div class="btn-group p-1 bg-light rounded-pill shadow-sm">
-                <button type="button" class="btn rounded-pill px-4" :class="viewMode === 'summary' ? 'btn-primary shadow' : 'btn-light'" @click="viewMode = 'summary'">
+                <button type="button" class="btn rounded-pill px-4" :class="viewMode === 'summary' ? 'btn-primary shadow' : 'btn-light'" @click="switchToSummary">
                     <i class="bi bi-pie-chart-fill me-1"></i> 통계 요약
                 </button>
                 <button type="button" class="btn rounded-pill px-4" :class="viewMode === 'individual' ? 'btn-primary shadow' : 'btn-light'" @click="switchToIndividual">
@@ -94,28 +94,13 @@
                                             </div>
                                         </li>
                                         <li v-if="question.otherAnswer === 'Y'" class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
-                                            <span class="text-info cursor-pointer" :title="getOtherCount(question.questionId) > 0 ? '기타 답변 보기' : ''" @click="showOtherDetails(question.questionId)">
-                                                기타 (입력값) <i v-if="getOtherCount(question.questionId) > 0" class="bi bi-chat-dots ms-1"></i>
-                                            </span>
+                                            <span class="text-info">기타 (입력값)</span>
                                             <div class="text-end">
                                                 <span class="fw-bold">{{ getOtherCount(question.questionId) }}명</span>
                                                 <span class="text-muted small ms-2">({{ getLabelPercent(question.questionId, 'OTHER') }}%)</span>
                                             </div>
                                         </li>
                                     </ul>
-                                    <!-- 기타 답변 리스트 (조건부 노출) -->
-                                    <div v-if="selectedOtherQId === question.questionId" class="mt-3 p-3 bg-light rounded shadow-sm anim-fade-in">
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <h6 class="small fw-bold m-0">기타 답변 내용</h6>
-                                            <button type="button" class="btn-close small" style="padding: 0.25rem 0.25rem;" @click="selectedOtherQId = null"></button>
-                                        </div>
-                                        <div class="overflow-auto" style="max-height: 150px;">
-                                            <div v-for="(item, idx) in getOtherTexts(question.questionId)" :key="idx" class="small py-1 border-bottom last-border-0">
-                                                - {{ item.otherAnswerResult }}
-                                            </div>
-                                            <div v-if="!getOtherTexts(question.questionId).length" class="small text-muted italic">입력된 내용이 없습니다.</div>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
 
@@ -200,16 +185,21 @@
                                 <h6 class="fw-bold m-0">응답자 목록</h6>
                             </div>
                             <div class="list-group list-group-flush overflow-auto" style="max-height: calc(100vh - 250px);">
-                                <button v-for="res in respondentList" :key="res.resultsId" 
-                                    type="button" 
-                                    class="list-group-item list-group-item-action py-3 border-start-0 border-end-0"
+                                <div v-for="res in respondentList" :key="res.resultsId" 
+                                    class="list-group-item list-group-item-action py-3 border-start-0 border-end-0 cursor-pointer"
                                     :class="{'active bg-primary border-primary': selectedResId === res.resultsId}"
                                     @click="fetchIndividualDetail(res.resultsId)">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div class="small fw-bold">{{ String(res.resultsId).substring(0, 8) }}...</div>
-                                        <span class="small" :class="selectedResId === res.resultsId ? 'text-white-50' : 'text-muted'">{{ res.registDt }}</span>
+                                        <div class="d-flex align-items-center">
+                                            <span class="small me-2" :class="selectedResId === res.resultsId ? 'text-white-50' : 'text-muted'">{{ res.registDt }}</span>
+                                            <button type="button" class="btn btn-sm btn-link p-0 text-danger opacity-75 hover-opacity-100" 
+                                                @click.stop="deleteResponse(res.resultsId)">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
                                     </div>
-                                </button>
+                                </div>
                                 <div v-if="!respondentList.length" class="p-5 text-center text-muted">응답 데이터가 없습니다.</div>
                             </div>
                         </div>
@@ -309,12 +299,12 @@
                 const individualMapInstances = {};
 
                 // Find total responses (approx)
-                if (Object.keys(stats.value).length > 0) {
+                if (stats.value && Object.keys(stats.value).length > 0) {
                    const firstKey = Object.keys(stats.value)[0];
                    const data = stats.value[firstKey];
                    if (Array.isArray(data)) totalResponses.value = data.length;
-                   else if (typeof data === 'object') {
-                       totalResponses.value = Object.values(data).reduce((a, b) => a + b, 0);
+                   else if (data && typeof data === 'object') {
+                       totalResponses.value = Object.values(data).reduce((a, b) => a + (typeof b === 'number' ? b : 0), 0);
                    }
                 }
 
@@ -328,24 +318,29 @@
                     return names[type] || type;
                 };
 
-                const getLabelCount = (qId, lId) => (stats.value[qId] && stats.value[qId][lId]) || 0;
+                const getLabelCount = (qId, lId) => (stats.value && stats.value[qId] && stats.value[qId][lId]) || 0;
                 const getLabelPercent = (qId, lId) => {
-                    const qStats = stats.value[qId] || {};
+                    if (!stats.value || !stats.value[qId]) return 0;
+                    const qStats = stats.value[qId];
                     const total = Object.values(qStats).reduce((a, b) => a + (typeof b === 'number' ? b : 0), 0);
-                    return total === 0 ? 0 : (( ( (lId === 'OTHER') ? getOtherCount(qId) : getLabelCount(qId, lId) ) / total) * 100).toFixed(1);
+                    if (total === 0) return 0;
+                    const count = (lId === 'OTHER') ? getOtherCount(qId) : getLabelCount(qId, lId);
+                    return ((count / total) * 100).toFixed(1);
                 };
-                const getOtherCount = (qId) => (stats.value[qId] && stats.value[qId]['OTHER']) || 0;
-                const getOtherTexts = (qId) => stats.value[qId + '_other_texts'] || [];
-                const showOtherDetails = (qId) => {
-                    if (selectedOtherQId.value === qId) selectedOtherQId.value = null;
-                    else if (getOtherCount(qId) > 0) selectedOtherQId.value = qId;
-                };
-                const getTextResponses = (qId) => (stats.value[qId] && Array.isArray(stats.value[qId])) ? stats.value[qId] : [];
-                const getLocationResponses = (qId) => (stats.value[qId] && Array.isArray(stats.value[qId])) ? stats.value[qId] : [];
+                const getOtherCount = (qId) => (stats.value && stats.value[qId] && stats.value[qId]['OTHER']) || 0;
+                const getOtherTexts = (qId) => (stats.value && stats.value[qId + '_other_texts']) || [];
+                const getTextResponses = (qId) => (stats.value && stats.value[qId] && Array.isArray(stats.value[qId])) ? stats.value[qId] : [];
+                const getLocationResponses = (qId) => (stats.value && stats.value[qId] && Array.isArray(stats.value[qId])) ? stats.value[qId] : [];
                 const formatDate = (dateStr) => dateStr ? dateStr.substring(0, 10) : '-';
 
                 const goMaster = () => location.href = '/mgt/survey/manageSurveyMenu.do?surveyId=' + survey.value.surveyId;
                 const downloadExcel = () => alert('엑셀 다운로드 기능은 준비 중입니다.');
+
+                const switchToSummary = async () => {
+                    viewMode.value = 'summary';
+                    await nextTick();
+                    setTimeout(initCharts, 200);
+                };
 
                 const switchToIndividual = async () => {
                     viewMode.value = 'individual';
@@ -390,6 +385,37 @@
                     } catch (e) { console.error(e); }
                 };
 
+                const deleteResponse = async (rid) => {
+                    if (!confirm('이 응답을 삭제하시겠습니까? 관련 통계 데이터에서도 제외됩니다.')) return;
+                    
+                    try {
+                        const formData = new FormData();
+                        formData.append('surveyId', survey.value.surveyId);
+                        formData.append('resultsId', rid);
+                        
+                        const res = await axios.post('/mgt/survey/deleteResponse.do', formData);
+                        if (res.data.status === 'success') {
+                            alert('삭제되었습니다.');
+                            // Remove from local list
+                            respondentList.value = respondentList.value.filter(r => r.resultsId !== rid);
+                            
+                            // If deleted item was selected, select next
+                            if (selectedResId.value === rid) {
+                                if (respondentList.value.length > 0) {
+                                    fetchIndividualDetail(respondentList.value[0].resultsId);
+                                } else {
+                                    selectedResId.value = null;
+                                    individualAnswers.value = {};
+                                }
+                            }
+                            // Note: Summary stats are typically cached or require full refresh. 
+                            // For simplicity, we suggest user refresh page for summary updates.
+                        } else {
+                            alert(res.data.message);
+                        }
+                    } catch (e) { console.error(e); alert('삭제 실패'); }
+                };
+
                 const isItemSelected = (qId, lId) => {
                     const ans = individualAnswers.value[qId];
                     if (Array.isArray(ans)) return ans.includes(lId);
@@ -405,12 +431,12 @@
                                 type: q.questionType === 'inputRadio' ? 'pie' : 'bar',
                                 data: {
                                     labels: [
-                                        ...q.labels.map(l => l.questionLabel),
+                                        ...(q.labels || []).map(l => l.questionLabel),
                                         ...(q.otherAnswer === 'Y' ? ['기타'] : [])
                                     ],
                                     datasets: [{
                                         data: [
-                                            ...q.labels.map(l => getLabelCount(q.questionId, l.questionLabelId)),
+                                            ...(q.labels || []).map(l => getLabelCount(q.questionId, l.questionLabelId)),
                                             ...(q.otherAnswer === 'Y' ? [getOtherCount(q.questionId)] : [])
                                         ],
                                         backgroundColor: ['#49a7b0', '#2b4b8a', '#ffc107', '#fd7e14', '#198754', '#0dcaf0', '#adb5bd']
@@ -444,10 +470,10 @@
 
                 return {
                     survey, stats, totalResponses, viewMode, getTypeName, getLabelCount, getLabelPercent,
-                    getOtherCount, getOtherTexts, selectedOtherQId, showOtherDetails,
+                    getOtherCount, getOtherTexts,
                     getTextResponses, getLocationResponses, formatDate,
                     goMaster, downloadExcel, focusMap,
-                    respondentList, selectedResId, individualAnswers, switchToIndividual, fetchIndividualDetail, isItemSelected
+                    respondentList, selectedResId, individualAnswers, switchToSummary, switchToIndividual, fetchIndividualDetail, isItemSelected, deleteResponse
                 };
             }
         });

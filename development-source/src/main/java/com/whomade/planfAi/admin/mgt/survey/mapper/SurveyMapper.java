@@ -137,4 +137,14 @@ public interface SurveyMapper {
          */
         List<com.whomade.planfAi.admin.mgt.survey.vo.TbResultsLabel> selectRespondentLabelDetail(
                         java.util.Map<String, Object> params);
+
+        /**
+         * 특정 응답(ResultsId) 삭제
+         */
+        int deleteResultsByResultsId(String surveyId, int resultsId);
+
+        /**
+         * 특정 응답(ResultsId)의 라벨 선택 데이터 삭제
+         */
+        int deleteResultsLabelByResultsId(String surveyId, int resultsId);
 }

@@ -241,4 +241,25 @@ public class SurveyController {
             @org.springframework.web.bind.annotation.RequestParam String resultsId) {
         return surveyService.getRespondentDetail(surveyId, resultsId);
     }
+
+    /**
+     * 특정 응답 삭제 (API)
+     */
+    @org.springframework.web.bind.annotation.PostMapping("/deleteResponse.do")
+    @org.springframework.web.bind.annotation.ResponseBody
+    public Map<String, Object> deleteResponse(
+            @org.springframework.web.bind.annotation.RequestParam String surveyId,
+            @org.springframework.web.bind.annotation.RequestParam int resultsId) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            surveyService.deleteSurveyResponse(surveyId, resultsId);
+            result.put("status", "success");
+            result.put("message", "삭제되었습니다.");
+        } catch (Exception e) {
+            log.error("Response Delete Error", e);
+            result.put("status", "error");
+            result.put("message", "삭제 중 오류가 발생했습니다: " + e.getMessage());
+        }
+        return result;
+    }
 }

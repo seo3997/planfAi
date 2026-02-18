@@ -345,4 +345,15 @@
         WHERE SURVEY_ID = #{surveyId} AND RESULTS_ID = #{resultsId}
     </select>
 
+    <!-- 특정 응답 삭제 -->
+    <delete id="deleteResultsByResultsId">
+        DELETE FROM tb_results 
+        WHERE SURVEY_ID = #{surveyId} AND RESULTS_ID = #{resultsId}
+    </delete>
+
+    <delete id="deleteResultsLabelByResultsId">
+        DELETE FROM tb_results_label 
+        WHERE SURVEY_ID = #{surveyId} AND RESULTS_ID = #{resultsId}
+    </delete>
+
 </mapper>

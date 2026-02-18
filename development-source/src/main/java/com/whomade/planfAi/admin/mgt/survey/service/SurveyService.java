@@ -424,4 +424,13 @@ public class SurveyService {
 
         return detail;
     }
+
+    /**
+     * 특정 응답 삭제 (응답 + 라벨)
+     */
+    @Transactional
+    public void deleteSurveyResponse(String surveyId, int resultsId) {
+        surveyMapper.deleteResultsLabelByResultsId(surveyId, resultsId);
+        surveyMapper.deleteResultsByResultsId(surveyId, resultsId);
+    }
 }
