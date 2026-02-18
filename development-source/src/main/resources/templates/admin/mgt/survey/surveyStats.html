@@ -36,8 +36,10 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-muted" :href="'/mgt/survey/editEntryForm.do?surveyId=' + survey.surveyId">
+                <a class="nav-link" :class="survey.opened === 'OPENED' ? 'disabled text-secondary opacity-50' : 'text-muted'" 
+                   :href="survey.opened === 'OPENED' ? 'javascript:void(0)' : '/mgt/survey/editEntryForm.do?surveyId=' + survey.surveyId">
                     질문 (Questions)
+                    <i v-if="survey.opened === 'OPENED'" class="bi bi-lock-fill small ms-1"></i>
                 </a>
             </li>
              <li class="nav-item">
